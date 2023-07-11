@@ -1,0 +1,36 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~nouislider/distribute/nouislider.min.css";
+body, app-root {
+   display: flex;
+   min-height: 100vh;
+   -webkit-flex-direction: column;
+   flex-direction: column;
+}
+
+#loading-container {
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    justify-content: center;
+    -webkit-justify-content: center;
+    min-height: 100vh;
+    min-width: 100vw;
+}
+
+.fill-parent {
+    min-width: 100vw;
+    min-height: 80vh;
+}
+
+.bg-light-grey {
+    background-color: #e0e0e0 !important;
+}
+
+.display-none {
+    display: none;
+}
+
+
+.view-container {
+    min-width: 98vw;
+}

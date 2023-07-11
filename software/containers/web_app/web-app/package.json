@@ -1,0 +1,72 @@
+{
+  "name": "tart-app",
+  "version": "1.1.0b6",
+  "license": "MIT",
+  "angular-cli": {},
+  "scripts": {
+    "ng": "ng",
+    "raspberry-build": "ng build --prod --source-map --stats-json --base-href /dev/",
+    "pear-build": "ng build --prod --source-map --stats-json --base-href /signal/",
+    "orange-build": "ng build --prod --source-map --stats-json --base-href /lab/",
+    "start": "ng serve --proxy-config proxy.conf.json",
+    "test": "ng test",
+    "pree2e": "webdriver-manager update --standalone false --gecko false",
+    "e2e": "protractor",
+    "bundle-report": "webpack-bundle-analyzer dist/stats.json"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^7.2.6",
+    "@angular/compiler": "^7.2.6",
+    "@angular/core": "^7.2.6",
+    "@angular/forms": "^7.2.6",
+    "@angular/http": "^7.2.6",
+    "@angular/platform-browser": "^7.2.6",
+    "@angular/platform-browser-dynamic": "^7.2.6",
+    "@angular/router": "^7.2.6",
+    "@ngx-loading-bar/core": "^4.1.1",
+    "@ngx-loading-bar/http": "^4.1.1",
+    "core-js": "^2.6.5",
+    "gifshot": "^0.4.5",
+    "moment": "^2.24.0",
+    "ng2-charts": "^1.6.0",
+    "ng2-nouislider": "^1.7.13",
+    "ngx-popover": "0.0.16",
+    "nouislider": "^13.1.1",
+    "rxjs": "^6.4.0",
+    "rxjs-compat": "^6.4.0",
+    "ts-helpers": "^1.1.1",
+    "vis_imaging": "file:api_imaging",
+    "zone.js": "^0.8.29"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^0.13.2",
+    "@angular/cli": "^7.3.2",
+    "@angular/compiler-cli": "^7.2.6",
+    "@types/jasmine": "3.3.9",
+    "@types/node": "^11.9.4",
+    "codelyzer": "4.5.0",
+    "jasmine-core": "3.3.0",
+    "jasmine-spec-reporter": "4.2.1",
+    "karma": "^4.0.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-cli": "^2.0.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-remap-istanbul": "^0.6.0",
+    "nyc": "^13.3.0",
+    "protractor": "^5.4.2",
+    "snyk": "^1.134.2",
+    "ts-node": "8.0.2",
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.4",
+    "webpack-bundle-analyzer": "^3.0.4"
+  },
+  "nouislider": {
+    "main": "distribute/nouislider.js",
+    "defaultExtension": "js"
+  },
+  "ng2-nouislider": {
+    "main": "src/nouislider.js",
+    "defaultExtension": "js"
+  }
+}
