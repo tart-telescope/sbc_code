@@ -43,7 +43,7 @@ services:
 
     api_container:
         build: 
-            context: ./software/containers/telescope_web_api
+            context: ./containers/telescope_web_api
         volumes:
             -   data-volume:/telescope_data
             -   ~/tart_web_api_store:/app
@@ -64,7 +64,7 @@ services:
 
     api_doc_server:
         build:
-            context: ./software/containers/telescope_web_api
+            context: ./containers/telescope_web_api
             dockerfile: Dockerfile.apidoc 
         ports: 
             - 8080:80
