@@ -1,9 +1,19 @@
 #
 #
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:20 as build-stage
+FROM debian:bookworm as build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG tart_name
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# debian setup
+RUN apt-get update -y && apt-get install -y \
+    curl \
+    npm
+
+RUN rm -rf /var/lib/apt/lists/*
+
 
 RUN mkdir /code
 WORKDIR /code
@@ -14,8 +24,8 @@ COPY ./web-app/package*.json /code/
 COPY ./web-app/api_imaging /code/api_imaging
 
 ENV npm_config_jobs=2
-RUN npm install
 RUN npm update --legacy-peer-deps
+RUN npm install
 RUN npm ci
 
 

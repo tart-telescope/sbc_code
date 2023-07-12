@@ -1,6 +1,16 @@
 # Stage 0, "build-stage", build the documentation
-FROM node:10 as build-stage
+FROM debian:bookworm as build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
+ARG tart_name
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# debian setup
+RUN apt-get update -y && apt-get install -y \
+    curl \
+    npm
+
+RUN rm -rf /var/lib/apt/lists/*
 
 RUN npm install apidoc -g
 
