@@ -23,10 +23,10 @@ ENV PATH /code/node_modules/.bin:$PATH
 COPY ./web-app/package*.json /code/
 COPY ./web-app/api_imaging /code/api_imaging
 
+ENV NODE_OPTIONS=--openssl-legacy-provider 
+
 ENV npm_config_jobs=2
-RUN npm update --legacy-peer-deps
 RUN npm install
-RUN npm ci
 
 
 COPY ./web-app /code
