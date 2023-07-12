@@ -7,6 +7,7 @@ RUN apt-get update -y && apt-get install -y \
     curl \
     python3-python-flask-jwt-extended \
     python3-pip \
+    python3-venv \
     python3-requests \
     python3-dateutil \
     python3-matplotlib \
@@ -21,8 +22,12 @@ RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./python_code /python_code
 
-RUN pip3 install -U setuptools --break-system-packages
-RUN pip3 install tart tart_tools --break-system-packages
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+RUN pip3 install -U setuptools
+RUN pip3 install tart tart_tools 
 
 WORKDIR /python_code/tart_hardware_interface
 RUN python3 setup.py install

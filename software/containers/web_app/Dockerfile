@@ -1,7 +1,7 @@
 #
 #
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:10 as build-stage
+FROM node:20 as build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG tart_name
 
@@ -14,6 +14,8 @@ COPY ./web-app/package*.json /code/
 COPY ./web-app/api_imaging /code/api_imaging
 
 ENV npm_config_jobs=2
+RUN npm install
+RUN npm update --legacy-peer-deps
 RUN npm ci
 
 
