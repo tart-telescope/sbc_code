@@ -8,7 +8,7 @@ CPPFLAGS ?= -E -nostdinc -I$(INCLUDE_DIR) -undef -D__DTS__ -x assembler-with-cpp
 all: build/quartz64b  $(DTBS)
 	
 install:
-	sudo cp tart.dtbo /boot/dtbo
+	sudo cp build/quartz64b/tart.dtbo /boot/dtbo
 	sudo u-boot-update
 
 build:
