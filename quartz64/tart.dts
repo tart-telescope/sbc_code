@@ -7,7 +7,7 @@
 /dts-v1/;
 /plugin/;	/* Identifies this as an overlay */
 
-&spi1 {
+&spi0 {
 	/* We are modifying the spi1 node of the base tree */
 	/* Set the pin muxes to the M1 mux configuration */
 	/* The next two are already set in the base tree we're overlaying onto,
@@ -21,7 +21,7 @@
 	status = "okay";	/* Enable the spi1 node of rk356x.dtsi */
 
 	spidev: spidev@0 {
-		compatible = "TART-3";
+		compatible = "TART";
 		reg = <0>;
 	};
 };

@@ -1,6 +1,7 @@
 ## Quartz64 Installation 
 
 For the Pine64 single board computer, there are some specific hardware requirements.
+https://github.com/Plebian-Linux/quartz64-images/issues/32
 
 
 ## SPI Device Tree
