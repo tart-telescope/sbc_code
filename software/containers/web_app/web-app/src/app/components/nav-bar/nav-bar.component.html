@@ -1,0 +1,53 @@
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+    <button class="navbar-toggler navbar-toggler-right"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#" routerLink="/">TART</a>
+    <span class="text-white navbar-info navbar-text">{{name}}
+        <br>Latitude: {{lat}}&#176; Longitude: {{lng}}&#176; Altitude: {{alt}}m
+    </span>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li *ngIf="isLoggedIn" class="nav-item">
+                <a class="nav-link" href="#" routerLink="/home" (click)="onLogoutClick()" >Logout</a>
+            </li>
+            <li *ngIf="!isLoggedIn" class="nav-item">
+                <!--<popover-content #loginPopover
+                    id="loginPopover"
+                    [closeOnClickOutside]="true">
+                    <app-login></app-login>
+                </popover-content>-->
+<!--                <span id="loginBtn" [popover]="loginPopover" class="nav-link" href="#">Login</span>-->
+                <span id="loginBtn" class="nav-link" href="#">Login</span>
+            </li>
+        </ul>
+    </div>
+</nav>
+<ngx-loading-bar></ngx-loading-bar>
+<ul class="nav nav-tabs" *ngIf="isLoggedIn">
+    <li class="nav-item">
+        <a class="nav-link" href="#" routerLink="/off-mode" routerLinkActive="active text-primary bg-light-grey">Idle</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" routerLink="/diag-mode" routerLinkActive="active text-primary bg-light-grey">Diagnose</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" routerLink="/raw-data-mode" routerLinkActive="active text-primary bg-light-grey">Raw Data</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" routerLink="/vis-data-mode" routerLinkActive="active text-primary bg-light-grey">Vis Data</a>
+    </li>
+    <!--li class="nav-item">
+        <a class="nav-link" href="#" routerLink="/calibrate-mode" routerLinkActive="active text-primary bg-light-grey">Calibrate</a>
+    </li-->
+    <!-- rtn sync mode -->
+    <!--li class="nav-item">
+        <a class="nav-link" href="#" routerLink="/hd-img-mode" routerLinkActive="active text-primary bg-light-grey">Harddrive Image</a>
+    </li-->
+</ul>

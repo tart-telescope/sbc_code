@@ -1,0 +1,26 @@
+<div id="info-container" class="bg-light-grey container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <strong>Mode:</strong> {{mode}}
+        </div>
+        <div class="col-12 col-sm-6 col-md-4">
+            <strong>L0 frequency [GHz]:</strong> {{l0Freq | number: '.8-8'}}
+        </div>
+        <div class="col-12 col-sm-6 col-md-4">
+            <strong>Operating Frequency [GHz]:</strong> {{operationFreq | number: '.8-8'}}
+        </div>
+        <div class="col-12 col-sm-6 col-md-4">
+            <strong>Number of Antennae:</strong> {{numAntenna}}
+        </div>
+        <div class="col-12 col-sm-6 col-md-4">
+            <strong>Bandwidth [MHz]:</strong> {{bandwidth | number: '.5-5'}}
+        </div>
+        <div class="col-12 col-sm-6 col-md-4">
+            <strong>Baseband Frequency [MHz]:</strong> {{basebandFreq | number: '.5-5'}}
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4">
+            <strong>Sampling Frequency [MHz]:</strong> {{samplingFreq | number: '.5-5'}}
+        </div>
+    </div>
+</div>

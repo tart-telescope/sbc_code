@@ -1,0 +1,110 @@
+#imaging-container {
+    clear: both;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    justify-content: space-around;
+    -webkit-justify-content: space-around;
+    align-content: space-between;
+    -webkit-align-content: space-between;
+    width: 100%;
+    margin: 0 auto;
+    margin-bottom: 8px;
+}
+#imaging-settings-container {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+}
+#synthesis-settings-container, #display-settings-container {
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+}
+
+#display-settings-container {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+}
+
+#imaging-canvas {
+    -webkit-order: 1;
+    order: 1;
+    -webkit-align-self: flex-start;
+    align-self: flex-start;
+}
+
+#gif-recorder-container, #imaging-config-container {
+    padding:  8px;
+    border: 1px solid black;
+    width: 100%;
+}
+
+#gif-recorder-container {
+    margin-top: 8px;
+    align-self: stretch;
+    -webkit-align-self: stretch;
+    height: 100%;
+}
+#imaging-inputs-container {
+    display: flex;
+    -webkit-display: flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    order: 2;
+    -webkit-order: 2;
+    flex-grow: 1;
+    -webkit-flex-grow: 1;
+    margin-left: 8px;
+}
+
+#gif-recorder-container {
+    align-self: flex-start;
+}
+
+#num-bins-input {
+    margin-left: 16px;
+}
+
+#save-img-btn {
+    float: right;
+}
+
+#hidden-image-downloader {
+    display:none;
+}
+
+@media (max-width: 479px) {
+    #image-recorded-timestamp {
+        display: block;
+    }
+    #save-img-btn {
+        margin-top: 8px;
+        float: left;
+    }
+}
+
+@media (max-width: 991px) {
+    #big-space {
+        margin-top:60px;
+    }
+    #imaging-canvas {
+        margin-top: 12px;
+    }
+
+    #imaging-config-container {
+        margin-top: 20px;
+        margin-left: auto;
+    }
+}

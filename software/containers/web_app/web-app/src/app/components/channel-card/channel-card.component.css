@@ -1,0 +1,11 @@
+.channel-card {
+    margin: 2px;
+    padding: 4px;
+}
+
+.channel-chart-display {
+    background-color: white;
+    padding: 8px;
+    margin: 0 auto;
+    border: 1px solid black;
+}

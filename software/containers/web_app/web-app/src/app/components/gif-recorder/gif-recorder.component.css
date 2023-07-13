@@ -1,0 +1,68 @@
+#imaging-recorder-container {
+    display: flex;
+    -webkit-display: flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    height: 100%;
+}
+
+#imaging-recorder-content {
+    display:flex;
+    -webkit-display: flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    flex-grow: 1;
+    -webkit-flex-grow: 1;
+}
+
+#imaging-recorder-display-container {
+    flex-grow: 1;
+    -webkit-flex-grow: 1;
+}
+
+#gif-display {
+    min-height: 250px;
+    min-width: 250px;
+    height: 100%;
+}
+
+#imaging-recorder-btn-container {
+    display:flex;
+    -webkit-display: flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    margin-left: 8px;
+}
+#imaging-recorder-btn-container > button {
+    margin-top: 8px;
+    width: 100%;
+}
+
+#hidden-gif-downloader {
+    display: hidden;
+}
+
+.imaging-recorder-info-row {
+    display: flex;
+    -webkit-display: flex;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    justify-content:flex-start;
+}
+
+.imaging-recorder-info-output {
+    margin-left: 4px;
+}
+
+@media (max-width: 427px) {
+    #gif-display {
+        display: block;
+        margin: 0 auto;
+    }
+}

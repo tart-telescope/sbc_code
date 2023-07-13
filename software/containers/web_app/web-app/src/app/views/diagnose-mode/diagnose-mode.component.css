@@ -1,0 +1,20 @@
+.object-value {
+    margin: 0 12px 0 0;
+    font-size: 16px;
+}
+.string-value , .status-content {
+    margin: 0 0 20px 20px;
+}
+.status-row {
+    margin-bottom: 16px;
+}
+.inline-btn {
+    display: inline !important;
+}
+.status-content {
+    padding:0px;
+}
+
+#status-report-header {
+    margin: 16px 16px 40px 16px;
+}
