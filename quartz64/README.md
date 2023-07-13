@@ -7,7 +7,7 @@ For the Pine64 single board computer, there are some specific hardware requireme
 
 See https://github.com/CounterPillow/overlay-examples/blob/main/quartz64b/mcp4821.dts
 
-    sudo apt install -y build-essential device-tree-compiler devicetrees-plebian-quartz64
+    sudo apt install -y build-essential linux-source device-tree-compiler devicetrees-plebian-quartz64
     make
 
 Simply place the .dtbo file into the /boot/dtbo/ directory, creating said directory if it doesn't already exist. 
