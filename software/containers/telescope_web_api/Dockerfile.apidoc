@@ -23,7 +23,7 @@ RUN apidoc -i ./ -o /doc
 
 
 # Stage 1, based on Nginx, to have only the compiled documentation, served by nginx
-FROM nginx:1.15
+FROM nginx:1
 
 COPY --from=build-stage /doc/ /usr/share/nginx/html
 

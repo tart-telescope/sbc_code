@@ -18,16 +18,20 @@ RUN apt-get update -y && apt-get install -y \
     python3-astropy \
     python3-healpy 
 
+RUN apt-get install -y libhdf5-dev python3-pkgconfig
+
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./python_code /python_code
 
 ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
+RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip3 install -U setuptools
-RUN pip3 install tart tart_tools 
+RUN pip install -U pip setuptools wheel
+RUN pip install tart 
+RUN pip install tart_tools 
+
 
 WORKDIR /python_code/tart_hardware_interface
 RUN python3 setup.py install

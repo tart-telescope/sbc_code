@@ -37,13 +37,13 @@ COPY ./web-app /code
 # ENV npm_config_jobs=2
 # RUN npm install
 
-RUN npm run ng -- build --source-map --base-href=/${tart_name}/ 
-#RUN npm run ng -- build --prod -sm --base-href=/${tart_name}/ 
+#RUN npm run ng -- build --source-map --base-href=/${tart_name}/ 
+RUN npm run ng -- build --prod  --base-href=/${tart_name}/ 
 
 #
 #
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.15
+FROM nginx:1
 ARG tart_name
 
 COPY --from=build-stage /code/dist/ /var/www/html
