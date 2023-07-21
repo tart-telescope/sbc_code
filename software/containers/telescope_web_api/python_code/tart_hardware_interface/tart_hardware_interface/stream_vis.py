@@ -59,7 +59,6 @@ def get_data(tart):
 def capture_loop(tart, process_queue, cmd_queue, runtime_config, logger=None,):
     tart.reset()
     tart.read_status(True)
-    permutation = tart.load_permute()
     tart.debug(on=False, shift=False, count=False, noisy=True)
     tart.read_status(True)
     tart.capture(on=True, noisy=False)

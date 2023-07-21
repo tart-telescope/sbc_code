@@ -22,7 +22,6 @@ RUN apt-get install -y libhdf5-dev python3-pkgconfig
 
 RUN rm -rf /var/lib/apt/lists/*
 
-
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
@@ -30,6 +29,8 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install -U pip setuptools wheel
 RUN pip install tart 
 RUN pip install tart_tools 
+
+ENV CONFIG_DIR=/config_data
 
 COPY ./python_code /python_code
 WORKDIR /python_code/tart_hardware_interface
