@@ -1,15 +1,23 @@
 import spidev
+import importlib.resources
 
 import numpy as np
 import time
 
-import importlib.resources
+
+from tart_hardware_interface.tart_dummy_spi import TartDummySPI
 
 PERMUTE_FILE='permute.txt'
 
 def tobin(arr):
   return [bin(i) for i in arr]
 
+def create_spi_object(speed=32000000):
+  try:
+    return TartSPI(speed)
+  except Exception as e:
+    return TartDummySPI(speed)
+  
 
 class TartSPI(object):
   '''Command for configuring, and querying TART hardware.'''

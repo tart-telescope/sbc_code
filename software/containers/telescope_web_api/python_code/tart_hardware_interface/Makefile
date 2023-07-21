@@ -1,5 +1,8 @@
-develop:
-	sudo python setup.py develop
+develop: venv
+	$(VENV)/python setup.py develop
+
+test:	venv
+	$(VENV)/python test/testbench.py
 
 dist:
 	cp ../../../hardware/FPGA/tart_spi/data/permute.txt tart_hardware_interface/permute.txt
@@ -10,3 +13,7 @@ test_upload: dist
 
 upload: dist
 	twine upload --repository pypi dist/*
+
+.PHONY: test
+
+include Makefile.venv

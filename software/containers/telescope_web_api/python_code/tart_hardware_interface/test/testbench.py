@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from tart_hardware_interface.tartspi import TartSPI
+from tart_hardware_interface.tartspi import create_spi_object
 
 import numpy as np
 import time
@@ -30,7 +30,7 @@ if __name__ == '__main__':
   num_words = np.power(2, args.bramexp)
 
   # Initialise the TART hardware, and place it into a known state.
-  tart = TartSPI(speed=args.speed*1000000)
+  tart = create_spi_object(speed=args.speed*1000000)
   tart.reset()
   tart.debug(on= True, shift=args.shifter, count=args.counter, noisy=args.verbose)
   tart.debug(on=False, shift=args.shifter, count=args.counter, noisy=args.verbose)
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     diffs = (resp_dec[1:]-resp_dec[:-1])
     diffssum = diffs.__ne__(1).sum()
     print(diffs)
-    print(('yo,', resp_dec[diffs.__ne__(1)]))
+    print(('yo,', resp_dec[1:][diffs.__ne__(1)]))
     print(('sum_of_errors: ', diffssum))
     index = np.arange(len(diffs))
     print((diffs[diffs.__ne__(1)]))
