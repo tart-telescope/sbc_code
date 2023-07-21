@@ -1,5 +1,5 @@
 # Stage 0, "build-stage", build the documentation
-FROM debian:bookworm as build-stage
+FROM node:16 as build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG tart_name
 
