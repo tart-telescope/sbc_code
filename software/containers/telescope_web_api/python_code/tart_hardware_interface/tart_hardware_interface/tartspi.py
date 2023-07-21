@@ -1,7 +1,6 @@
 import spidev
 import logging
-
-import importlib.resources
+import os
 
 import numpy as np
 import time
@@ -11,16 +10,23 @@ from tart_hardware_interface.tart_dummy_spi import TartDummySPI
 
 PERMUTE_FILE='permute.txt'
 
+def load_permute(filepath=PERMUTE_FILE, noisy=False):
+  '''Load a permutation vector from the file at the given filepath.'''
+  filepath = os.path.join(os.environ["CONFIG_DIR"], PERMUTE_FILE);
+  pp = np.loadtxt(filepath, dtype='int')
+  return pp
+
 def tobin(arr):
   return [bin(i) for i in arr]
 
 def create_spi_object(speed=32000000):
+  perm = load_permute()
   try:
-    return TartSPI(speed)
+    return TartSPI(perm, speed)
   except Exception as e:
     logging.exception(e)
     logging.warn('USING DUMMY SPI MODULE.')
-    return TartDummySPI(speed)
+    return TartDummySPI(perm, speed)
   
 
 class TartSPI(object):
@@ -64,14 +70,13 @@ class TartSPI(object):
   ##--------------------------------------------------------------------------
   ##  TART SPI interface commands.
   ##--------------------------------------------------------------------------
-  def __init__(self, speed=32000000):
+  def __init__(self, permute, speed=32000000):
     self.spi = spidev.SpiDev()
     self.spi.open(0, 0)
     self.spi.mode = 0b00
     self.spi.bits_per_word = 8
     self.spi.max_speed_hz = int(speed)
-    self.perm = None
-    self.load_permute()
+    self.perm = permute
 
   def close(self, noisy=False):
     self.spi.close()
@@ -428,12 +433,5 @@ class TartSPI(object):
       arr[i] = x
     return arr
 
-  def load_permute(self, filepath=PERMUTE_FILE, noisy=False):
-    '''Load a permutation vector from the file at the given filepath.'''
-    if self.perm is None:
-      permute_txt = importlib.resources.files('tart_hardware_interface').joinpath(PERMUTE_FILE).read_text()
-      pp = np.fromstring(permute_txt, dtype='int')
-      self.perm = pp
-    return self.perm
 
 #endclass TartSPI

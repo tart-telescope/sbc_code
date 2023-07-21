@@ -45,8 +45,9 @@ class TartDummySPI(object):
   ##--------------------------------------------------------------------------
   ##  TART SPI interface commands.
   ##--------------------------------------------------------------------------
-  def __init__(self, speed=32000000):
-      pass
+  def __init__(self, permute, speed=32000000):
+    self.perm = permute
+    pass
 
   def close(self, noisy=False):
     return 1
@@ -392,9 +393,4 @@ class TartDummySPI(object):
         x = -x
       arr[i] = x
     return arr
-
-  def load_permute(self, filepath='test', noisy=False):
-    '''Load a permutation vector from the file at the given filepath.'''
-    self.perm = 1
-    return self.perm
 

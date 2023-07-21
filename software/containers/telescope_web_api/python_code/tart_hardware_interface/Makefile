@@ -1,7 +1,8 @@
 develop: venv
 	$(VENV)/python setup.py develop
 
-test:	venv
+test:	export CONFIG_DIR=../../config_data
+test:
 	$(VENV)/python test/testbench.py
 
 dist:
