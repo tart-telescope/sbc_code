@@ -1,4 +1,6 @@
 import spidev
+import logging
+
 import importlib.resources
 
 import numpy as np
@@ -16,6 +18,8 @@ def create_spi_object(speed=32000000):
   try:
     return TartSPI(speed)
   except Exception as e:
+    logging.exception(e)
+    logging.warn('USING DUMMY SPI MODULE.')
     return TartDummySPI(speed)
   
 
