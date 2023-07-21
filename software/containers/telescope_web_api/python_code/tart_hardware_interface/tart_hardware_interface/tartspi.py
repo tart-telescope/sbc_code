@@ -3,9 +3,9 @@ import spidev
 import numpy as np
 import time
 
-import pkg_resources
+import importlib.resources
 
-PERMUTE_FILE=pkg_resources.resource_filename('tart_hardware_interface','permute.txt')
+PERMUTE_FILE='permute.txt'
 
 def tobin(arr):
   return [bin(i) for i in arr]
@@ -419,7 +419,8 @@ class TartSPI(object):
   def load_permute(self, filepath=PERMUTE_FILE, noisy=False):
     '''Load a permutation vector from the file at the given filepath.'''
     if self.perm is None:
-      pp = np.loadtxt(filepath, dtype='int')
+      permute_txt = importlib.resources.files('tart_hardware_interface').joinpath(PERMUTE_FILE).read_text()
+      pp = np.fromstring(permute_txt, dtype='int')
       self.perm = pp
     return self.perm
 
