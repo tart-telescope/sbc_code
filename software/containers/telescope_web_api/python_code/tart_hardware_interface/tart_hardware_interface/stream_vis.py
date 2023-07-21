@@ -115,6 +115,7 @@ def process_loop(process_queue, vis_queue, cmd_queue, runtime_config, logger=Non
         except Exception as e:
             logger.error("Processing Error %s" % str(e))
             logger.error(traceback.format_exc())
+            logger.error(f"Data: {data}")
     print('process_loop finished')
     return 1
 
