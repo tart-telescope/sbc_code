@@ -3,15 +3,6 @@ FROM node:16 as build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG tart_name
 
-ARG DEBIAN_FRONTEND=noninteractive
-
-# debian setup
-RUN apt-get update -y && apt-get install -y \
-    curl \
-    npm
-
-RUN rm -rf /var/lib/apt/lists/*
-
 RUN npm install apidoc -g
 
 COPY ./python_code/tart_web_api /code
