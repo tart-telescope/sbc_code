@@ -285,7 +285,7 @@ class TartControl():
             if vis is not None:
                 self.config['vis_current'] = create_direct_vis_dict(vis)
                 self.vislist.append(vis)
-                print('Updated visibilities N={}.'.format(len(self.vislist)))
+                # print('Updated visibilities N={}.'.format(len(self.vislist)))
                 
                 chunksize = self.config['vis']['chunksize']
                 if len(self.vislist) >= chunksize:
