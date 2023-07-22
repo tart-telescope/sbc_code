@@ -1,6 +1,6 @@
 <div id="login-form-row">
     <div class="input-group">
-        <input id="password-input" (keypress)="onPasswordKeyPress()" (keyup.enter)="onLoginClick()" [(ngModel)]="password" type="password" class="form-control" placeholder="Password">
+        <input id="password-input" (keypress)="onPasswordKeyPress()" (keyup.enter)="onLoginClick()" [(ngModel)]="password" type="password" class="form-control" placeholder="Password" autofocus>
     </div>
     <div>
         <input id="admin-login-btn" (click)="onLoginClick()" type="button" value="Login" class="btn btn-primary">

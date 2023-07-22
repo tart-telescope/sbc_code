@@ -12,6 +12,7 @@ import { KeysPipe } from './pipes/keys-pipe';
 import { DecimalPipe } from '@angular/common';
 import { NouisliderModule } from 'ng2-nouislider';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
+import { PopoverModule } from 'ngx-smart-popover';
 /** Services */
 import { ModeService } from './services/mode.service';
 import { AuthService } from './services/auth.service';
@@ -126,6 +127,7 @@ const appRoutes = [
     BrowserModule,
     FormsModule,
     HttpModule,
+    PopoverModule,
     HttpClientModule,
     NouisliderModule,
     ChartsModule

@@ -18,13 +18,14 @@
                 <a class="nav-link" href="#" routerLink="/home" (click)="onLogoutClick()" >Logout</a>
             </li>
             <li *ngIf="!isLoggedIn" class="nav-item">
-                <!--<popover-content #loginPopover
+                <popover-content #loginPopover
                     id="loginPopover"
-                    [closeOnClickOutside]="true">
+                    [animation]="true"
+                    [closeOnClickOutside]="true"
+                    [closeOnMouseOutside]="false">
                     <app-login></app-login>
-                </popover-content>-->
-<!--                <span id="loginBtn" [popover]="loginPopover" class="nav-link" href="#">Login</span>-->
-                <span id="loginBtn" class="nav-link" href="#">Login</span>
+                </popover-content>
+                <span id="loginBtn" [popoverOnHover]="false" [popover]="loginPopover" class="nav-link" href="#">Login</span>
             </li>
         </ul>
     </div>

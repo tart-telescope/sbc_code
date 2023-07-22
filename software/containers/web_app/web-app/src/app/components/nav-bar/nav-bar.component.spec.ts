@@ -6,6 +6,7 @@ import { DebugElement } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { LoadingBarHttpModule } from '@ngx-loading-bar/http';
+import { PopoverModule } from 'ngx-smart-popover';
 
 import { LoginComponent } from '../../views/login/login.component';
 import { NavBarComponent } from './nav-bar.component';
@@ -23,6 +24,7 @@ describe('NavBarComponent', () => {
         imports: [
             LoadingBarHttpModule,
             FormsModule,
+            PopoverModule,
             RouterModule.forRoot([])
         ],
         declarations: [ NavBarComponent, LoginComponent ],
