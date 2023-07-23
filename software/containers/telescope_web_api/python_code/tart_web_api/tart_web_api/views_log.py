@@ -4,7 +4,7 @@ from time import strftime
 
 from flask import request
 
-from tart_web_api.main import app
+from tart_web_api.app import app
 
 from logging.handlers import RotatingFileHandler
 

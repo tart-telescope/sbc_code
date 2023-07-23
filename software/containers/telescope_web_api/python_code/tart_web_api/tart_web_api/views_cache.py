@@ -1,4 +1,4 @@
-from tart_web_api.main import app
+from tart_web_api.app import app
 @app.after_request
 def add_header(r):
   """

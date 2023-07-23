@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager, jwt_required
 
 import numpy as np
 
-from tart_web_api.main import app
+from tart_web_api.app import app
 import tart_web_api.database as db
 
 @app.route('/status/fpga', methods=['GET',])

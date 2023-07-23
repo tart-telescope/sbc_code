@@ -34,16 +34,18 @@ ENV CONFIG_DIR=/config_data
 
 COPY ./python_code /python_code
 WORKDIR /python_code/tart_hardware_interface
-RUN python3 setup.py install
+RUN pip install .
 
 WORKDIR /python_code/tart_web_api
-RUN python3 setup.py install
+RUN pip install .
 
 COPY ./config_data /config_data
 WORKDIR /app
 ENV FLASK_APP=tart_web_api.main
 #ENV FLASK_DEBUG=1
+RUN pip install waitress
 
 EXPOSE 5000
+CMD ["waitress-serve", "--port=5000", "tart_web_api:app.app"]
 
-CMD flask run --no-reload -h0.0.0.0
+# CMD flask run --no-reload -h0.0.0.0

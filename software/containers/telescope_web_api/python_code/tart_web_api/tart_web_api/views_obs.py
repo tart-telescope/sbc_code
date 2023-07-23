@@ -1,5 +1,5 @@
 from flask import jsonify
-from tart_web_api.main import app
+from tart_web_api.app import app
 import tart_web_api.database as db
 
 @app.route('/raw/data')

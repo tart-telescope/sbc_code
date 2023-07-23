@@ -6,7 +6,7 @@ from flask_jwt_extended import jwt_required, \
     create_access_token, \
     create_refresh_token, get_jwt_identity
 
-from tart_web_api.main import app, jwt
+from tart_web_api.app import app, jwt
 
 import os
 if 'LOGIN_PW' in os.environ:
