@@ -74,6 +74,7 @@ class TartDummySPI(object):
     if noisy:
       for val in res:
         print('%s' % self.show_status(reg, val))
+    self.pause(duration=num/100000.0)
     return res
 
   def setbit(self, reg, bit, noisy=False):
