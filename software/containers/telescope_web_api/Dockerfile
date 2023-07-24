@@ -46,4 +46,4 @@ ENV FLASK_APP=tart_web_api.main
 RUN pip install waitress
 
 EXPOSE 5000
-CMD ["waitress-serve", "--threads 1", "--port=5000", "tart_web_api:app.app"]
+CMD ["waitress-serve", "--threads=1", "--port=5000", "tart_web_api:app.app"]
