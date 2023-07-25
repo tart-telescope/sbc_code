@@ -1,25 +1,29 @@
+COMPOSE="docker compose"
+
 network:
 	docker network create reverseproxy-nw
 
 build:
-	docker compose build
+	${COMPOSE} build
 
 up:
-	docker compose up
+	${COMPOSE} up --remove-orphans
+# check by pointing browser to http://localhost:9090/metrics
 
 down:
-	docker compose down
+	${COMPOSE} down
 
-new_tart:
-	docker compose exec headscale \
-	        headscale -n tartnamespace preauthkeys create --reusable --expiration 24h
+auth_key:
+	${COMPOSE} exec headscale \
+	        headscale --user tartnamespace preauthkeys create --reusable --expiration 24h
+	echo "make test_client AUTH_KEY=xxx
 
 test_client:
-	docker exec tailscale \
-		tailscale up --login-server http://172.16.1.108:9080 --authkey ${AUTH_KEY}
+	${COMPOSE} -f test-client.yml exec tailscale \
+		tailscale up --login-server http://dibbler:9080 --authkey ${AUTH_KEY}
 
 # Run this only once...
 namespace:
-	docker compose exec headscale \
+	${COMPOSE} exec headscale \
 		headscale namespaces create tartnamespace
 
