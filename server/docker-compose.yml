@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
     ## Now all these containers just need to be connected to the tailscale network
@@ -6,29 +6,48 @@ services:
     ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
     nginx-proxy:
         image: jwilder/nginx-proxy
+        networks:
+            reverseproxy-nw:
         ports:
-        - "8880:80"
+            - "8880:80"
         environment:
-        - DEFAULT_HOST=tart.api
+            - DEFAULT_HOST=tart.api
         volumes:
-        - /var/run/docker.sock:/tmp/docker.sock:ro
+            - /var/run/docker.sock:/tmp/docker.sock:ro
 
-    signal:
-        image: jwilder/whoami
-        expose:
-        - "8000"
-        environment:
-        - VIRTUAL_HOST=tart.api
-        - VIRTUAL_PORT=8000
-        - VIRTUAL_PATH=/signal
+    # The config file is in config/config.yaml
+    headscale:
+        image: headscale/headscale:latest
+        networks:
+            reverseproxy-nw:
+        volumes:
+            - ./config:/etc/headscale/
+            - ./data:/var/lib/headscale
+        command: headscale serve
+        ports:
+            - "9080:8080"
+            - "9090:9090"
+        restart: unless-stopped
+    # signal:
+    #     image: jwilder/whoami
+    #     expose:
+    #     - "8000"
+    #     environment:
+    #     - VIRTUAL_HOST=tart.api
+    #     - VIRTUAL_PORT=8000
+    #     - VIRTUAL_PATH=/signal
+    # 
+    # # curl -H "Host: tart.local" HTTP://localhost:8880/makhanda
+    # makhanda:
+    #     image: jwilder/whoami
+    #     expose:
+    #     - "8000"
+    #     environment:
+    #     - VIRTUAL_HOST=tart.api
+    #     - VIRTUAL_PORT=8000
+    #     - VIRTUAL_PATH=/makhanda
 
-    # curl -H "Host: tart.local" HTTP://localhost:8880/makhanda
-    makhanda:
-        image: jwilder/whoami
-        expose:
-        - "8000"
-        environment:
-        - VIRTUAL_HOST=tart.api
-        - VIRTUAL_PORT=8000
-        - VIRTUAL_PATH=/makhanda
-
+# docker network create reverseproxy-nw
+networks:
+    reverseproxy-nw:
+        external: true
