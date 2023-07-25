@@ -6,7 +6,7 @@ services:
     ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
     nginx-proxy:
         image: jwilder/nginx-proxy
-        networks:
+        netwrk:
             reverseproxy-nw:
         ports:
             - "8880:80"
