@@ -6,12 +6,13 @@ services:
     ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
     nginx-proxy:
         image: jwilder/nginx-proxy
-        netwrk:
+        networks:
             reverseproxy-nw:
         ports:
             - "8880:80"
         environment:
             - DEFAULT_HOST=tart.api
+            - TRUST_DOWNSTREAM_PROXY=true
         volumes:
             - /var/run/docker.sock:/tmp/docker.sock:ro
 
@@ -25,7 +26,7 @@ services:
             - ./data:/var/lib/headscale
         command: headscale serve
         ports:
-            - "9080:8080"
+            - "51820:8080"
             - "9090:9090"
         restart: unless-stopped
     # signal:

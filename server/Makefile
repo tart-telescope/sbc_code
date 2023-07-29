@@ -1,4 +1,5 @@
 COMPOSE="docker compose"
+USER=tart
 
 network:
 	docker network create reverseproxy-nw
@@ -15,8 +16,8 @@ down:
 
 auth_key:
 	${COMPOSE} exec headscale \
-	        headscale --user tartnamespace preauthkeys create --reusable --expiration 24h
-	echo "make test_client AUTH_KEY=xxx
+	        headscale --user ${USER} preauthkeys create --reusable --expiration 24h
+	echo "make test_client AUTH_KEY=xxx"
 
 test_client:
 	${COMPOSE} -f test-client.yml exec tailscale \
@@ -25,5 +26,4 @@ test_client:
 # Run this only once...
 namespace:
 	${COMPOSE} exec headscale \
-		headscale namespaces create tartnamespace
-
+		headscale namespaces create ${USER}

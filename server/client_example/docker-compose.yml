@@ -14,7 +14,7 @@ services:
             - sys_module
         command: tailscaled
         environment:
-            - TS_EXTRA_ARGS=--login-server=http://dibbler:9080
+            - TS_EXTRA_ARGS=--login-server=http://tart.elec.ac.nz:51820
             
         restart: unless-stopped
       
