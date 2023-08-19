@@ -2,6 +2,7 @@
 
 The worldwide network of TART telescopes are all available directly, but also available through a common web interface at http://tart.elec.ac.nz/<tart_name>, where <tart_name> is the unique name of each TART. How this is done is described here.
 
+## https://blog.gurucomputing.com.au/Reverse%20Proxies%20with%20Nginx%20Proxy%20Manager/Installing%20Nginx%20Proxy%20Manager/#routing-by-hostname
 
 ## Service Discovery
 
