@@ -367,6 +367,9 @@ class TartSPI(object):
 
   def set_blocksize_and_start(self, blocksize=24, overwrite=False, noisy=False):
     '''Set the correlator blocksize to 2^blocksize.\nNOTE: With `overwrite` enabled, the TART device can get itself into invalid states.'''
+    if self.spi is None:
+      return 1
+    
     if blocksize > 9 and blocksize < 25:
       if overwrite:
         ow = 0x40

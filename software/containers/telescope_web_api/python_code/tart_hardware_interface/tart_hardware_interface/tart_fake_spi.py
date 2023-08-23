@@ -24,6 +24,7 @@ class TartFakeSPI(TartSPI):
         '''
         return True
 
+
     def getbyte(self, reg, noisy=False):
         res = 0xFF
         return res
