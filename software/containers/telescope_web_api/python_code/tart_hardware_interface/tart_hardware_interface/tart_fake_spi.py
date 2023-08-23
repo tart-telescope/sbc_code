@@ -3,15 +3,16 @@
     from a model sky, then return this data
 '''
 import numpy as np
-from tartspi import TartSPI
 
-class tart_fake_spi(TartSPI):
+from .tartspi import TartSPI
+
+class TartFakeSPI(TartSPI):
     
     ##--------------------------------------------------------------------------
     ##  FAKE TART SPI interface.
     ##--------------------------------------------------------------------------
     def __init__(self, permute, speed=32000000):
-        self.super().__init__(permute, speed)
+        super().__init__(permute, speed)
     
 
     # Override reading of data
@@ -30,9 +31,9 @@ class tart_fake_spi(TartSPI):
         reg = int(reg) & 0x7f
         res = [0xFF for i in range(num)]
         if noisy:
-        for val in res:
-            print('%s' % self.show_status(reg, val))
-        self.pause(duration=num/100000.0)
+            for val in res:
+                print('%s' % self.show_status(reg, val))
+            self.pause(duration=num/100000.0)
         return res
 
     def vis_ready(self, noisy=False):
@@ -55,8 +56,8 @@ class tart_fake_spi(TartSPI):
         res = self.getbytes(self.VX_STREAM, 4*576)
         val = self.vis_convert(res)
         if noisy:
-        tim = time.time()
-        print(" Visibilities (@t = %g):\n%s (sum = %d)" % (tim, val[self.perm]-int(2**(self.blocksize-1)), sum(val)))
+            tim = time.time()
+            print(" Visibilities (@t = %g):\n%s (sum = %d)" % (tim, val[self.perm]-int(2**(self.blocksize-1)), sum(val)))
         return val
 
     def vis_convert(self, viz):

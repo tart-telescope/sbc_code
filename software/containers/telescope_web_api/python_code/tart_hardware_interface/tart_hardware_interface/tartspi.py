@@ -6,27 +6,10 @@ import numpy as np
 import time
 
 
-from tart_hardware_interface.tart_dummy_spi import TartDummySPI
-
-PERMUTE_FILE='permute.txt'
-
-def load_permute(filepath=PERMUTE_FILE, noisy=False):
-  '''Load a permutation vector from the file at the given filepath.'''
-  filepath = os.path.join(os.environ["CONFIG_DIR"], PERMUTE_FILE);
-  pp = np.loadtxt(filepath, dtype='int')
-  return pp
 
 def tobin(arr):
   return [bin(i) for i in arr]
 
-def create_spi_object(speed=32000000):
-  perm = load_permute()
-  try:
-    return TartSPI(perm, speed)
-  except Exception as e:
-    logging.exception(e)
-    logging.warn('USING DUMMY SPI MODULE.')
-    return TartDummySPI(perm, speed)
   
 
 class TartSPI(object):

@@ -26,7 +26,7 @@ from scipy.optimize import minimize
 
 import tart_web_api.database as db
 
-from tart_hardware_interface.tartspi import create_spi_object
+from tart_hardware_interface.util import create_spi_object
 
 
 from tart_hardware_interface.highlevel_modes_api import *
