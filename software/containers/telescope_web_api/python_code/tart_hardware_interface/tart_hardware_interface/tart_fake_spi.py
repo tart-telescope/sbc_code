@@ -2,6 +2,7 @@
     Inherit from tartspi and create fake data
     from a model sky, then return this data
 '''
+import logging
 import numpy as np
 
 from .tartspi import TartSPI
@@ -12,7 +13,7 @@ class TartFakeSPI(TartSPI):
     ##  FAKE TART SPI interface.
     ##--------------------------------------------------------------------------
     def __init__(self, permute, speed=32000000):
-        super().__init__(permute, speed)
+        super().__init__(permute, speed, True)
     
 
     # Override reading of data

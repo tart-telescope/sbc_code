@@ -53,16 +53,20 @@ class TartSPI(object):
   ##--------------------------------------------------------------------------
   ##  TART SPI interface commands.
   ##--------------------------------------------------------------------------
-  def __init__(self, permute, speed=32000000):
-    self.spi = spidev.SpiDev()
-    self.spi.open(0, 0)
-    self.spi.mode = 0b00
-    self.spi.bits_per_word = 8
-    self.spi.max_speed_hz = int(speed)
+  def __init__(self, permute, speed=32000000, fake=False):
+    if not fake:
+      self.spi = spidev.SpiDev()
+      self.spi.open(0, 0)
+      self.spi.mode = 0b00
+      self.spi.bits_per_word = 8
+      self.spi.max_speed_hz = int(speed)
+    else:
+      self.spi = None
     self.perm = permute
 
   def close(self, noisy=False):
-    self.spi.close()
+    if self.spi is not None:
+      self.spi.close()
     if noisy:
       print('SPI <-> TART interface closed.')
     return 1
