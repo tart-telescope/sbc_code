@@ -33,10 +33,10 @@ def load_permute(filepath=PERMUTE_FILE, noisy=False):
 '''
 def forward_map():
     filepath = os.path.join(os.environ["CONFIG_DIR"], 'telescope_config.json');
-    with open(filepath) as json_file
+    with open(filepath) as json_file:
         config = json.load(json_file)
     filepath = os.path.join(os.environ["CONFIG_DIR"], 'calibrated_antenna_positions.json');
-    with open(filepath) as json_file
+    with open(filepath) as json_file:
         positions = json.load(json_file)
     
     
