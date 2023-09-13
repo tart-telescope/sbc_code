@@ -2,10 +2,56 @@
     Inherit from tartspi and create fake data
     from a model sky, then return this data
 '''
+import json
+
 import logging
 import numpy as np
 
 from .tartspi import TartSPI
+
+from tart.imaging import visibility
+from tart.imaging import calibration
+from tart.imaging import antenna_model
+from tart.imaging import radio_source
+from tart.imaging import correlator
+from tart.imaging import location
+from tart.simulation import skymodel
+from tart.simulation import antennas
+from tart.simulation import radio
+from tart.simulation.simulator import get_vis_parallel, get_vis
+
+def load_permute(filepath=PERMUTE_FILE, noisy=False):
+  '''Load a permutation vector from the file at the given filepath.'''
+  filepath = os.path.join(os.environ["CONFIG_DIR"], PERMUTE_FILE);
+  pp = np.loadtxt(filepath, dtype='int')
+  return pp
+
+
+'''
+    Load the telescope configuration as well as the entenna positions. Then
+    calculate the visibilities from some moving point sources.
+'''
+def forward_map():
+    filepath = os.path.join(os.environ["CONFIG_DIR"], 'telescope_config.json');
+    with open(filepath) as json_file
+        config = json.load(json_file)
+    filepath = os.path.join(os.environ["CONFIG_DIR"], 'calibrated_antenna_positions.json');
+    with open(filepath) as json_file
+        positions = json.load(json_file)
+    
+    
+    n_ant = config['num_antenna']
+    n_vis = (n_ant * (n_ant - 1)) // 2
+
+    # Generate model visibilities according to specified point source positions
+    sim_sky= skymodel.Skymodel(0, location=loc,
+                               gps=0, thesun=0, known_cosmic=0)
+    sim_sky.add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
+    v_sim = get_vis(sim_sky, COR, RAD, ANTS, ANT_MODELS, SETTINGS, timestamp, mode=MODE)
+    sim_vis = calibration.CalibratedVisibility(v_sim)
+
+
+    return np.ones(n_vis)
 
 class TartFakeSPI(TartSPI):
     
@@ -55,6 +101,8 @@ class TartFakeSPI(TartSPI):
             Read back visibilities data.
             This should perform the ifft imaging...
         '''
+        vis = forward_map()
+        
         res = self.getbytes(self.VX_STREAM, 4*576)
         val = self.vis_convert(res)
         if noisy:

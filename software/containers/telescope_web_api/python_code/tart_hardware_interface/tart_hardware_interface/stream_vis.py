@@ -44,8 +44,7 @@ def get_vis_object(data, runtime_config):
             baselines.append([i, j])
             v_real = correlator.van_vleck_correction((-means[i]*means[j]) + corr_cos_i_cos_j[idx])
             v_imag = correlator.van_vleck_correction((-means[i]*means[j]) + corr_cos_i_sin_j[idx])
-            #v_real = (-means[i]*means[j]) + corr_cos_i_cos_j[idx]
-            #v_imag = (-means[i]*means[j]) + corr_cos_i_sin_j[idx]
+
             v_com = correlator.combine_real_imag(v_real, v_imag)
             v.append(v_com)
     vis = visibility.Visibility(config, timestamp)

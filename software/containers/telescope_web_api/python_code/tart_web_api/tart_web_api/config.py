@@ -4,7 +4,7 @@ import socket
 def init_config(manager):
     
     data_root = '/telescope_data'
-    config_root = '/config_data'
+    config_root = os.environ["CONFIG_DIR"]
 
     runtime_config = manager.dict()
     runtime_config['spi_speed'] = 32000000
