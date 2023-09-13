@@ -1,5 +1,5 @@
 DOCKER=/usr/bin/docker
-COMPOSE="/usr/bin/docker compose --progress plain"
+COMPOSE=/usr/bin/docker compose --progress plain
 USER=tart
 
 build:
