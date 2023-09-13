@@ -1,4 +1,4 @@
-COMPOSE="docker compose"
+COMPOSE=docker compose
 USER=tart
 
 network:

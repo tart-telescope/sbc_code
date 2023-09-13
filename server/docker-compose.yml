@@ -3,19 +3,6 @@ version: '3'
 services:
     ## Now all these containers just need to be connected to the tailscale network
 
-    ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
-    nginx-proxy:
-        image: jwilder/nginx-proxy
-        networks:
-            reverseproxy-nw:
-        ports:
-            - "8880:80"
-        environment:
-            - DEFAULT_HOST=tart.api
-            - TRUST_DOWNSTREAM_PROXY=true
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
-
     # The config file is in config/config.yaml
     headscale:
         image: headscale/headscale:latest
@@ -28,7 +15,32 @@ services:
         ports:
             - "51820:8080"
             - "9090:9090"
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:9090"]
+            interval: 1m30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+            start_interval: 5s
         restart: unless-stopped
+        
+    ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
+    nginx-proxy:
+        image: jwilder/nginx-proxy
+        depends_on:
+            headscale:
+                condition: service_healthy
+        networks:
+            reverseproxy-nw:
+        ports:
+            - "8880:80"
+        environment:
+            - DEFAULT_HOST=tart.api
+            - TRUST_DOWNSTREAM_PROXY=true
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+
+
     # signal:
     #     image: jwilder/whoami
     #     expose:
