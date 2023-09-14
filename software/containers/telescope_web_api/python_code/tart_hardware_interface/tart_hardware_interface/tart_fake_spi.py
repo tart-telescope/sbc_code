@@ -20,11 +20,11 @@ from tart.simulation import antennas
 from tart.simulation import radio
 from tart.simulation.simulator import get_vis_parallel, get_vis
 
-def load_permute(filepath=PERMUTE_FILE, noisy=False):
-  '''Load a permutation vector from the file at the given filepath.'''
-  filepath = os.path.join(os.environ["CONFIG_DIR"], PERMUTE_FILE);
-  pp = np.loadtxt(filepath, dtype='int')
-  return pp
+# def load_permute(filepath=PERMUTE_FILE, noisy=False):
+#   '''Load a permutation vector from the file at the given filepath.'''
+#   filepath = os.path.join(os.environ["CONFIG_DIR"], PERMUTE_FILE);
+#   pp = np.loadtxt(filepath, dtype='int')
+#   return pp
 
 
 '''
