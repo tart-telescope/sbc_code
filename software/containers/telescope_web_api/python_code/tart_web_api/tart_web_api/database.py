@@ -14,7 +14,7 @@ def connect_to_db():
         print(e)
     return con, c
 
-def setup_db():
+def setup_db(num_ant):
     con, c = connect_to_db()
     c.execute("CREATE TABLE IF NOT EXISTS raw_data (Id INTEGER PRIMARY KEY, date timestamp, filename TEXT, checksum TEXT)")
     c.execute("CREATE TABLE IF NOT EXISTS observation_cache_process (Id INTEGER PRIMARY KEY, date timestamp, state TEXT)")
@@ -27,7 +27,7 @@ def setup_db():
     c.execute('SELECT * FROM channels;')
     con.commit()
     if len(c.fetchall()) == 0:
-        ch = [(i, 1) for i in range(24)]
+        ch = [(i, 1) for i in range(num_ant)]
         con.executemany("INSERT INTO channels(channel_id, enabled) values (?, ?)", ch)
     con.commit()
     c.execute('SELECT * FROM calibration_process;')
@@ -41,8 +41,8 @@ def setup_db():
     con.commit()
     if len(c.fetchall()) == 0:
         utc_date = datetime.datetime.utcnow()
-        g = [1,]*24
-        ph = [0,]*24
+        g = [1,]*num_ant
+        ph = [0,]*num_ant
         insert_gain(utc_date, g, ph)
     con.close()
 
@@ -95,11 +95,6 @@ def get_gain():
     for row in rows:
         rows_dict[row[1]] = row
 
-    if False:
-        for i in range(24):
-            c.execute('SELECT * FROM calibration WHERE antenna = '+str(i)+' ORDER BY date DESC LIMIT 1;')
-            row = c.fetchall()[0]
-            rows_dict[row[1]] = row
     return rows_dict
 
 #########################

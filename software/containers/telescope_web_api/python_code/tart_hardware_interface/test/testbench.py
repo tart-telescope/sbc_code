@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from tart_hardware_interface.tartspi import create_spi_object
+from tart_hardware_interface.util import create_spi_object
 
 import numpy as np
 import time

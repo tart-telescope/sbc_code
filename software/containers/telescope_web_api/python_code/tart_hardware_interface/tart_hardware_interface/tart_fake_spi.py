@@ -20,12 +20,8 @@ from tart.simulation import skymodel
 from tart.simulation import antennas
 from tart.simulation import radio
 from tart.simulation.simulator import get_vis_parallel, get_vis
+from tart.operation import settings
 
-# def load_permute(filepath=PERMUTE_FILE, noisy=False):
-#   '''Load a permutation vector from the file at the given filepath.'''
-#   filepath = os.path.join(os.environ["CONFIG_DIR"], PERMUTE_FILE);
-#   pp = np.loadtxt(filepath, dtype='int')
-#   return pp
 
 
 '''
@@ -40,16 +36,37 @@ def forward_map():
     with open(filepath) as json_file:
         positions = json.load(json_file)
     
+    print(config)
     
-    n_ant = config['num_antenna']
-    n_vis = (n_ant * (n_ant - 1)) // 2
+    SETTINGS = settings.from_dict(config)
+    loc = location.get_loc(SETTINGS)
+    
+    ANTS = [antennas.Antenna(loc, pos)
+            for pos in config['antenna_positions']]
+    ANT_MODELS = [antenna_model.GpsPatchAntenna() for i in range(SETTINGS.get_num_antenna())]
+    NOISE_LVLS = 0.0 * np.ones(SETTINGS.get_num_antenna())
+    RAD = radio.Max2769B(n_samples=2**12, noise_level=NOISE_LVLS)
+    COR = correlator.Correlator()
 
-    # Generate model visibilities according to specified point source positions
-    # sim_sky= skymodel.Skymodel(0, location=loc,
-    #                            gps=0, thesun=0, known_cosmic=0)
-    # sim_sky.add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
-    # v_sim = get_vis(sim_sky, COR, RAD, ANTS, ANT_MODELS, SETTINGS, timestamp, mode=MODE)
-    # sim_vis = calibration.CalibratedVisibility(v_sim)
+    global msd_vis, sim_vis
+    sim_vis = {}
+    msd_vis = {}
+    sim_sky = {}
+
+    for m in cal_measurements:
+        timestamp = dateutil.parser.parse(m['data']['timestamp'])
+
+        key = '%f,%f,%s' % (m['el'], m['az'], timestamp)
+        # Generate model visibilities according to specified point source positions
+        sim_sky[key] = skymodel.Skymodel(0, location=loc,
+                                         gps=0, thesun=0, known_cosmic=0)
+        sim_sky[key].add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
+        v_sim = get_vis(sim_sky[key], COR, RAD, ANTS, ANT_MODELS, SETTINGS, timestamp, mode=MODE)
+        sim_vis[key] = calibration.CalibratedVisibility(v_sim)
+
+        # Construct (un)calibrated visibility objects from received measured visibilities
+        vis = vis_object_from_response(m['data']['vis']['data'], timestamp, SETTINGS)
+        msd_vis[key] = calibration.CalibratedVisibility(vis)
 
 
     return np.ones(n_vis)

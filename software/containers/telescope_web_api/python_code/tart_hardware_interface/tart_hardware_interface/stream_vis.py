@@ -32,11 +32,11 @@ def get_vis_object(data, runtime_config):
     num_ant = config.get_num_antenna()
     v = []
     baselines = []
-    xnor_cos = data[0:-24:2]
-    xnor_sin = data[1:-24:2]
+    xnor_cos = data[0:-num_ant:2]
+    xnor_sin = data[1:-num_ant:2]
     corr_cos_i_cos_j = get_corr(xnor_cos, n_samples)
     corr_cos_i_sin_j = get_corr(xnor_sin, n_samples)
-    means = (data[-24:])/float(n_samples)*2.-1
+    means = (data[-num_ant:])/float(n_samples)*2.-1
     #print(means)
     for i in range(0, num_ant):
         for j in range(i+1, num_ant):
