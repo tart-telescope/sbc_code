@@ -3,6 +3,7 @@
     from a model sky, then return this data
 '''
 import json
+import os
 
 import logging
 import numpy as np
@@ -44,11 +45,11 @@ def forward_map():
     n_vis = (n_ant * (n_ant - 1)) // 2
 
     # Generate model visibilities according to specified point source positions
-    sim_sky= skymodel.Skymodel(0, location=loc,
-                               gps=0, thesun=0, known_cosmic=0)
-    sim_sky.add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
-    v_sim = get_vis(sim_sky, COR, RAD, ANTS, ANT_MODELS, SETTINGS, timestamp, mode=MODE)
-    sim_vis = calibration.CalibratedVisibility(v_sim)
+    # sim_sky= skymodel.Skymodel(0, location=loc,
+    #                            gps=0, thesun=0, known_cosmic=0)
+    # sim_sky.add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
+    # v_sim = get_vis(sim_sky, COR, RAD, ANTS, ANT_MODELS, SETTINGS, timestamp, mode=MODE)
+    # sim_vis = calibration.CalibratedVisibility(v_sim)
 
 
     return np.ones(n_vis)
