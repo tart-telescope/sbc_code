@@ -70,9 +70,11 @@ def get_gain():
 
     @apiSampleRequest /calibration/gain
     """
+    runtime_config = app.config['CONFIG']
+    num_ant = runtime_config['telescope_config']['num_antenna']
     rows_dict =  db.get_gain()
-    ret_gain = [rows_dict[i][2] for i in range(24)]
-    ret_ph = [rows_dict[i][3] for i in range(24)]
+    ret_gain = [rows_dict[i][2] for i in range(num_ant)]
+    ret_ph = [rows_dict[i][3] for i in range(num_ant)]
     ret_dict = {"gain": ret_gain,
                 "phase_offset": ret_ph}
     return jsonify(ret_dict)

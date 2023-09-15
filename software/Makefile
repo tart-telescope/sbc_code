@@ -1,11 +1,15 @@
-COMPOSE="docker compose"
+DOCKER=/usr/bin/docker
+COMPOSE=/usr/bin/docker compose --progress plain
 USER=tart
 
 build:
-	${COMPOSE} --progress plain --parallel 1 -f docker-compose-test.yml build
+	${COMPOSE} --parallel 1 -f docker-compose-test.yml build
 
 up:
 	${COMPOSE} -f docker-compose-test.yml up -d
 
 down:
 	${COMPOSE} -f docker-compose-test.yml down
+
+logs:
+	${COMPOSE} -f docker-compose-test.yml logs

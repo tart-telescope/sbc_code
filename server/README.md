@@ -1,8 +1,20 @@
 # Server Side of the TART
 
-The worldwide network of TART telescopes are all available directly, but also available through a common web interface at http://tart.elec.ac.nz/<tart_name>, where <tart_name> is the unique name of each TART. How this is done is described here.
+The worldwide network of TART telescopes are all available directly, but also available through a common web interface at http://tart.elec.ac.nz/<tart_name>, where <tart_name> is the unique name of each TART. How this is done is described here. 
 
-## https://blog.gurucomputing.com.au/Reverse%20Proxies%20with%20Nginx%20Proxy%20Manager/Installing%20Nginx%20Proxy%20Manager/#routing-by-hostname
+* The cloud server runs a headscale server which creates the TART_VPN a virtual network..
+* Each tart runs tailscale container that connects to the TART_VPN
+* There is a service discovery running on the TART_VPN
+<code>
+TART_VPN: ----------------------------------------------------------------------------------------------------------
+                             |                 |               |
+                          TART1               TART2          Discovery
+</code>
+
+
+## Some links
+
+* https://blog.gurucomputing.com.au/Reverse%20Proxies%20with%20Nginx%20Proxy%20Manager/Installing%20Nginx%20Proxy%20Manager/#routing-by-hostname
 
 ## Service Discovery
 

@@ -17,12 +17,20 @@ def load_permute(filepath=PERMUTE_FILE, noisy=False):
   pp = np.loadtxt(filepath, dtype='int')
   return pp
 
+def load_config():
+    filepath = os.path.join(os.environ["CONFIG_DIR"], 'telescope_config.json');
+    with open(filepath) as json_file:
+        config = json.load(json_file)
+    filepath = os.path.join(os.environ["CONFIG_DIR"], 'calibrated_antenna_positions.json');
+    with open(filepath) as json_file:
+        positions = json.load(json_file)
+    
 
-def create_spi_object(speed=32000000):
+def create_spi_object(runtime_config, speed=32000000):
   perm = load_permute()
   try:
-    return TartSPI(perm, speed)
+    return TartSPI(runtime_config, perm, speed)
   except Exception as e:
     logging.exception(e)
     logging.warn('USING DUMMY SPI MODULE.')
-    return TartFakeSPI(perm, speed)
+    return TartFakeSPI(runtime_config, perm, speed)

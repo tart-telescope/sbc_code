@@ -52,4 +52,5 @@ COPY --from=build-stage /code/dist/ /var/www/html
 COPY ./rpi_nginx.conf /etc/nginx/conf.d/default.conf
 RUN /bin/sed -i "s/<tart_name>/${tart_name}/" /etc/nginx/conf.d/default.conf
 RUN echo  "s/<tart_name>/$tart_name/"
+RUN cat /etc/nginx/conf.d/default.conf
 EXPOSE 80

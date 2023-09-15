@@ -43,20 +43,19 @@ def get_vis_object(data, runtime_config):
     num_ant = config.get_num_antenna()
     v = []
     baselines = []
-    xnor_cos = data[0:-24:2]
-    xnor_sin = data[1:-24:2]
+    xnor_cos = data[0:-num_ant:2]
+    xnor_sin = data[1:-num_ant:2]
     corr_cos_i_cos_j = get_corr(xnor_cos, n_samples)
     corr_cos_i_sin_j = get_corr(xnor_sin, n_samples)
-    means = (data[-24:])/float(n_samples)*2.-1
+    means = (data[-num_ant:])/float(n_samples)*2.-1
     #print(means)
     for i in range(0, num_ant):
         for j in range(i+1, num_ant):
             idx = len(baselines)
             baselines.append([i, j])
-            v_real = van_vleck_correction((-means[i]*means[j]) + corr_cos_i_cos_j[idx])
-            v_imag = van_vleck_correction((-means[i]*means[j]) + corr_cos_i_sin_j[idx])
-            #v_real = (-means[i]*means[j]) + corr_cos_i_cos_j[idx]
-            #v_imag = (-means[i]*means[j]) + corr_cos_i_sin_j[idx]
+            v_real = correlator.van_vleck_correction((-means[i]*means[j]) + corr_cos_i_cos_j[idx])
+            v_imag = correlator.van_vleck_correction((-means[i]*means[j]) + corr_cos_i_sin_j[idx])
+
             v_com = v_real - 1j * v_imag
             v.append(v_com)
     vis = visibility.Visibility(config, timestamp)
@@ -65,6 +64,8 @@ def get_vis_object(data, runtime_config):
 
 def get_data(tart):
     viz = tart.vis_read(False)
+    if tart.spi is None:
+        return viz
     return viz[tart.perm]
 
 def capture_loop(tart, process_queue, cmd_queue, runtime_config, logger=None,):
@@ -87,7 +88,7 @@ def capture_loop(tart, process_queue, cmd_queue, runtime_config, logger=None,):
             d, d_json = get_status_json(tart)
             runtime_config['status'] = d
             process_queue.put(data)
-            logger.info(('Capture Loop: Acquired', data[0]))
+            logger.info((f"Capture Loop: Acquired"))
         except Exception as e:
             logger.error("Capture Loop Error %s" % str(e))
             logger.error(traceback.format_exc())
@@ -116,7 +117,12 @@ def process_loop(process_queue, vis_queue, cmd_queue, runtime_config, logger=Non
                     active = 0
             if process_queue.empty() == False:
                 data = process_queue.get()
-                vis, means, timestamp = get_vis_object(data, runtime_config)
+                if data.v is not None:
+                    vis = data
+                    means = np.zeros(runtime_config['telescope_config']["num_antenna"])
+                    timestamp = vis.timestamp
+                else:
+                    vis, means, timestamp = get_vis_object(data, runtime_config)
                 #print(vis, means, timestamp)
                 #update_means(means, timestamp, runtime_config)
                 #print(means)
@@ -125,7 +131,7 @@ def process_loop(process_queue, vis_queue, cmd_queue, runtime_config, logger=Non
         except Exception as e:
             logger.error("Processing Error %s" % str(e))
             logger.error(traceback.format_exc())
-            logger.error(f"Data: {data}")
+            logger.error(f"Data: {data.shape}")
     print('process_loop finished')
     return 1
 
