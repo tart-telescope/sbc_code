@@ -17,14 +17,25 @@ logger = logging.getLogger(__name__)
 
 from tart.operation import settings
 from tart.imaging import visibility
-from tart.imaging import correlator
 from tart.util import angle
 
 from tart_hardware_interface.highlevel_modes_api import get_status_json
 
+'''
+    This function performs the van_vleck_correction for two-level quantization.
+
+    https://arxiv.org/pdf/1608.04367.pdf
+'''
+def van_vleck_correction(R):
+    return np.sin(np.pi / 2.0 * R)
+
 def get_corr(xnor_sum, n_samples):
     return 2*xnor_sum/float(n_samples)-1
 
+
+'''
+    The data is composed to 276 real:imag pairs, followed by the 24 means of the real components
+'''
 def get_vis_object(data, runtime_config):
     n_samples = 2**runtime_config['vis']['N_samples_exp']
     timestamp = datetime.datetime.utcnow()
@@ -42,11 +53,11 @@ def get_vis_object(data, runtime_config):
         for j in range(i+1, num_ant):
             idx = len(baselines)
             baselines.append([i, j])
-            v_real = correlator.van_vleck_correction((-means[i]*means[j]) + corr_cos_i_cos_j[idx])
-            v_imag = correlator.van_vleck_correction((-means[i]*means[j]) + corr_cos_i_sin_j[idx])
+            v_real = van_vleck_correction((-means[i]*means[j]) + corr_cos_i_cos_j[idx])
+            v_imag = van_vleck_correction((-means[i]*means[j]) + corr_cos_i_sin_j[idx])
             #v_real = (-means[i]*means[j]) + corr_cos_i_cos_j[idx]
             #v_imag = (-means[i]*means[j]) + corr_cos_i_sin_j[idx]
-            v_com = correlator.combine_real_imag(v_real, v_imag)
+            v_com = v_real - 1j * v_imag
             v.append(v_com)
     vis = visibility.Visibility(config, timestamp)
     vis.set_visibilities(v, baselines)
