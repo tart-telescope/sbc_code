@@ -4,6 +4,7 @@
 '''
 import json
 import os
+from datetime import datetime
 
 import logging
 import numpy as np
@@ -28,21 +29,13 @@ from tart.operation import settings
     Load the telescope configuration as well as the entenna positions. Then
     calculate the visibilities from some moving point sources.
 '''
-def forward_map():
-    filepath = os.path.join(os.environ["CONFIG_DIR"], 'telescope_config.json');
-    with open(filepath) as json_file:
-        config = json.load(json_file)
-    filepath = os.path.join(os.environ["CONFIG_DIR"], 'calibrated_antenna_positions.json');
-    with open(filepath) as json_file:
-        positions = json.load(json_file)
-    
-    print(config)
-    
-    SETTINGS = settings.from_dict(config)
+def forward_map(runtime_config):
+    MODE = 'mini'
+    SETTINGS = settings.from_dict(runtime_config['telescope_config'])
     loc = location.get_loc(SETTINGS)
     
     ANTS = [antennas.Antenna(loc, pos)
-            for pos in config['antenna_positions']]
+            for pos in runtime_config['antenna_positions']]
     ANT_MODELS = [antenna_model.GpsPatchAntenna() for i in range(SETTINGS.get_num_antenna())]
     NOISE_LVLS = 0.0 * np.ones(SETTINGS.get_num_antenna())
     RAD = radio.Max2769B(n_samples=2**12, noise_level=NOISE_LVLS)
@@ -51,33 +44,31 @@ def forward_map():
     global msd_vis, sim_vis
     sim_vis = {}
     msd_vis = {}
-    sim_sky = {}
 
-    for m in cal_measurements:
-        timestamp = dateutil.parser.parse(m['data']['timestamp'])
+    sim_sky= skymodel.Skymodel(0, location=loc, gps=0, thesun=0, known_cosmic=0)
 
-        key = '%f,%f,%s' % (m['el'], m['az'], timestamp)
+    sources = [ { 'el': 45, 'az': theta} for theta in [0, 45, 90, 135, 180, 225, 270, 315] ]
+    print(sources)
+    for m in sources:
+        timestamp = datetime.utcnow()
+
         # Generate model visibilities according to specified point source positions
-        sim_sky[key] = skymodel.Skymodel(0, location=loc,
-                                         gps=0, thesun=0, known_cosmic=0)
-        sim_sky[key].add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
-        v_sim = get_vis(sim_sky[key], COR, RAD, ANTS, ANT_MODELS, SETTINGS, timestamp, mode=MODE)
-        sim_vis[key] = calibration.CalibratedVisibility(v_sim)
+        sim_sky.add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
+    v_sim = get_vis(sim_sky, COR, RAD, ANTS, ANT_MODELS, SETTINGS, timestamp, mode=MODE)
+    # print(f"Simulated Vis: {v_sim.v.shape}")
+    # sim_vis = calibration.CalibratedVisibility(v_sim)
 
-        # Construct (un)calibrated visibility objects from received measured visibilities
-        vis = vis_object_from_response(m['data']['vis']['data'], timestamp, SETTINGS)
-        msd_vis[key] = calibration.CalibratedVisibility(vis)
-
-
-    return np.ones(n_vis)
+    # Now convert to an array of bytes
+    
+    return v_sim
 
 class TartFakeSPI(TartSPI):
     
     ##--------------------------------------------------------------------------
     ##  FAKE TART SPI interface.
     ##--------------------------------------------------------------------------
-    def __init__(self, permute, speed=32000000):
-        super().__init__(permute, speed, True)
+    def __init__(self, runtime_config, permute, speed=32000000):
+        super().__init__(runtime_config, permute, speed, True)
     
 
     # Override reading of data
@@ -119,14 +110,14 @@ class TartFakeSPI(TartSPI):
             Read back visibilities data.
             This should perform the ifft imaging...
         '''
-        vis = forward_map()
+        vis = forward_map(self.runtime_config)
         
         res = self.getbytes(self.VX_STREAM, 4*576)
         val = self.vis_convert(res)
         if noisy:
             tim = time.time()
             print(" Visibilities (@t = %g):\n%s (sum = %d)" % (tim, val[self.perm]-int(2**(self.blocksize-1)), sum(val)))
-        return val
+        return vis
 
     def vis_convert(self, viz):
         arr = np.zeros(576, dtype='int')

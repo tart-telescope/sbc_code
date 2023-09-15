@@ -212,7 +212,7 @@ def create_direct_vis_dict(vis):
 class TartControl():
     ''' High Level TART Interface'''
     def __init__(self, runtime_config):
-        self.TartSPI = create_spi_object()
+        self.TartSPI = create_spi_object(runtime_config)
 
         self.config = runtime_config
         self.state = 'off'

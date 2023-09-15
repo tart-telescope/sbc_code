@@ -53,6 +53,8 @@ def get_vis_object(data, runtime_config):
 
 def get_data(tart):
     viz = tart.vis_read(False)
+    if tart.spi is None:
+        return viz
     return viz[tart.perm]
 
 def capture_loop(tart, process_queue, cmd_queue, runtime_config, logger=None,):
@@ -75,7 +77,7 @@ def capture_loop(tart, process_queue, cmd_queue, runtime_config, logger=None,):
             d, d_json = get_status_json(tart)
             runtime_config['status'] = d
             process_queue.put(data)
-            logger.info(('Capture Loop: Acquired', data[0]))
+            logger.info((f"Capture Loop: Acquired"))
         except Exception as e:
             logger.error("Capture Loop Error %s" % str(e))
             logger.error(traceback.format_exc())
@@ -104,7 +106,12 @@ def process_loop(process_queue, vis_queue, cmd_queue, runtime_config, logger=Non
                     active = 0
             if process_queue.empty() == False:
                 data = process_queue.get()
-                vis, means, timestamp = get_vis_object(data, runtime_config)
+                if data.v is not None:
+                    vis = data
+                    means = np.zeros(runtime_config['telescope_config']["num_antenna"])
+                    timestamp = vis.timestamp
+                else:
+                    vis, means, timestamp = get_vis_object(data, runtime_config)
                 #print(vis, means, timestamp)
                 #update_means(means, timestamp, runtime_config)
                 #print(means)
@@ -113,7 +120,7 @@ def process_loop(process_queue, vis_queue, cmd_queue, runtime_config, logger=Non
         except Exception as e:
             logger.error("Processing Error %s" % str(e))
             logger.error(traceback.format_exc())
-            logger.error(f"Data: {data}")
+            logger.error(f"Data: {data.shape}")
     print('process_loop finished')
     return 1
 

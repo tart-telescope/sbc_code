@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from tart_hardware_interface.util import create_spi_object
+from tart_hardware_interface.config import init_config
 
 import numpy as np
 import time
@@ -28,9 +29,11 @@ if __name__ == '__main__':
 
   args = parser.parse_args()
   num_words = np.power(2, args.bramexp)
+  m = multiprocessing.Manager()
+  runtime_config = init_config(m)
 
   # Initialise the TART hardware, and place it into a known state.
-  tart = create_spi_object(speed=args.speed*1000000)
+  tart = create_spi_object(runtime_config, speed=args.speed*1000000)
   tart.reset()
   tart.debug(on= True, shift=args.shifter, count=args.counter, noisy=args.verbose)
   tart.debug(on=False, shift=args.shifter, count=args.counter, noisy=args.verbose)
