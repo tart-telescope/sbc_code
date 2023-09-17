@@ -55,7 +55,7 @@ def forward_map(runtime_config):
     #
     # The pattern rotates once every 12 hours
     #
-    hour_hand = timestamp.hour*30.0 + timestamp.minute/4.0
+    hour_hand = timestamp.hour*30.0 + timestamp.minute/2.0
 
     sources = [ { 'el': el, 'az': hour_hand} for el in [85, 75, 65, 55] ]
     for m in sources:
