@@ -28,6 +28,9 @@ from tart.operation import settings
 '''
     Load the telescope configuration as well as the entenna positions. Then
     calculate the visibilities from some moving point sources.
+
+    The point sources are chosen to make up a clock with an hour hand, and a minute hand
+    that keeps 12-hour time according to UTC!
 '''
 def forward_map(runtime_config):
     MODE = 'mini'
@@ -41,7 +44,6 @@ def forward_map(runtime_config):
     RAD = radio.Max2769B(n_samples=2**12, noise_level=NOISE_LVLS)
     COR = correlator.Correlator()
 
-    global msd_vis, sim_vis
     sim_vis = {}
     msd_vis = {}
 
@@ -49,13 +51,20 @@ def forward_map(runtime_config):
     
     timestamp = datetime.utcnow()
     
-    # The pattern rotates once per day
+    ############### HOUR HAND ###########################
+    #
+    # The pattern rotates once every 12 hours
+    #
     hour_hand = timestamp.hour*30.0 + timestamp.minute/4.0
 
     sources = [ { 'el': el, 'az': hour_hand} for el in [85, 75, 65, 55] ]
     for m in sources:
         sim_sky.add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
 
+    ############### HOUR HAND ###########################
+    #
+    # The pattern rotates once every 1 hour
+    #
     minute_hand = timestamp.minute*6.0 + timestamp.second/10.0
 
     sources = [ { 'el': el, 'az': minute_hand} for el in [90, 80, 70, 60, 50, 40, 30] ]
