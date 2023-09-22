@@ -1,4 +1,4 @@
-COMPOSE="docker compose"
+COMPOSE=docker compose
 
 build:
 	${COMPOSE} build

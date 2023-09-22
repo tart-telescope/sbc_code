@@ -6,8 +6,6 @@ services:
     # The config file is in config/config.yaml
     headscale:
         image: headscale/headscale:latest
-        networks:
-            reverseproxy-nw:
         volumes:
             - ./config:/etc/headscale/
             - ./data:/var/lib/headscale
@@ -23,22 +21,28 @@ services:
             start_period: 40s
             start_interval: 5s
         restart: unless-stopped
-        
-    ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
-    nginx-proxy:
-        image: jwilder/nginx-proxy
-        depends_on:
-            headscale:
-                condition: service_healthy
-        networks:
-            reverseproxy-nw:
-        ports:
-            - "8880:80"
-        environment:
-            - DEFAULT_HOST=tart.api
-            - TRUST_DOWNSTREAM_PROXY=true
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
+    # headscale-ui:
+    #     image: ghcr.io/gurucomputing/headscale-ui:latest
+    #     restart: unless-stopped
+    #     container_name: headscale-ui
+    #     # ports:
+    #     #     - 9443:443
+      
+    # ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
+    # nginx-proxy:
+    #     image: jwilder/nginx-proxy
+    #     depends_on:
+    #         headscale:
+    #             condition: service_healthy
+    #     networks:
+    #         reverseproxy-nw:
+    #     ports:
+    #         - "8880:80"
+    #     environment:
+    #         - DEFAULT_HOST=tart.api
+    #         - TRUST_DOWNSTREAM_PROXY=true
+    #     volumes:
+    #         - /var/run/docker.sock:/tmp/docker.sock:ro
 
 
     # signal:
@@ -61,6 +65,3 @@ services:
     #     - VIRTUAL_PATH=/makhanda
 
 # docker network create reverseproxy-nw
-networks:
-    reverseproxy-nw:
-        external: true

@@ -11,6 +11,7 @@
 # https://myheadscale.example.com:443
 #
 server_url: http://tart.elec.ac.nz:51820
+#server_url: http://127.0.0.1:8080
 
 # Address to listen to / bind to on the server
 #
@@ -31,8 +32,8 @@ metrics_listen_addr: 0.0.0.0:9090
 # valid certificates.
 #
 # For production:
-# grpc_listen_addr: 0.0.0.0:50443
-grpc_listen_addr: 127.0.0.1:50443
+grpc_listen_addr: 0.0.0.0:50443
+#grpc_listen_addr: 127.0.0.1:50443
 
 # Allow the gRPC admin interface to run in INSECURE
 # mode. This is not recommended as the traffic will
@@ -253,7 +254,7 @@ dns_config:
   # `base_domain` must be a FQDNs, without the trailing dot.
   # The FQDN of the hosts will be
   # `hostname.user.base_domain` (e.g., _myhost.myuser.example.com_).
-  base_domain: example.com
+  base_domain: tart.network
 
 # Unix socket used for the CLI to connect without authentication
 # Note: for production you will want to set this to something like:
