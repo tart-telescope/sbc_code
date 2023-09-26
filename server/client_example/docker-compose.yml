@@ -15,6 +15,7 @@ services:
         command: tailscaled
         environment:
             - TS_EXTRA_ARGS=--login-server=http://tart.elec.ac.nz:51820
+            - TS_TAILSCALED_EXTRA_ARGS=--login-server=http://tart.elec.ac.nz:51820
             - TS_HOSTNAME=signal            # Will resolve to signal.tart.network
             #- TS_EXTRA_ARGS=--login-server=http://localhost:51820
             
