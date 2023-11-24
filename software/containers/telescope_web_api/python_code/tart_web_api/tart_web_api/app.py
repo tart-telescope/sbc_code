@@ -60,10 +60,11 @@ import tart_web_api.views_channel
 #if __name__ == "__main__":
 m = multiprocessing.Manager()
 runtime_config = init_config(m)
-runtime_config['sample_delay'] = db.get_sample_delay()
 app.config['CONFIG'] = runtime_config
 num_ant = runtime_config['telescope_config']['num_antenna']
 db.setup_db(num_ant)
+
+runtime_config['sample_delay'] = db.get_sample_delay()
 
 observation_cache_process = multiprocessing.Process(target=cleanup_observation_cache, args=())
 observation_cache_process.start()
