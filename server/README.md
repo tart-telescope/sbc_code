@@ -1,16 +1,47 @@
 # Server Side of the TART
 
-The worldwide network of TART telescopes are all available directly, but also available through a common web interface at http://tart.elec.ac.nz/<tart_name>, where <tart_name> is the unique name of each TART. How this is done is described here. 
+The worldwide network of TART telescopes are all available directly, but also available through a common web interface at https://tart.elec.ac.nz/<tart_name>, where <tart_name> is the unique name of each TART. How this is done is described here.
 
 * The cloud server runs a headscale server which creates the TART_VPN a virtual network..
 * Each tart runs tailscale container that connects to the TART_VPN
 * There is a service discovery running on the TART_VPN
+
 <code>
 TART_VPN: ----------------------------------------------------------------------------------------------------------
-                             |                 |               |
-                          TART1               TART2          Discovery
+                             |                 |               |                    |
+                          TART1               TART2          Discovery            HTTP
 </code>
 
+The role of the HTTP server is to make the TARTs available via the public internet. This is done using Caddy
+
+## tart_vpn Network
+
+This network lives inside docker.
+
+    docker network create tart-vpn-nw
+
+## HTTP Server
+
+    caddy:
+        image: caddy:latest
+        container_name: caddy
+        restart: always
+        networks:
+            tart-vpn-nw:
+        stdin_open: true
+        tty: true
+        volumes:
+            - ./container-data:/data
+            - ./container-config:/config
+            - /etc/localtime:/etc/localtime:ro
+        ports:
+            - 80:80
+            - 443:443
+        entrypoint: /usr/bin/caddy run --adapter caddyfile --config /config/Caddyfile
+
+    networks:
+    tart-vpn-nw:
+        external: true
 
 ## Some links
 
