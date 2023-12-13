@@ -34,7 +34,9 @@ services:
         build:
             context: ./containers/telescope_web_api
             dockerfile: Dockerfile.apidoc 
-        ports: 
+            args:
+                tart_doc_url: tart.elec.ac.nz\/signal
+        ports:
             - 8080:80
         restart: always
 

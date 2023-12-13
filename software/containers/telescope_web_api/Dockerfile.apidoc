@@ -1,14 +1,14 @@
 # Stage 0, "build-stage", build the documentation
 FROM node:16 as build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
-ARG tart_name
+ARG tart_doc_url
 
 RUN npm install apidoc -g
 
 COPY ./python_code/tart_web_api /code
 
 WORKDIR /code/tart_web_api
-RUN sed "s/localhost/`hostname`/g" -i apidoc.json
+RUN sed "s/localhost/${tart_doc_url}/g" -i apidoc.json
 
 RUN apidoc -i ./ -o /doc
 
