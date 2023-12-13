@@ -43,6 +43,7 @@ This network lives inside docker.
     tart-vpn-nw:
         external: true
 
+Where the /config
 ## Some links
 
 * https://blog.gurucomputing.com.au/Reverse%20Proxies%20with%20Nginx%20Proxy%20Manager/Installing%20Nginx%20Proxy%20Manager/#routing-by-hostname

@@ -7,9 +7,9 @@ services:
     headscale:
         image: headscale/headscale:latest
         volumes:
-            - ./config:/etc/headscale/
-            - ./data:/var/lib/headscale
-        command: headscale serve
+            - ./headscale/config:/etc/headscale/
+            - ./headscale/data:/var/lib/headscale
+        entrypoint: headscale serve
         ports:
             - "51820:8080"
             - "9090:9090"
@@ -21,6 +21,8 @@ services:
             start_period: 40s
             start_interval: 5s
         restart: unless-stopped
+        networks:
+          tart-vpn-nw:
     # headscale-ui:
     #     image: ghcr.io/gurucomputing/headscale-ui:latest
     #     restart: unless-stopped
@@ -65,3 +67,6 @@ services:
     #     - VIRTUAL_PATH=/makhanda
 
 # docker network create reverseproxy-nw
+networks:
+  reverseproxy-nw:
+    external: true
