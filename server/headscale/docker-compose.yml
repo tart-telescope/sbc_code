@@ -15,13 +15,13 @@ services:
         ports:
             - "8080:8080"
             - "9090:9090"
-        # healthcheck:
-        #     test: ["CMD", "curl", "-f", "http://localhost:9090"]
-        #     interval: 1m30s
-        #     timeout: 10s
-        #     retries: 3
-        #     start_period: 40s
-        #     start_interval: 5s
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:9090/metrics"]
+            interval: 1m30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+            start_interval: 5s
         restart: unless-stopped
         # networks:
         #   tart-vpn-nw:
