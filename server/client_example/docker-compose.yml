@@ -4,8 +4,8 @@ services:
 
     tailscale:
         image: tailscale/tailscale:latest
-        expose:
-            - "8000"
+        ports:
+            - "8000:80"
         volumes:
             - "./tailscale/var_lib:/var/lib"        # State data will be stored in this directory
             - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work 
@@ -30,6 +30,6 @@ services:
     # # 1cd50ab45eb69c9c5cccba50f58fa14e7261e6e345d72cbd
     # # tailscale up --login-server http://headscale.mydomain.com --authkey 3215a1ce7967c11e8ea844b3e199d3c46f9f5e7b660b48fb
     signal:
-        image: jwilder/whoami
+        image: nginx
         network_mode: "service:tailscale"
         
