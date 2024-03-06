@@ -14,7 +14,7 @@ services:
         ports:
             - "8880:80"
         environment:
-            - TS_EXTRA_ARGS=--login-server=http://tart.elec.ac.nz:51820
+            - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
             #- TS_EXTRA_ARGS=--login-server=http://localhost:51820
             
         restart: unless-stopped
@@ -22,7 +22,7 @@ services:
 
     ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
     # Get an auth_key
-    # 	docker compose -f proxy-compose.yml exec tailscale tailscale up --login-server http://tart.elec.ac.nz:51820 --authkey ${AUTH_KEY}
+    # 	docker compose -f proxy-compose.yml exec tailscale tailscale up --login-server http://cloud.elec.ac.nz:51820 --hostname=proxy --authkey ${AUTH_KEY}
     #
     # Only proxy hosts on the headscale network...
     nginx:

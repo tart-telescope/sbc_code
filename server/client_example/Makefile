@@ -11,5 +11,5 @@ down:
 
 auth_client:
 	${COMPOSE} exec tailscale \
-		tailscale up --login-server http://tart.elec.ac.nz:51820 --hostname=rhodes
+		tailscale up --login-server https://cloud.elec.ac.nz --hostname=rhodes
 		#--authkey ${AUTH_KEY}
