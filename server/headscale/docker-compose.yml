@@ -73,7 +73,7 @@ services:
     #     - VIRTUAL_HOST=tart.api
     #     - VIRTUAL_PORT=8000
     #     - VIRTUAL_PATH=/signal
-    # 
+    #
     # # curl -H "Host: tart.local" HTTP://localhost:8880/makhanda
     # makhanda:
     #     image: jwilder/whoami

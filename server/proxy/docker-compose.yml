@@ -39,3 +39,26 @@ services:
             options:
                 max-file: "5"
                 max-size: "1m"
+
+
+    # ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
+    # nginx-proxy:
+    #     image: jwilder/nginx-proxy
+    #     depends_on:
+    #         tailscale:
+    #             condition: service_healthy
+    #     network_mode: "service:tailscale"
+    #     ports:
+    #         - "8880:80"
+    #     environment:
+    #         - DEFAULT_HOST=tart.api
+    #         - TRUST_DOWNSTREAM_PROXY=true
+    #     volumes:
+    #         - /var/run/docker.sock:/tmp/docker.sock:ro
+
+    # signal:
+    #     image: nginx
+    #     environment:
+    #     - VIRTUAL_HOST=tart.api
+    #     - VIRTUAL_PORT=8000
+    #     - VIRTUAL_PATH=/signal
