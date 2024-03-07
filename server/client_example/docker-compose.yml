@@ -9,26 +9,17 @@ services:
         volumes:
             - "./tailscale/var_lib:/var/lib"        # State data will be stored in this directory
             - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work 
-        cap_add:                                               # Required for tailscale to work
+        cap_add:                                    # Required for tailscale to work
             - net_admin
             - sys_module
-        command: tailscaled
         environment:
-            - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
-            - TS_TAILSCALED_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
-            - TS_HOSTNAME=signal            # Will resolve to signal.tart.network
-            #- TS_EXTRA_ARGS=--login-server=http://localhost:51820
-            
+            - TS_EXTRA_ARGS=--login-server=http://cloud.elec.ac.nz:8080
+            - TS_HOSTNAME=signal            # Will resolve to signal.tart.telescopes.elec.ac.nz
+            - TS_STATE_DIR=/var/lib/tailscale
+
         restart: unless-stopped
       
-    # whoami:
-    #     # A container that exposes an API to show its IP address
-    #     image: traefik/whoami
-    #     network_mode: "service:tailscale"
-    #     labels:
-    #         - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
-    # # 1cd50ab45eb69c9c5cccba50f58fa14e7261e6e345d72cbd
-    # # tailscale up --login-server http://headscale.mydomain.com --authkey 3215a1ce7967c11e8ea844b3e199d3c46f9f5e7b660b48fb
+    # Dummy webserver to mimic a TART
     signal:
         image: nginx
         network_mode: "service:tailscale"

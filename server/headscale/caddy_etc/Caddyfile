@@ -1,3 +1,3 @@
 cloud.elec.ac.nz {
-    reverse_proxy localhost:8080
+        reverse_proxy http://headscale:8080
 }

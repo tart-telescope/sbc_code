@@ -2,18 +2,19 @@ version: '3'
 
 services:
 
-    # The config file is in config/config.yaml
+    # The headscale config file is in config/config.yaml
     headscale:
         # image: headscale/headscale:latest
         build:
             context: .
+        container_name: headscale
         volumes:
             - ./config:/etc/headscale/
             - ./hs_data/lib:/var/lib/headscale
             - ./hs_data/run:/var/run/headscale
         entrypoint: headscale serve
         ports:
-            - "8080:8080"
+            # - "8080:8080"
             - "9090:9090"
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:9090/metrics"]
@@ -23,24 +24,22 @@ services:
             start_period: 40s
             start_interval: 5s
         restart: unless-stopped
-        # networks:
-        #   tart-vpn-nw:
 
     caddy:
         image: caddy:latest
         container_name: caddy
         restart: unless-stopped
         security_opt:
-        - label:disable
+            - label:disable
         ports:
-        - "80:80"
-        - "443:443"
-        - "443:443/udp"
+            - "80:80"
+            - "443:443"
+            - "443:443/udp"
         volumes:
-        - caddy_data:/data
-        - caddy_config:/config
-        - ./Caddyfile:/etc/caddy/Caddyfile
-        - /etc/localtime:/etc/localtime:ro
+            - caddy_data:/data
+            - caddy_config:/config
+            - ./caddy_etc:/etc/caddy
+            - /etc/localtime:/etc/localtime:ro
 
     # headscale-ui:
     #     image: ghcr.io/gurucomputing/headscale-ui:latest
