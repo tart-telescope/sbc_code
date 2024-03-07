@@ -13,13 +13,13 @@ services:
             - net_admin
             - sys_module
         environment:
-            - TS_EXTRA_ARGS=--login-server=http://cloud.elec.ac.nz:8080
+            - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
             - TS_HOSTNAME=signal            # Will resolve to signal.tart.telescopes.elec.ac.nz
             - TS_STATE_DIR=/var/lib/tailscale
 
         restart: unless-stopped
       
-    # Dummy webserver to mimic a TART
+    # Sidecar webserver to mimic a TART
     signal:
         image: nginx
         network_mode: "service:tailscale"
