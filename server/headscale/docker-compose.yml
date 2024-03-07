@@ -41,10 +41,10 @@ services:
             - ./caddy_etc:/etc/caddy
             - /etc/localtime:/etc/localtime:ro
 
-    # headscale-ui:
-    #     image: ghcr.io/gurucomputing/headscale-ui:latest
-    #     restart: unless-stopped
-    #     container_name: headscale-ui
+    headscale-ui:
+        image: ghcr.io/gurucomputing/headscale-ui:latest
+        restart: unless-stopped
+        container_name: headscale-ui
     #     # ports:
     #     #     - 9443:443
       
