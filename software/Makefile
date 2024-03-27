@@ -12,4 +12,4 @@ down:
 	${COMPOSE} -f docker-compose-test.yml down
 
 logs:
-	${COMPOSE} -f docker-compose-test.yml logs
+	${COMPOSE} -f docker-compose-test.yml logs -f

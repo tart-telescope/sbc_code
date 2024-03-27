@@ -26,7 +26,7 @@ def load_config():
         positions = json.load(json_file)
     
 
-def create_spi_object(runtime_config, speed=32000000):
+def create_spi_object(runtime_config, speed=16000000):
   perm = load_permute()
   try:
     return TartSPI(runtime_config, perm, speed)

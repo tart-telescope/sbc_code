@@ -280,7 +280,7 @@ class TartControl():
 
         while self.queue_vis.qsize() > 0:
             vis, means = self.queue_vis.get()
-            #print('vis = {}, means={}.'.format(vis, means))
+            print('vis = {}, means={}.'.format(vis, means))
 
             if vis is not None:
                 self.config['vis_current'] = create_direct_vis_dict(vis)

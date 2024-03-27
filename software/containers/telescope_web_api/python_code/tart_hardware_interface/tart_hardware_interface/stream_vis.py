@@ -53,8 +53,8 @@ def get_vis_object(data, runtime_config):
         for j in range(i+1, num_ant):
             idx = len(baselines)
             baselines.append([i, j])
-            v_real = correlator.van_vleck_correction((-means[i]*means[j]) + corr_cos_i_cos_j[idx])
-            v_imag = correlator.van_vleck_correction((-means[i]*means[j]) + corr_cos_i_sin_j[idx])
+            v_real = van_vleck_correction((-means[i]*means[j]) + corr_cos_i_cos_j[idx])
+            v_imag = van_vleck_correction((-means[i]*means[j]) + corr_cos_i_sin_j[idx])
 
             v_com = v_real - 1j * v_imag
             v.append(v_com)
@@ -63,12 +63,13 @@ def get_vis_object(data, runtime_config):
     return vis, means, timestamp
 
 def get_data(tart):
-    viz = tart.vis_read(False)
+    viz = tart.vis_read(noisy=False)
     if tart.spi is None:
         return viz
     return viz[tart.perm]
 
 def capture_loop(tart, process_queue, cmd_queue, runtime_config, logger=None,):
+    print('Capture Loop Start')
     tart.reset()
     tart.read_status(True)
     tart.debug(on=False, shift=False, count=False, noisy=True)
@@ -108,6 +109,7 @@ def update_means(means, ts, runtime_config):
 
 def process_loop(process_queue, vis_queue, cmd_queue, runtime_config, logger=None):
     active = 1
+    print('process_loop start')
     while active:
         try:
             time.sleep(0.01)
@@ -117,11 +119,11 @@ def process_loop(process_queue, vis_queue, cmd_queue, runtime_config, logger=Non
                     active = 0
             if process_queue.empty() == False:
                 data = process_queue.get()
-                if data.v is not None:
+                if hasattr(data, 'v'): # Test if the data contains a vis object.
                     vis = data
                     means = np.zeros(runtime_config['telescope_config']["num_antenna"])
                     timestamp = vis.timestamp
-                else:
+                else:  # Otherwise the data is real.
                     vis, means, timestamp = get_vis_object(data, runtime_config)
                 #print(vis, means, timestamp)
                 #update_means(means, timestamp, runtime_config)

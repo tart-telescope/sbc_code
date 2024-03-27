@@ -53,7 +53,7 @@ class TartSPI(object):
   ##--------------------------------------------------------------------------
   ##  TART SPI interface commands.
   ##--------------------------------------------------------------------------
-  def __init__(self, runtime_config, permute, speed=32000000, fake=False):
+  def __init__(self, runtime_config, permute, speed=16000000, fake=False):
     if not fake:
       self.spi = spidev.SpiDev()
       self.spi.open(0, 0)
