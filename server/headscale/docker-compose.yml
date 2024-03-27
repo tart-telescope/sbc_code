@@ -1,32 +1,50 @@
 version: '3'
 
 services:
-    ## Now all these containers just need to be connected to the tailscale network
 
-    # The config file is in config/config.yaml
+    # The headscale config file is in config/config.yaml
     headscale:
-        image: headscale/headscale:latest
+        # image: headscale/headscale:latest
+        build:
+            context: .
+        container_name: headscale
         volumes:
-            - ./headscale/config:/etc/headscale/
-            - ./headscale/data:/var/lib/headscale
+            - ./config:/etc/headscale/
+            - ./hs_data/lib:/var/lib/headscale
+            - ./hs_data/run:/var/run/headscale
         entrypoint: headscale serve
         ports:
-            - "51820:8080"
+            # - "8080:8080"
             - "9090:9090"
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:9090"]
+            test: ["CMD", "curl", "-f", "http://localhost:9090/metrics"]
             interval: 1m30s
             timeout: 10s
             retries: 3
             start_period: 40s
             start_interval: 5s
         restart: unless-stopped
-        networks:
-          tart-vpn-nw:
-    # headscale-ui:
-    #     image: ghcr.io/gurucomputing/headscale-ui:latest
-    #     restart: unless-stopped
-    #     container_name: headscale-ui
+
+    caddy:
+        image: caddy:latest
+        container_name: caddy
+        restart: unless-stopped
+        security_opt:
+            - label:disable
+        ports:
+            - "80:80"
+            - "443:443"
+            - "443:443/udp"
+        volumes:
+            - caddy_data:/data
+            - caddy_config:/config
+            - ./caddy_etc:/etc/caddy
+            - /etc/localtime:/etc/localtime:ro
+
+    headscale-ui:
+        image: ghcr.io/gurucomputing/headscale-ui:latest
+        restart: unless-stopped
+        container_name: headscale-ui
     #     # ports:
     #     #     - 9443:443
       
@@ -55,7 +73,7 @@ services:
     #     - VIRTUAL_HOST=tart.api
     #     - VIRTUAL_PORT=8000
     #     - VIRTUAL_PATH=/signal
-    # 
+    #
     # # curl -H "Host: tart.local" HTTP://localhost:8880/makhanda
     # makhanda:
     #     image: jwilder/whoami
@@ -67,6 +85,10 @@ services:
     #     - VIRTUAL_PATH=/makhanda
 
 # docker network create reverseproxy-nw
-networks:
-  reverseproxy-nw:
+# networks:
+#   reverseproxy-nw:
+#     external: true
+volumes:
+  caddy_data:
     external: true
+  caddy_config:

@@ -16,7 +16,7 @@ The role of the HTTP server is to make the TARTs available via the public intern
 
 ## tart_vpn Network
 
-This network lives inside docker.
+This network lives inside docker. It is a headscale/tailscale VPN network.
 
     docker network create tart-vpn-nw
 
