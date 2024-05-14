@@ -3,7 +3,7 @@
 Information on testing the SPI connection. MODE1 (POL = 0, PHA = 1) SPI master, and the data bit-width is set to 8-bits.
 
     apt install pigpiod pigpio-tools
-
+    sudo pigpiod
     pigs spio 0 100000 1
     pigs spix 0 0x55 0x11 0xFF 0xAA
     ...

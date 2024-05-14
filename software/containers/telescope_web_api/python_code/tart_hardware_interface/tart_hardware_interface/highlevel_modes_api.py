@@ -40,7 +40,7 @@ def ph_stats(vals, stable_threshold, N_samples):
     s = np.abs(expval.sum())/(1.*len(vals))
     if m<0:
         m += 2*np.pi
-    mean_rounded = np.int(np.round(m/(2*np.pi)*12))
+    mean_rounded = int(np.round(m/(2*np.pi)*12))
     return [mean_rounded, s, stable_threshold, N_samples, int(s>stable_threshold)]
 
 def mean_stats(vals,mean_threshold):
@@ -75,7 +75,7 @@ def get_status_json(tart_instance):
 
 
 def run_diagnostic(tart, runtime_config):
-    pp = tart.load_permute()
+    # pp = tart.load_permute()
     print("Enabling DEBUG mode")
     tart.debug(on=not runtime_config['acquire'] , shift=runtime_config['shifter'], count=runtime_config['counter'], noisy=runtime_config['verbose'])
     print("Setting capture registers:")
@@ -146,7 +146,7 @@ def run_diagnostic(tart, runtime_config):
         power, freq = get_psd(ant_data[i]-ant_data[i].mean(),16e6,runtime_config['diagnostic']['spectre']['NFFT'])
         power_db = 10.*np.log10(power)
         power_db = np.nan_to_num(power_db)
-        channel['power'] = (np.asarray(power_db*1000,dtype=np.int)/1000.        ).tolist()
+        channel['power'] = (np.asarray(power_db*1000,dtype=int)/1000.        ).tolist()
         channel['freq'] = ((freq/1e6)).tolist()
         channels.append(channel)
 
