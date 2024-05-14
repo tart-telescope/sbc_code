@@ -26,24 +26,24 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip install -U pip setuptools wheel
-RUN pip install tart 
-RUN pip install tart_tools 
+RUN /opt/venv/bin/pip install -U pip setuptools wheel
+RUN /opt/venv/bin/pip install tart 
+RUN /opt/venv/bin/pip install tart_tools 
 
 ENV CONFIG_DIR=/config_data
 
 COPY ./python_code /python_code
 WORKDIR /python_code/tart_hardware_interface
-RUN pip install .
+RUN /opt/venv/bin/pip install .
 
 WORKDIR /python_code/tart_web_api
-RUN pip install .
+RUN /opt/venv/bin/pip install .
 
 COPY ./config_data /config_data
 WORKDIR /app
 ENV FLASK_APP=tart_web_api.main
 #ENV FLASK_DEBUG=1
-RUN pip install waitress
+RUN /opt/venv/bin/pip install waitress
 
 EXPOSE 5000
-CMD ["waitress-serve", "--threads=1", "--port=5000", "tart_web_api:app.app"]
+CMD ["/opt/venv/bin/waitress-serve", "--threads=1", "--port=5000", "tart_web_api:app.app"]
