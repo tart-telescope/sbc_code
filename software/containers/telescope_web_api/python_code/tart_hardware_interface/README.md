@@ -2,7 +2,7 @@
 
 This module is used for low-level interfacing to the open-source Transient Array Radio Telescope (TART).
 
-For more information see the [TART github repository](https://github.com/tmolteno/TART)
+For more information see the [TART github repository](https://github.com/tart-telescope/sbc_code)
 
 ## Authors
 
@@ -25,3 +25,4 @@ in which case changes to the source-code will be immediately available to projec
 * Version 0.1.7. Further python3 support
 * Version 0.1.8. Remove unused routines, no implicit import paths
 * Version 0.2.0. Save RAW data as .hdf5 files
+* Version 0.2.0b3. Add dummy and fake SPI modules when SPI isn't readable. This displays a clock :)

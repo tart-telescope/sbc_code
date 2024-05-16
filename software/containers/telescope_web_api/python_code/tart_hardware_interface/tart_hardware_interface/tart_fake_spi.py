@@ -85,7 +85,7 @@ class TartFakeSPI(TartSPI):
     ##  FAKE TART SPI interface.
     ##--------------------------------------------------------------------------
     def __init__(self, runtime_config, permute, speed=32000000):
-        super().__init__(runtime_config, permute, speed, True)
+        super().__init__(runtime_config, permute, speed, fake=True)
     
 
     # Override reading of data

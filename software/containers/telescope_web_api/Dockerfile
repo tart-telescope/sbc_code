@@ -24,8 +24,7 @@ RUN rm -rf /var/lib/apt/lists/*
 
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
+RUN sh /opt/venv/bin/activate
 RUN /opt/venv/bin/pip install -U pip setuptools wheel
 RUN /opt/venv/bin/pip install tart 
 RUN /opt/venv/bin/pip install tart_tools 
