@@ -9,25 +9,22 @@ The worldwide network of TART telescopes are all available directly, but also av
 <code>
 TART_VPN: ----------------------------------------------------------------------------------------------------------
                              |                 |               |                    |
-                          TART1               TART2          Discovery            HTTP
+                          TART1              TART2           Proxy                TART3
 </code>
 
 The role of the HTTP server is to make the TARTs available via the public internet. This is done using Caddy
 
-## tart_vpn Network
-
-This network lives inside docker. It is a headscale/tailscale VPN network hosted on cloud.elec.ac.nz.
-
-    docker network create tart-vpn-nw
     
 ## TART proxy 
+
+See the proxy directory...
 
 This server lives on the headscale network and matches http requests for example api.elec.ac.nz/tart/signal/{request} -> signal.tart.telescopes.elec.ac.nz/{request}
 (https://caddyserver.com/docs/caddyfile/matchers#path)
 
     api.elec.ac.nz {
-        @tartapi path_regexp tartapi /tart/([a-z]+)/*$
-        reverse_proxy @tartapi http://{re.tartapi.tart}.tart.telescopes.elec.ac.nz/{re.tartapi.request}
+        @tartapi path_regexp tartapi /tart/(?<tartname>[a-z]+)/(?<request>.*)$
+        reverse_proxy @tartapi http://{re.tartapi.tartname}.tart.telescopes.elec.ac.nz/{re.tartapi.request}
     }
 
 ## HTTP Server
