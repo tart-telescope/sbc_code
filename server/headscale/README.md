@@ -6,6 +6,14 @@ it will have a domain name of signal.tart.telescopes.elec.ac.nz
 
 ## Headscale
 
-## Proxy'
+To issue commands for headscale
 
-This proxies between
+    docker compose exec headscale /bin/bash
+
+## Add a telescope
+
+Create a new device key for user 'tart'. Then authenticate the user during bring up on the TART telescope.
+
+## Proxy
+
+A single host sits on the headscale network and acts as a proxy routing /user/host to the correct internal domain name. This is just another machine on the tailscale network. At this stage the proxy is configured manually.

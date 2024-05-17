@@ -16,9 +16,19 @@ The role of the HTTP server is to make the TARTs available via the public intern
 
 ## tart_vpn Network
 
-This network lives inside docker. It is a headscale/tailscale VPN network.
+This network lives inside docker. It is a headscale/tailscale VPN network hosted on cloud.elec.ac.nz.
 
     docker network create tart-vpn-nw
+    
+## TART proxy 
+
+This server lives on the headscale network and matches http requests for example api.elec.ac.nz/tart/signal/{request} -> signal.tart.telescopes.elec.ac.nz/{request}
+(https://caddyserver.com/docs/caddyfile/matchers#path)
+
+    api.elec.ac.nz {
+        @tartapi path_regexp tartapi /tart/([a-z]+)/*$
+        reverse_proxy @tartapi http://{re.tartapi.tart}.tart.telescopes.elec.ac.nz/{re.tartapi.request}
+    }
 
 ## HTTP Server
 
@@ -48,50 +58,7 @@ Where the /config
 
 * https://blog.gurucomputing.com.au/Reverse%20Proxies%20with%20Nginx%20Proxy%20Manager/Installing%20Nginx%20Proxy%20Manager/#routing-by-hostname
 
-## Service Discovery
 
-Each TART telescope runs a service that connects it to a VPN network hosted in the cloud. This is done by using headscale on tart.elec.ac.nz. 
-This tailscale exists on a docker network
-
-    docker network create reverseproxy-nw
-
-
-Change to your hostname or host IP (https://github.com/juanfont/headscale/blob/main/docs/reverse-proxy.md)
-
-    service: headscale
-        image: headscale:latest
-        volume $(pwd)/config:/etc/headscale/ \
-        ports:
-            8080:8080
-            9090:9090
-
-    service: caddy
-        caddyfile:   
-        tart.elec.ac.nz {
-            reverse_proxy headscale:8080
-        }
-
-    services:
-    caddy:
-        image: caddy:latest
-        container_name: caddy
-        restart: always
-        networks:
-            reverseproxy-nw:
-        stdin_open: true
-        tty: true
-        volumes:
-            - ./container-data:/data
-            - ./container-config:/config
-            - /etc/localtime:/etc/localtime:ro
-        ports:
-            - 80:80
-            - 443:443
-        entrypoint: /usr/bin/caddy run --adapter caddyfile --config /config/Caddyfile
-
-    networks:
-    reverseproxy-nw:
-        external: true
 ## Adding a TART
 
 On the server, execute the following hich will generate an <AUTH_KEY>
