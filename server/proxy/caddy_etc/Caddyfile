@@ -1,7 +1,14 @@
 #
 # Caddyfile to match API requests to api.elec.ac.nz/tart/signal/xxx -> signal.tart.telescopes.elec.ac.nz/xxx
 #
-api.elec.ac.nz {
-    @tartapi path_regexp tartapi /tart/(?<tartname>[a-z]+)/(?<request>.*)$
-    reverse_proxy @tartapi http://{re.tartapi.tartname}.tart.telescopes.elec.ac.nz/{re.tartapi.request}
+{
+	# General Options
+	debug
+}
+
+# api.elec.ac.nz should go here. The following is for testing. wget --no-check-certificate http://localhost/tart/signal
+localhost {
+    log
+    @tartapi path_regexp tartapi /tart/([a-z]+)/(.*)$
+    reverse_proxy @tartapi {re.tartapi.1}.tart.telescopes.elec.ac.nz/{re.tartapi.2}
 }
