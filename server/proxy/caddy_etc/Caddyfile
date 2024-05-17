@@ -1,0 +1,7 @@
+#
+# Caddyfile to match API requests to api.elec.ac.nz/tart/signal/xxx -> signal.tart.telescopes.elec.ac.nz/xxx
+#
+api.elec.ac.nz {
+    @tartapi path_regexp tartapi /tart/(?<tartname>[a-z]+)/(?<request>.*)$
+    reverse_proxy @tartapi http://{re.tartapi.tartname}.tart.telescopes.elec.ac.nz/{re.tartapi.request}
+}
