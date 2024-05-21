@@ -19,36 +19,17 @@ services:
         restart: unless-stopped
       
 
-    ## Automatic Proxy which will resolve the VIRTUAL_HOST to the container specified.
-    # Get an auth_key
-    # 	docker compose -f proxy-compose.yml exec tailscale tailscale up --login-server http://cloud.elec.ac.nz:51820 --hostname=proxy --authkey ${AUTH_KEY}
-    #
-    # Only proxy hosts on the headscale network...
-    # nginx:
-    #     image: nginx
-    #     network_mode: "service:tailscale"
-    #     restart: always
-    #     volumes:
-    #         - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-    #         - ./nginx/html:/var/www/html
-    #         - ~/cache:/cache
-    #     logging:
-    #         driver: "json-file"
-    #         options:
-    #             max-file: "5"
-    #             max-size: "1m"
-
-
-    caddy:
+    headscale_proxy:
         image: caddy:latest
-        container_name: caddy
+        container_name: headscale_proxy
+        network_mode: "service:tailscale"
         restart: unless-stopped
         security_opt:
             - label:disable
-        ports:
-            - "80:80"
-            - "443:443"
-            - "443:443/udp"
+        # ports:
+        #     - "80:80"
+        #     - "443:443"
+        #     - "443:443/udp"
         volumes:
             - caddy_data:/data
             - caddy_config:/config

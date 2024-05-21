@@ -7,15 +7,8 @@ cloud.elec.ac.nz {
         reverse_proxy http://headscale:8080
 }
 
+# Proxy this to the telescope_proxy which is connected to the headscale network in a separate container
 api.elec.ac.nz {
-    log
-    
-    handle_path /testing/* {
-        respond "Hi test {uri}"
-    }
-    @tartapi path_regexp tartapi /tart/([a-z]+)/(.*)
-#    reverse_proxy @tartapi {re.tartapi.1}.tart.telescopes.elec.ac.nz/{re.tartapi.2}
-#    handle @tartapi {
-#        respond testing/{re.tartapi.1}/{re.tartapi.2}
-#    }
+     reverse_proxy http://host.docker.internal:8880
+
 }

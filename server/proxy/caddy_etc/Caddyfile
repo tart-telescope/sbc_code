@@ -7,15 +7,20 @@
 }
 
 # api.elec.ac.nz should go here. The following is for testing. wget --no-check-certificate http://localhost/tart/signal
-localhost:80 {
+api.elec.ac.nz:80 {
     log
     
-    handle_path /testing/* {
-        respond "Hi test {uri}"
+    @testpath path_regexp testpath /testing/tart/([a-z]+)/(.*)
+    
+    handle @testpath {
+        respond "{uri} ->  {re.testpath.1}.tart.telescopes.elec.ac.nz/{re.testpath.2}"
     }
+    
     @tartapi path_regexp tartapi /tart/([a-z]+)/(.*)
-#    reverse_proxy @tartapi {re.tartapi.1}.tart.telescopes.elec.ac.nz/{re.tartapi.2}
     handle @tartapi {
-        respond testing/{re.tartapi.1}/{re.tartapi.2}
-        }
+        # respond "{uri} ->  {re.tartapi.1}.tart.telescopes.elec.ac.nz/{re.tartapi.2}"
+        reverse_proxy {re.tartapi.1}.tart.telescopes.elec.ac.nz/{re.tartapi.2}
+    }
+
+    respond "{uri} Not handled"
 }
