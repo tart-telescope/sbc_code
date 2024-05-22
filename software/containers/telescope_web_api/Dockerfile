@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:bullseye
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -16,7 +16,9 @@ RUN apt-get update -y && apt-get install -y \
     python3-jsonrpclib-pelix \
     python3-h5py \
     python3-astropy \
-    python3-healpy 
+    python3-healpy \
+    python3-cryptodome \
+    python3-argon2
 
 RUN apt-get install -y libhdf5-dev python3-pkgconfig
 
