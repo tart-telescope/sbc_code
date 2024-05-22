@@ -26,17 +26,17 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
 
 RUN . /opt/venv/bin/activate && pip install -U pip setuptools wheel
-RUN . /opt/venv/bin/activate && pip install tart 
-RUN . /opt/venv/bin/activate && pip install tart_tools 
+RUN . /opt/venv/bin/activate && pip install --user tart 
+RUN . /opt/venv/bin/activate && pip install --user tart_tools 
 
 ENV CONFIG_DIR=/config_data
 
 COPY ./python_code /python_code
 WORKDIR /python_code/tart_hardware_interface
-RUN . /opt/venv/bin/activate && pip install .
+RUN . /opt/venv/bin/activate && pip install --user  .
 
 WORKDIR /python_code/tart_web_api
-RUN . /opt/venv/bin/activate && pip install .
+RUN . /opt/venv/bin/activate && pip install --user .
 
 COPY ./config_data /config_data
 WORKDIR /app

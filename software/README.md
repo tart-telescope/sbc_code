@@ -43,18 +43,13 @@ Set hostname, activate SPI & SSH with raspi-config ( SSH and SPI can be enabled 
 
 Install docker on the raspberry pi. This is done by following commands.  
 
-Debian Buster:
-
-    sudo apt install docker.io docker-compose
-    sudo usermod -aG docker $USER
-    sudo reboot
-    
- OR:
-    
     curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
     sudo usermod -aG docker $USER
     sudo reboot
-    
+
+### Prepare the pi for long-term use
+
+Add tempfs for /var/log
   
 
 ### Step 2. Copy code to the Pi
@@ -70,16 +65,16 @@ SSH into the raspberry pi after completing step 1.
 
     cd software
     
-Edit docker-compose.yml and change LOGIN_PW= from passwd to your secure password. This password is used to log in to the TART web interface
+Edit docker compose.yml and change LOGIN_PW= from passwd to your secure password. This password is used to log in to the TART web interface
 
 Now run  
  
-    docker-compose build
+    docker compose build
 This last step can take ages (around 1 hour or so)
 
 This will build all the necessary sofware on the Pi. To run all the software an services. Type
 
-    docker-compose up
+    docker compose up
 
 This will launch all the necessary processes in docker containers on the pi.
 
@@ -87,7 +82,7 @@ This will launch all the necessary processes in docker containers on the pi.
 
 To make the system start automatically at startup (and run in the background) modify the line in step 3 to
 
-    docker-compose up -d
+    docker compose up -d
 
 
 ### Testing
