@@ -1,1 +1,1 @@
-rsync --verbose -rv --exclude "tailscale/*" --exclude="nginx/*" . tart@cloud.elec.ac.nz:proxy
+rsync --verbose -rv --exclude "tailscale/*" . tart@cloud.elec.ac.nz:proxy

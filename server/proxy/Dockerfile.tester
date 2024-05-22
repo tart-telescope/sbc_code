@@ -1,12 +1,17 @@
-FROM debian:bookworm
+FROM jrei/systemd-debian:bullseye
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG DEBIAN_FRONTEND=noninteractive
 
 # debian setup
 RUN apt-get update -y && apt-get install -y \
-    curl \
-    net-tools inetutils-tools
+    curl nginx bind9-dnsutils vim \
+    net-tools inetutils-tools iputils-ping bind9-utils
+RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bullseye.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
+RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bullseye.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list
+RUN apt-get update -y
+RUN apt-get install -y tailscale
 
-RUN apt-get install -y iputils-ping
-RUN apt-get install -y nginx
-CMD /bin/bash
+RUN rm /etc/nginx/sites-enabled/default
+# RUN service nginx stop
+# CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+
