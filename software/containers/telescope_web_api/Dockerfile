@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -27,7 +27,6 @@ RUN rm -rf /var/lib/apt/lists/*
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
 
-RUN . /opt/venv/bin/activate && pip install -U pip setuptools wheel
 RUN . /opt/venv/bin/activate && pip install --user tart 
 RUN . /opt/venv/bin/activate && pip install --user tart_tools 
 
