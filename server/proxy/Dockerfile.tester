@@ -1,0 +1,12 @@
+FROM debian:bookworm
+MAINTAINER Tim Molteno "tim@elec.ac.nz"
+ARG DEBIAN_FRONTEND=noninteractive
+
+# debian setup
+RUN apt-get update -y && apt-get install -y \
+    curl \
+    net-tools inetutils-tools
+
+RUN apt-get install -y iputils-ping
+RUN apt-get install -y nginx
+CMD /bin/bash
