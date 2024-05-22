@@ -17,7 +17,7 @@ RUN apt-get update -y && apt-get install -y \
     python3-h5py \
     python3-astropy \
     python3-healpy \
-    python3-cryptodome \
+    python3-pycryptodome \
     python3-argon2
 
 RUN apt-get install -y libhdf5-dev python3-pkgconfig
