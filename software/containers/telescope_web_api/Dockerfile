@@ -20,7 +20,7 @@ RUN apt-get update -y && apt-get install -y \
     python3-pycryptodome \
     python3-argon2
 
-RUN apt-get install -y libhdf5-dev python3-pkgconfig cython3 python3-waitress
+RUN apt-get install -y libhdf5-dev python3-pkgconfig cython3
 
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -44,7 +44,7 @@ COPY ./config_data /config_data
 WORKDIR /app
 ENV FLASK_APP=tart_web_api.main
 #ENV FLASK_DEBUG=1
-# RUN . /opt/venv/bin/activate && install waitress
+RUN . /opt/venv/bin/activate && pip3 install waitress
 
 EXPOSE 5000
-CMD [". /opt/venv/bin/activate && waitress-serve", "--threads=1", "--port=5000", "tart_web_api:app.app"]
+CMD ["/opt/venv/bin/waitress-serve", "--threads=1", "--port=5000", "tart_web_api:app.app"]
