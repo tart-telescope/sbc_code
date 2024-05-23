@@ -7,8 +7,6 @@
 #
 #   Author: Tim Molteno (c) 2019-2023.
 
-version: '3.4'
-
 services:
 
     api_container:
