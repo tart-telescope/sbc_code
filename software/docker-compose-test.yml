@@ -52,7 +52,7 @@ services:
             context: ./containers/web_app
             args:
                 # Change this if you desire. Really only needed for running multiple TART telescopes and reverse proxying.
-                tart_name: tart3dev
+                tart_name: gui
         restart: always
         logging:
             driver: "json-file"
