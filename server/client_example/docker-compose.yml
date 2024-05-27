@@ -22,4 +22,6 @@ services:
     signal:
         image: nginx
         network_mode: "service:tailscale"
-        
+        depends_on:
+            - tailscale
+        restart: unless-stopped
