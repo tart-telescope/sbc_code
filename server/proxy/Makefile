@@ -2,7 +2,8 @@ COMPOSE=docker compose -f docker-compose.yml
 USER=tart
 
 build:
-	docker compose  --progress=plain --parallel=1 build
+	${COMPOSE}  --progress=plain --parallel=1 build
+
 auth:
 	ssh tart@cloud.elec.ac.nz \
 		'cd headscale; docker compose exec headscale \

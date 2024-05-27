@@ -18,10 +18,8 @@ services:
              - ~/cache:/cache
              - "./ts-proxy/state:/var/lib/tailscale"        # State data will be stored in this directory
              - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work 
-             - /sys/fs/cgroup:/sys/fs/cgroup:ro      # Required for systemd in debian
         environment:
             - TS_ACCEPT_DNS=true
-            # - TS_USERSPACE=false
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
             - TS_HOSTNAME=telescope-proxy            # Will resolve to proxy.tart.telescopes.elec.ac.nz
             - TS_STATE_DIR=/var/lib/tailscale
