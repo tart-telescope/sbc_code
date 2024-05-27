@@ -11,7 +11,5 @@ COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscaled /app/
 COPY --from=docker.io/tailscale/tailscale:stable /usr/local/bin/tailscale /app/tailscale
 RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
 
-RUN cat /etc/nginx/nginx.conf
-RUN ls -Rl /etc/nginx/
 # Run on container startup.
 CMD ["/app/start.sh"]
