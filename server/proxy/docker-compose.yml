@@ -18,6 +18,8 @@ services:
              - ~/cache:/cache
              - "./ts-proxy/state:/var/lib/tailscale"        # State data will be stored in this directory
              - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work 
+        env_file:
+            - secrets.env                           # this file provides TS_AUTH_KEY 
         environment:
             - TS_ACCEPT_DNS=true
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
