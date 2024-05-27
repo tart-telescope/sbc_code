@@ -11,9 +11,10 @@ services:
         cap_add:                                    # Required for tailscale to work
             - net_admin
             - sys_module
+        env_file:
+            - secrets.env                           # this file provides TS_AUTH_KEY, TS_HOSTNAME 
         environment:
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
-            - TS_HOSTNAME=signal            # Will resolve to signal.tart.telescopes.elec.ac.nz
             - TS_STATE_DIR=/var/lib/tailscale
 
         restart: unless-stopped
