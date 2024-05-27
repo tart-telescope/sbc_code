@@ -10,5 +10,8 @@ cloud.elec.ac.nz {
 # Proxy this to the telescope_proxy which is connected to the headscale network in a separate container
 api.elec.ac.nz {
      reverse_proxy http://host.docker.internal:8880
+}
 
+immich.molteno.net {
+     reverse_proxy http://host.docker.internal:2283
 }
