@@ -5,11 +5,11 @@
 #   RESTful API documentation (api_doc_server). Connect to this via http://localhost:5000.
 #   VPN connection to AWS
 #
-#   Author: Tim Molteno (c) 2019-2023.
+#   Author: Tim Molteno (c) 2019-2024.
 
 services:
 
-    api_container:
+    api_container: # Port 5000 internal only
         build: 
             context: ./containers/telescope_web_api
         volumes:
@@ -19,8 +19,6 @@ services:
         environment:
             # Change the following to be something secure. You will use this to login to your telescope from the web api.
             - LOGIN_PW=passwd
-        ports:
-            - 5000:5000
         restart: always
         logging:
             driver: "json-file"
@@ -28,14 +26,14 @@ services:
                 max-file: "5"
                 max-size: "10m"
 
-    api_doc_server:
+    api_doc_server: # Port 80 internally only
         build:
             context: ./containers/telescope_web_api
             dockerfile: Dockerfile.apidoc 
             args:
-                tart_doc_url: tart.elec.ac.nz\/signal
-        ports:
-            - 8080:80
+                tart_name: ${TS_HOSTNAME}
+        env_file:
+            - secrets.env                           # this file provides TS_AUTH_KEY, TS_HOSTNAME 
         restart: always
 
     web_app:

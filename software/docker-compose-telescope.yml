@@ -3,45 +3,35 @@
 #   RESTful API (api_container)
 #   TART web front end app (web_app)
 #   RESTful API documentation (api_doc_server). Connect to this via http://localhost:5000.
-#   VPN connection to AWS
+#   VPN connection to the cloud
 #
-#   Author: Tim Molteno (c) 2019-2020.
-
-version: '3.4'
+#   Author: Tim Molteno (c) 2019-2024.
 
 services:
-    client_vpn:
-        #
-        # This makes the VPN connection to tart.elec.ac.nz. It requires a local directory called ./vpn that contains the necessary vpn keys
-        # those keys should have been created by an adminstrator on tart.elec.ac.nz
-        #
-        image: dperson/openvpn-client:armhf
-            # cap_add, security_opt, and volume required for the image to function
-        cap_add:
-            - net_admin
-        environment:
-            TZ: 'EST5EDT'
-        networks:
-            - default
-        read_only: true
-        tmpfs:
-            - /run
-            - /tmp
-        restart: unless-stopped
-        security_opt:
-            - label:disable
-        stdin_open: true
-        tty: true
+    tailscale:
+        image: tailscale/tailscale:latest
+        ports:
+            - "8000:80"
         volumes:
-            - /dev/net:/dev/net:z
-            - ./vpn:/vpn
+            - "./tailscale/var_lib:/var/lib"        # State data will be stored in this directory
+            - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work 
+        cap_add:                                    # Required for tailscale to work
+            - net_admin
+            - sys_module
+        env_file:
+            - secrets.env                           # this file provides TS_AUTH_KEY, TS_HOSTNAME 
+        environment:
+            - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
+            - TS_STATE_DIR=/var/lib/tailscale
+
+        restart: unless-stopped
         logging:
             driver: "json-file"
             options:
                 max-file: "5"
                 max-size: "10m"
 
-    api_container:
+    api_container: # Port 5000
         build: 
             context: ./containers/telescope_web_api
         volumes:
@@ -62,15 +52,17 @@ services:
                 max-file: "5"
                 max-size: "10m"
 
-    api_doc_server:
+    api_doc_server: # Port 80 internal
+        env_file:
+            - secrets.env                           # this file provides TS_HOSTNAME 
         build:
             context: ./containers/telescope_web_api
             dockerfile: Dockerfile.apidoc 
-        ports: 
-            - 8080:80
+            args:
+                tart_name: ${TS_HOSTNAME}
         restart: always
 
-    web_app:
+    web_app: # Port 80 on service tailscale
         depends_on:
             - api_container
             - api_doc_server
@@ -78,12 +70,14 @@ services:
             - data-volume:/telescope_data
         environment:
             - NODE_ENV=production
+        env_file:
+            - secrets.env                           # this file provides TS_HOSTNAME 
         build: 
             context: ./containers/web_app
             args:
                 # Change this if you desire. Really only needed for running multiple TART telescopes and reverse proxying.
-                tart_name: signal
-        network_mode: "service:client_vpn"
+                tart_name: ${TS_HOSTNAME}
+        network_mode: "service:tailscale"
         restart: always
         logging:
             driver: "json-file"

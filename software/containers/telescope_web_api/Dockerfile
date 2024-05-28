@@ -18,7 +18,8 @@ RUN apt-get update -y && apt-get install -y \
     python3-astropy \
     python3-healpy \
     python3-pycryptodome \
-    python3-argon2
+    python3-argon2 \
+    python3-tqdm
 
 RUN apt-get install -y libhdf5-dev python3-pkgconfig cython3
 
@@ -28,7 +29,8 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
 
 RUN . /opt/venv/bin/activate && pip3 install  "h5py<=3.10"
-RUN . /opt/venv/bin/activate && pip3 install  tart  
+RUN . /opt/venv/bin/activate && pip3 install --no-deps tart 
+RUN . /opt/venv/bin/activate && pip3 install "minio<=7.1"
 RUN . /opt/venv/bin/activate && pip3 install  tart_tools 
 
 ENV CONFIG_DIR=/config_data

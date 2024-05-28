@@ -1,14 +1,13 @@
 # Stage 0, "build-stage", build the documentation
 FROM node:16 as build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
-ARG tart_doc_url
-
+ARG tart_name
 RUN npm install apidoc -g
 
 COPY ./python_code/tart_web_api /code
 
 WORKDIR /code/tart_web_api
-RUN sed "s/localhost/${tart_doc_url}/g" -i apidoc.json
+RUN sed "s/localhost/api.elec.ac.nz\/tart\/${tart_name}/g" -i apidoc.json
 
 RUN apidoc -i ./ -o /doc
 
@@ -17,5 +16,6 @@ RUN apidoc -i ./ -o /doc
 FROM nginx:1
 
 COPY --from=build-stage /doc/ /usr/share/nginx/html
+# COPY nginx_apidoc.conf /etc/nginx/http.d/default.conf
 
 EXPOSE 80

@@ -40,8 +40,14 @@ Set hostname, activate SPI & SSH with raspi-config ( SSH and SPI can be enabled 
     sudo raspi-config
     sudo apt update
     sudo apt dist-upgrade
+    
+Install tailscale on the TART
 
-Install docker on the raspberry pi. This is done by following commands.  
+    curl -fsSL https://tailscale.com/install.sh | sh
+    
+Now set up tailscale onto the elec.ac.nz tailcale network.
+
+Install docker on the SBC. This is done by following commands.  
 
     curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
     sudo usermod -aG docker $USER
@@ -54,9 +60,7 @@ Add tempfs for /var/log
 
 ### Step 2. Copy code to the Pi
 
-clone the Github repository
-
-    git clone https://github.com/tart-telescope/sbc_code
+Run the install script, to copy the SBC code to the new machine
 
 
 ### Step 3. Build on the Pi

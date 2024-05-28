@@ -61,9 +61,5 @@ Where the /config
 On the server, execute the following hich will generate an <AUTH_KEY>
 
     docker compose exec headscale \
-        headscale --user myfirstuser preauthkeys create --reusable --expiration 24h
+        headscale --user tart preauthkeys create --reusable --expiration 24h
 
-On the tart:
-
-    docker exec tailscale \
-        tailscale up --login-server <URL> --authkey <AUTH_KEY>
