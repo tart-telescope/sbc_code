@@ -70,6 +70,7 @@ SSH into the raspberry pi after completing step 1.
     cd software
     
 Edit docker compose.yml and change LOGIN_PW= from passwd to your secure password. This password is used to log in to the TART web interface
+Also add a file called .env with TS_HOSTNAME=foo 
 
 Now run  
  

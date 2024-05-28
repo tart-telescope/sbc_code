@@ -18,9 +18,8 @@ services:
         cap_add:                                    # Required for tailscale to work
             - net_admin
             - sys_module
-        env_file:
-            - secrets.env                           # this file provides TS_AUTH_KEY, TS_HOSTNAME 
         environment:
+            - TS_HOSTNAME=${TS_HOSTNAME}
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
             - TS_STATE_DIR=/var/lib/tailscale
 
@@ -53,8 +52,6 @@ services:
                 max-size: "10m"
 
     api_doc_server: # Port 80 internal
-        env_file:
-            - secrets.env                           # this file provides TS_HOSTNAME 
         build:
             context: ./containers/telescope_web_api
             dockerfile: Dockerfile.apidoc 
