@@ -56,12 +56,11 @@ Install docker on the SBC. This is done by following commands.
 ### Prepare the pi for long-term use
 
 Add tempfs for /var/log
-  
+Fix up journald (https://forums.raspberrypi.com/viewtopic.php?t=341605)  
 
 ### Step 2. Copy code to the Pi
 
-Run the install script, to copy the SBC code to the new machine
-
+    make install TART=user@tart-host
 
 ### Step 3. Build on the Pi
 
