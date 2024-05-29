@@ -3,6 +3,6 @@
 	"version": "0.0.1",
 	"description": "API to monitor and control the TART",
 	"title": "TART API",
-	"url" : "http://localhost/api/v1",
-	"sampleUrl" : "http://localhost/api/v1"
+	"url" : "https://localhost/api/v1",
+	"sampleUrl" : "https://localhost/api/v1"
 }
