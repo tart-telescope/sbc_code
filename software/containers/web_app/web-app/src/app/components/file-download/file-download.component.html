@@ -10,7 +10,7 @@
         <tbody>
             <tr *ngFor="let file of filePaths">
                 <td class="download-table-cell">
-                    <a [href]="baseLocation + '/' + file.filename" download>
+                    <a [href]="file.filename" download>
                         {{ file.filename | fileNameParse }}
                     </a>
                 </td>
