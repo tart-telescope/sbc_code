@@ -38,7 +38,7 @@ COPY ./web-app /code
 # RUN npm install
 
 #RUN npm run ng -- build --source-map --base-href=/${tart_name}/ 
-RUN npm run ng -- build --prod  --base-href=/${tart_name}/ 
+RUN npm run ng -- build --prod  --base-href=./ --deploy-url ./
 
 #
 #
