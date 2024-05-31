@@ -1,10 +1,12 @@
 # Server Side of the TART
 
+Author: Tim Molteno (c) 2024
+
 The worldwide network of TART telescopes are all available directly, but also available through a common web interface at https://tart.elec.ac.nz/<tart_name>, where <tart_name> is the unique name of each TART. How this is done is described here.
 
 * The cloud server runs a headscale server which creates the TART_VPN a virtual network..
 * Each tart runs tailscale container that connects to the TART_VPN
-* There is a service discovery running on the TART_VPN
+* There is a special proxy running on the TART_VPN that provides access to each TART.
 
 <code>
 TART_VPN: ----------------------------------------------------------------------------------------------------------
@@ -17,49 +19,20 @@ The role of the HTTP server is to make the TARTs available via the public intern
     
 ## TART proxy 
 
-See the proxy directory...
+See the proxy directory... If a TART is called <tart_name> then it will be visible at
 
-This server lives on the headscale network and matches http requests for example api.elec.ac.nz/tart/signal/{request} -> signal.tart.telescopes.elec.ac.nz/{request}
-(https://caddyserver.com/docs/caddyfile/matchers#path)
+    https://api.elec.ac.nz/tart/<tart_name>/
+    
+and it's API endpoint will be 
 
-    api.elec.ac.nz {
-        @tartapi path_regexp tartapi /tart/(?<tartname>[a-z]+)/(?<request>.*)$
-        reverse_proxy @tartapi http://{re.tartapi.tartname}.tart.telescopes.elec.ac.nz/{re.tartapi.request}
-    }
+    https://api.elec.ac.nz/tart/<tart_name>/api
 
-## HTTP Server
+and it's API documentation will be available at 
 
-    caddy:
-        image: caddy:latest
-        container_name: caddy
-        restart: always
-        networks:
-            tart-vpn-nw:
-        stdin_open: true
-        tty: true
-        volumes:
-            - ./container-data:/data
-            - ./container-config:/config
-            - /etc/localtime:/etc/localtime:ro
-        ports:
-            - 80:80
-            - 443:443
-        entrypoint: /usr/bin/caddy run --adapter caddyfile --config /config/Caddyfile
-
-    networks:
-    tart-vpn-nw:
-        external: true
-
-Where the /config
-## Some links
-
-* https://blog.gurucomputing.com.au/Reverse%20Proxies%20with%20Nginx%20Proxy%20Manager/Installing%20Nginx%20Proxy%20Manager/#routing-by-hostname
-
+    https://api.elec.ac.nz/tart/<tart_name>/doc
 
 ## Adding a TART
 
-On the server, execute the following hich will generate an <AUTH_KEY>
-
-    docker compose exec headscale \
-        headscale --user tart preauthkeys create --reusable --expiration 24h
+The first time a TART is configured and run (see ../software) it will need to be given a unique tart name, and then
+authenticated onto the cloud by a system administrator.
 
