@@ -9,19 +9,19 @@ services:
             - /tmp
             - /run
             - /run/lock
-        cap_add:                                    # Required for tailscale to work
+        cap_add:                                     # Required for tailscale to work
             - net_admin
             - sys_module
         volumes:
              - ./nginx/nginx.conf:/etc/nginx/http.d/default.conf
              - ./nginx/html:/var/www/html
              - ~/cache:/cache
-             - "./ts-proxy/state:/var/lib/tailscale"        # State data will be stored in this directory
+             - "./ts-proxy/state:/var/lib/tailscale" # State data will be stored in this directory
              - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work 
         env_file:
-            - secrets.env                           # this file provides TS_AUTH_KEY 
+            - secrets.env                            # this file provides TS_AUTH_KEY 
         environment:
             - TS_ACCEPT_DNS=true
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
-            - TS_HOSTNAME=telescope-proxy            # Will resolve to proxy.tart.telescopes.elec.ac.nz
+            - TS_HOSTNAME=telescope-proxy
             - TS_STATE_DIR=/var/lib/tailscale

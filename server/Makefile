@@ -1,3 +1,6 @@
+#
+#	Author: Tim Molteno tim@elec.ac.nz (c) 2024
+#
 COMPOSE=docker compose -f docker-compose.yml
 USER=tart
 
@@ -9,7 +12,6 @@ build:
 
 up:
 	${COMPOSE} up --remove-orphans
-# check by pointing browser to http://localhost:9090/metrics
 
 down:
 	${COMPOSE} down
@@ -33,5 +35,3 @@ namespace:
 	${COMPOSE} exec headscale \
 		headscale namespaces create ${USER}
 
-# headscale nodes register --user tart --key nodekey:0e985c452bded096544c2bf27d4043d0643912a3726397f21ce39015d5b26a1f
-# headscale nodes register --user tart --key nodekey:54fe44e10fd3722d2090df86f9ad91e54ea1b129ee5c084a1d9dfd9826052a06
