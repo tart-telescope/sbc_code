@@ -1,7 +1,7 @@
 #
 #
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM node:16 as build-stage
+FROM node:16 AS build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG tart_name
 

@@ -144,7 +144,7 @@ def run_diagnostic(tart, runtime_config):
         channel['phase'] = phases[i]
         channel['radio_mean'] =radio_means[i]
         power, freq = get_psd(ant_data[i]-ant_data[i].mean(),16e6,runtime_config['diagnostic']['spectre']['NFFT'])
-        power_db = 10.*np.log10(power)
+        power_db = 10.*np.log10(power + 1e-32) # Avoid divide by zero
         power_db = np.nan_to_num(power_db)
         channel['power'] = (np.asarray(power_db*1000,dtype=int)/1000.        ).tolist()
         channel['freq'] = ((freq/1e6)).tolist()

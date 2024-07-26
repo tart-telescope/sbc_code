@@ -3,7 +3,7 @@
 # Build the web app for development purposes.
 #
 #
-FROM debian:bookworm as build-stage
+FROM debian:bookworm AS build-stage
 MAINTAINER Tim Molteno "tim@elec.ac.nz"
 ARG tart_name
 
