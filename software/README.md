@@ -68,8 +68,13 @@ SSH into the raspberry pi after completing step 1.
 
     cd software
     
-Edit docker compose.yml and change LOGIN_PW= from passwd to your secure password. This password is used to log in to the TART web interface
-Also add a file called .env with TS_HOSTNAME=foo 
+Create a secrets file called .env with the variables
+
+    TS_HOSTNAME=my-hostname
+    LOGIN_PW=xxx
+    
+${LOGIN_PW} is used to log in to the TART web interface
+${TS_HOSTNAME} will be the public name of the TART telescope https://api.elec.ac.nz/tart/${TS_HOSTNAME}/home
 
 Now run  
  
@@ -91,7 +96,7 @@ To make the system start automatically at startup (and run in the background) mo
 
 ### Testing
 
-Point your browser to the raspberry pi (http://tart2-dev.local). You should see the telescope web interface. 
+Point your browser to the raspberry pi (https://api.elec.ac.nz/tart/${TS_HOSTNAME}/home). You should see the telescope web interface. 
 
 On a different computer, you should be able to download data from the command line using the web api.
 
@@ -103,11 +108,11 @@ This should download some HDF files to your local machine. These can be checked 
 
 #### Documentation Server
 
-Point your browser at  [http:/tart2-dev.local/doc/](http:/tart2-dev.local/doc/). You should see the documentation for the TART web API. 
+Point your browser at  [https://api.elec.ac.nz/tart/${TS_HOSTNAME}/doc](https://api.elec.ac.nz/tart/${TS_HOSTNAME}/doc/). You should see the documentation for the TART web API. 
 
 #### Live Telescope View
 
-Point your browser at the target Pi [http:/tart2-dev.local/](http:/tart2-dev.local/). You should see the TART web interface. Remember to login and change the mode to 'vis' so that the telescope starts acquiring data.
+Point your browser at the target Pi [http:/my-pi-name/](http:/tart2-dev.local/). You should see the TART web interface. Remember to login and change the mode to 'vis' so that the telescope starts acquiring data.
 
 
 ## Calibration
