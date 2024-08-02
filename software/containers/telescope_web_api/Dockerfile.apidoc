@@ -1,6 +1,6 @@
 # Stage 0, "build-stage", build the documentation
 FROM node:16 AS build-stage
-MAINTAINER Tim Molteno "tim@elec.ac.nz"
+LABEL Maintainer: Tim Molteno "tim@elec.ac.nz"
 ARG tart_name
 RUN npm install apidoc -g
 

@@ -55,6 +55,8 @@ class TartSPI(object):
   ##--------------------------------------------------------------------------
   def __init__(self, runtime_config, permute, speed=16000000, fake=False):
     if not fake:
+      logging.info(f'TartSPI(runtime_config={runtime_config}, speed={speed}')
+
       self.spi = spidev.SpiDev()
       self.spi.open(0, 0)
       self.spi.mode = 0b00

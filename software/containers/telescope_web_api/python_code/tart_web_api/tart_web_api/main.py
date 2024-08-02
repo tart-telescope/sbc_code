@@ -22,7 +22,7 @@ def tart_p(rt_config):
     tart_control = TartControl(rt_config)
     while True:
         tart_control.set_state(rt_config['mode'])
-        tart_control.run()
+        tart_control.run(noisy=True)
 
 
 

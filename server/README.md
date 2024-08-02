@@ -36,3 +36,9 @@ and it's API documentation will be available at
 The first time a TART is configured and run (see ../software) it will need to be given a unique tart name, and then
 authenticated onto the cloud by a system administrator.
 
+	ssh tart@cloud.elec.ac.nz \
+		'cd headscale; docker compose exec headscale \
+	        headscale -o yaml --user tart preauthkeys create --reusable --expiration 24h | grep key'
+
+	docker compose exec tailscale tailscale up --hostname=nz-dunedin --login-server http://cloud.elec.ac.nz --authkey=
+

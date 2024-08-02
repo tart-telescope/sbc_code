@@ -32,8 +32,8 @@ Create an empty file called ssh and copy it onto the sd card (Make sure that the
 
 log in or SSH into the Raspberry Pi.
 
-    user: pi
-    pw: raspberry
+    user: tart
+    pw: <xxxxxxx>
 
 Set hostname, activate SPI & SSH with raspi-config ( SSH and SPI can be enabled under Interfacing Options) :
 
@@ -45,7 +45,11 @@ Install tailscale on the TART
 
     curl -fsSL https://tailscale.com/install.sh | sh
     
-Now set up tailscale onto the elec.ac.nz tailcale network.
+Now set up tailscale onto the elec.ac.nz tailcale network. This is done using 
+
+    sudo tailscale up
+    
+Ensure that key expiry is disabled for this machine.
 
 Install docker on the SBC. This is done by following commands.  
 
@@ -55,7 +59,7 @@ Install docker on the SBC. This is done by following commands.
 
 ### Prepare the pi for long-term use
 
-Add tempfs for /var/log
+Add tempfs for /var/log (https://github.com/azlux/log2ram)
 Fix up journald (https://forums.raspberrypi.com/viewtopic.php?t=341605)  
 
 ### Step 2. Copy code to the Pi
@@ -66,7 +70,7 @@ Fix up journald (https://forums.raspberrypi.com/viewtopic.php?t=341605)
 
 SSH into the raspberry pi after completing step 1.
 
-    cd software
+    cd code
     
 Create a secrets file called .env with the variables
 
@@ -75,6 +79,13 @@ Create a secrets file called .env with the variables
     
 ${LOGIN_PW} is used to log in to the TART web interface
 ${TS_HOSTNAME} will be the public name of the TART telescope https://api.elec.ac.nz/tart/${TS_HOSTNAME}/home
+
+#### Modify default antenna positions
+
+Change the default antenna positions to be the ones for your TART.
+
+    telescope_config.json
+    calibrated_antenna_positions.json
 
 Now run  
  

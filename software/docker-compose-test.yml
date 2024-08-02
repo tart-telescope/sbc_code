@@ -18,7 +18,7 @@ services:
         # Comment the following two lines to disable access to the TART hardware (this allows testing of software on a desktop)
         environment:
             # Change the following to be something secure. You will use this to login to your telescope from the web api.
-            - LOGIN_PW=passwd
+            - LOGIN_PW=${LOGIN_PW}
         restart: always
         logging:
             driver: "json-file"

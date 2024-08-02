@@ -17,8 +17,8 @@ setup(
         'flask-cli',
         'flask-cors',
         'flask-script',
-        'tart_hardware_interface',
-        'tart'
+        'tart_hardware_interface'
+#        'tart'  TODO H5PY fix
     ],
     url='http://github.com/tmolteno/TART',
     author='Tim Molteno, Max Scheel, Pat Suggate',

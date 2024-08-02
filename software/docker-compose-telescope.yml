@@ -67,8 +67,6 @@ services:
             - data-volume:/telescope_data
         environment:
             - NODE_ENV=production
-        env_file:
-            - secrets.env                           # this file provides TS_HOSTNAME 
         build: 
             context: ./containers/web_app
             args:

@@ -31,7 +31,10 @@ def set_gain():
     content = request.get_json(silent=False)
     g = content['gain']
     ph = content['phase_offset']
-    db.insert_gain(utc_date, g, ph)
+    con = db.connect_to_db()
+    with con:
+        c = con.cursor()
+        db.insert_gain(c, utc_date, g, ph)
     return jsonify({})
 
 

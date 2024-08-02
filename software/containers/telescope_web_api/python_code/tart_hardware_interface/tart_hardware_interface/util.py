@@ -28,6 +28,7 @@ def load_config():
 
 def create_spi_object(runtime_config, speed=16000000):
   perm = load_permute()
+  logging.info(f'create_spi_object(speed={speed}')
   try:
     return TartSPI(runtime_config, perm, speed)
   except Exception as e:

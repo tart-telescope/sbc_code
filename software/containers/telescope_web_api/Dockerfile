@@ -1,5 +1,5 @@
 FROM debian:bookworm
-MAINTAINER Tim Molteno "tim@elec.ac.nz"
+LABEL Maintainer: Tim Molteno "tim@elec.ac.nz"
 ARG DEBIAN_FRONTEND=noninteractive
 
 # debian setup
@@ -28,10 +28,13 @@ RUN rm -rf /var/lib/apt/lists/*
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
 
-RUN . /opt/venv/bin/activate && pip3 install  "h5py<=3.10"
-RUN . /opt/venv/bin/activate && pip3 install --no-deps tart 
+# All the following are to avoid a stupid debian bug which builds h5py 
+# and this takes hours on an RPi (it can't use system-site-packages)
+# Also fails on 3.11. TODO H5PY fix (when h5py has wheels on aarch64, this will be fine)
+# RUN . /opt/venv/bin/activate && pip3 install  "h5py<=3.10"
+RUN . /opt/venv/bin/activate && pip3 install --no-deps tart  # --no-deps to avoid depending on h5py
 RUN . /opt/venv/bin/activate && pip3 install "minio<=7.1"
-RUN . /opt/venv/bin/activate && pip3 install  tart_tools 
+RUN . /opt/venv/bin/activate && pip3 install --no-deps tart_tools   # --no-deps to avoid depending on h5py
 
 ENV CONFIG_DIR=/config_data
 

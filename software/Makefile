@@ -14,6 +14,12 @@ down:
 logs:
 	${COMPOSE} -f docker-compose-test.yml logs -f
 
-TART=tart@nzdunedin
+TART=tart@nz-dunedin
 install:
-	rsync --recursive --verbose --exclude '*.venv*'  --exclude 'node_modules'  --exclude '*.egg-info' --exclude '*.bak' --exclude '*.pyc' . ${TART}:code/
+	rsync --recursive --verbose \
+			--exclude '*.venv*' \
+			--exclude '.env'  \
+			--exclude 'node_modules'  \
+			--exclude '*.egg-info' \
+			--exclude '*.bak' \
+			--exclude '*.pyc' . ${TART}:code/

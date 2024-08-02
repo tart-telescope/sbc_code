@@ -280,13 +280,13 @@ class TartControl():
 
         while self.queue_vis.qsize() > 0:
             vis, means = self.queue_vis.get()
-            print('vis = {}, means={}.'.format(vis, means))
+            # print('vis = {}, means={}.'.format(vis, means))
 
             if vis is not None:
                 self.config['vis_current'] = create_direct_vis_dict(vis)
                 self.vislist.append(vis)
-                # print('Updated visibilities N={}.'.format(len(self.vislist)))
-                
+                logger.info(f'Updated vis list N={len(self.vislist)}')
+
                 chunksize = self.config['vis']['chunksize']
                 if len(self.vislist) >= chunksize:
                     print('reached chunksize of {}'.format(chunksize))
