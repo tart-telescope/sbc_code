@@ -31,16 +31,10 @@ RUN npm install
 
 COPY ./web-app /code
 
-# WORKDIR /code
-# RUN ls
-# 
-# ENV npm_config_jobs=2
-# RUN npm install
-
-#RUN npm run ng -- build --source-map --base-href=/${tart_name}/ 
+ENV npm_config_jobs=1
+ENV NODE_OPTIONS=--max_old_space_size=2048
 RUN npm run ng -- build --prod  --base-href=./ --deploy-url ./
 
-#
 #
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
 FROM nginx:1
