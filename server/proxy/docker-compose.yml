@@ -3,6 +3,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.proxy
+	    network: host
         ports:
             - "8880:80"
         tmpfs:
