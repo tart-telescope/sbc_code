@@ -6,6 +6,7 @@ services:
         # image: headscale/headscale:latest
         build:
             context: .
+            network: host
         container_name: headscale
         volumes:
             - ./config:/etc/headscale/
