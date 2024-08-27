@@ -28,6 +28,7 @@ def tart_p(rt_config):
 
 
 app = Flask(__name__)
+CORS(app)
 
 # Set up logging
 
@@ -38,7 +39,6 @@ def setup_logging():
         app.logger.addHandler(logging.StreamHandler())
         app.logger.setLevel(logging.INFO)
 
-CORS(app)
 #app.config['SECRET_KEY'] = 'super-secret-cow-key-hsa'
 #from datetime import timedelta as td
 #app.config['JWT_EXPIRATION_DELTA'] = td(seconds=3600)
