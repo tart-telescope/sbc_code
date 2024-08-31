@@ -23,6 +23,14 @@ services:
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
             - TS_STATE_DIR=/var/lib/tailscale
 
+        healthcheck:
+            test: ["CMD", "tailscale", "status"] # Check if Tailscale is running
+            interval: 1m # How often to perform the check
+            timeout: 10s # Time to wait for the check to succeed
+            retries: 3 # Number of retries before marking as unhealthy
+            start_period: 10s # Time to wait before starting health checks
+        restart: unless-stopped
+    
         restart: unless-stopped
         logging:
             driver: "json-file"
@@ -45,6 +53,8 @@ services:
         ports:
             - 5000:5000
         restart: always
+        depends_on:
+            - tailscale
         logging:
             driver: "json-file"
             options:
@@ -58,6 +68,8 @@ services:
             args:
                 tart_name: ${TS_HOSTNAME}
         restart: always
+        depends_on:
+            - tailscale
 
     web_app: # Port 80 on service tailscale
         depends_on:
