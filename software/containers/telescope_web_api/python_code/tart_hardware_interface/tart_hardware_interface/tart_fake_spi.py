@@ -57,7 +57,7 @@ def forward_map(runtime_config):
     #
     hour_hand = timestamp.hour*30.0 + timestamp.minute/2.0
 
-    sources = [ { 'el': el, 'az': hour_hand} for el in [85, 75, 65, 55] ]
+    sources = [ { 'el': el, 'az': -hour_hand} for el in [85, 75, 65, 55] ]
     for m in sources:
         sim_sky.add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
 
@@ -67,7 +67,7 @@ def forward_map(runtime_config):
     #
     minute_hand = timestamp.minute*6.0 + timestamp.second/10.0
 
-    sources = [ { 'el': el, 'az': minute_hand} for el in [90, 80, 70, 60, 50, 40, 30] ]
+    sources = [ { 'el': el, 'az': -minute_hand} for el in [90, 80, 70, 60, 50, 40, 30] ]
     for m in sources:
         sim_sky.add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
     
