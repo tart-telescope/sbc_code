@@ -2,7 +2,7 @@
 FROM node:16 AS build-stage
 LABEL Maintainer: Tim Molteno "tim@elec.ac.nz"
 ARG tart_name
-RUN npm install apidoc -g
+RUN npm install --only=prod  apidoc -g
 
 COPY ./python_code/tart_web_api /code
 

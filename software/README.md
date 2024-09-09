@@ -35,7 +35,7 @@ log in or SSH into the Raspberry Pi.
     user: tart
     pw: <xxxxxxx>
 
-Set hostname, activate SPI & SSH with raspi-config ( SSH and SPI can be enabled under Interfacing Options) :
+Set hostname to something suitable we'll use 'nz-elec', activate SPI & SSH with raspi-config ( SSH and SPI can be enabled under Interfacing Options) :
 
     sudo raspi-config
     sudo apt update

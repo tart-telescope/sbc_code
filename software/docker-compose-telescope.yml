@@ -22,15 +22,12 @@ services:
             - TS_HOSTNAME=${TS_HOSTNAME}
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
             - TS_STATE_DIR=/var/lib/tailscale
-
         healthcheck:
             test: ["CMD", "tailscale", "status"] # Check if Tailscale is running
             interval: 1m # How often to perform the check
             timeout: 10s # Time to wait for the check to succeed
             retries: 3 # Number of retries before marking as unhealthy
             start_period: 10s # Time to wait before starting health checks
-        restart: unless-stopped
-    
         restart: unless-stopped
         logging:
             driver: "json-file"
