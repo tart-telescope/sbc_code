@@ -35,7 +35,11 @@ log in or SSH into the Raspberry Pi.
     user: tart
     pw: <xxxxxxx>
 
-Set hostname to something suitable we'll use 'nz-elec', activate SPI & SSH with raspi-config ( SSH and SPI can be enabled under Interfacing Options) :
+Set hostname to something suitable we'll use 'nz-elec', 
+
+    sudo hostnamectl hostname nz-elec
+
+activate SPI & SSH with raspi-config ( SSH and SPI can be enabled under Interfacing Options) :
 
     sudo raspi-config
     sudo apt update
@@ -87,7 +91,7 @@ Change the default antenna positions to be the ones for your TART.
     telescope_config.json
     calibrated_antenna_positions.json
 
-Now run  
+Now copy docker-compose-telescope.yml -> docker-compose.yml
  
     docker compose build
 This last step can take ages (around 1 hour or so)
