@@ -47,9 +47,9 @@ RUN . /opt/venv/bin/activate && pip3 install  .
 
 COPY ./config_data /config_data
 WORKDIR /app
-ENV FLASK_APP=tart_web_api.main
+ENV FLASK_APP=tart_web_api.app
 #ENV FLASK_DEBUG=1
 RUN . /opt/venv/bin/activate && pip3 install waitress
 
 EXPOSE 5000
-CMD ["/opt/venv/bin/waitress-serve", "--threads=1", "--port=5000", "tart_web_api:app.app"]
+CMD ["/opt/venv/bin/waitress-serve", "--threads=1", "--port=5000", "tart_web_api.app:app"]
