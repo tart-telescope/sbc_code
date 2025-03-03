@@ -3,10 +3,10 @@ services:
 
     # The headscale config file is in config/config.yaml
     headscale:
-        # image: headscale/headscale:latest
-        build:
-            context: .
-            network: host
+        image: headscale/headscale:v0.25
+        # build:
+        #     context: .
+        #     network: host
         container_name: headscale
         volumes:
             - ./config:/etc/headscale/
