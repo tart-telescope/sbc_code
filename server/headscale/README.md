@@ -17,3 +17,9 @@ Create a new device key for user 'tart'. Then authenticate the user during bring
 ## Proxy
 
 A single host sits on the headscale network and acts as a proxy routing /user/host to the correct internal domain name. This is just another machine on the tailscale network. At this stage the proxy is configured manually.
+
+## GUI
+
+There is a basic gui that requires API keys to work. https://cloud.elec.ac.nz/web/users.html. 
+
+    docker compose exec headscale headscale apikeys list

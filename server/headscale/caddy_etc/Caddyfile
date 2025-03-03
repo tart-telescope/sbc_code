@@ -1,10 +1,6 @@
 
 cloud.elec.ac.nz {
-        reverse_proxy /web* https://headscale-ui {
-                transport http {
-                        tls_insecure_skip_verify
-                }
-        }
+        reverse_proxy /web* http://headscale-ui:8080
         reverse_proxy http://headscale:8080
 }
 
