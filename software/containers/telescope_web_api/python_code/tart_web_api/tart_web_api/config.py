@@ -29,7 +29,7 @@ def init_config(manager):
     runtime_config['raw'] = {
         'save': 1,
         'N_samples_exp': 20,
-        'base_path': '{}/raw'.format(data_root)
+        'base_path': os.path.join(data_root, 'raw')
     }
     runtime_config['diagnostic'] = {
         'num_ant': 24,
@@ -43,7 +43,7 @@ def init_config(manager):
         'save': 1,
         'chunksize': 60,
         'N_samples_exp': 24,
-        'base_path': '{}/vis'.format(data_root)
+        'base_path': os.path.join(data_root, 'vis')
     }
 
     runtime_config['telescope_config_path'] = \

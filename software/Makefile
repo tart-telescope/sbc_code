@@ -20,7 +20,7 @@ install:
 			--exclude '*.venv*' \
 			--exclude '.env'  \
 			--exclude 'node_modules'  \
-			--exclude '*config_data*'  \
+			--exclude '*config_data/*.json'  \
 			--exclude '*.egg-info' \
 			--exclude '*.bak' \
 			--exclude '*.pyc' . ${TART}:code/
