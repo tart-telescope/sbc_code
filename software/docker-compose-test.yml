@@ -15,7 +15,7 @@ services:
         volumes:
             -   data-volume:/telescope_data
             -   ~/tart_web_api_store:/app
-        # Comment the following two lines to disable access to the TART hardware (this allows testing of software on a desktop)
+            -   ~/telescope_config:/config_data
         environment:
             # Change the following to be something secure. You will use this to login to your telescope from the web api.
             - LOGIN_PW=${LOGIN_PW}

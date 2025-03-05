@@ -14,6 +14,7 @@ from tart.operation import settings
 Helper functions
 '''
 
+
 def get_psd(d, fs, nfft):
     power, freq = mlab.psd(d, Fs=fs, NFFT=nfft)
     num_bins = 128
@@ -27,34 +28,41 @@ def get_psd(d, fs, nfft):
         freq_ret.append(freq[start:stop].mean())
     return np.asarray(power_ret), np.asarray(freq_ret)
 
+
 def sha256_checksum(filename, block_size=65536):
-        sha256 = hashlib.sha256()
-        with open(filename, 'rb') as f:
-                for block in iter(lambda: f.read(block_size), b''):
-                        sha256.update(block)
-        return sha256.hexdigest()
+    sha256 = hashlib.sha256()
+    with open(filename, 'rb') as f:
+        for block in iter(lambda: f.read(block_size), b''):
+            sha256.update(block)
+    return sha256.hexdigest()
+
 
 def ph_stats(vals, stable_threshold, N_samples):
     expval = np.exp(1j*np.asarray(vals)*np.pi/6.)
     m = np.angle(np.mean(expval))
     s = np.abs(expval.sum())/(1.*len(vals))
-    if m<0:
+    if m < 0:
         m += 2*np.pi
     mean_rounded = int(np.round(m/(2*np.pi)*12))
-    return [mean_rounded, s, stable_threshold, N_samples, int(s>stable_threshold)]
+    return [mean_rounded, s, stable_threshold, N_samples, int(s > stable_threshold)]
 
-def mean_stats(vals,mean_threshold):
+
+def mean_stats(vals, mean_threshold):
     m = np.mean(vals)
-    return [m, mean_threshold, int(abs(m-0.5)<mean_threshold)]
+    return [m, mean_threshold, int(abs(m-0.5) < mean_threshold)]
 
-def mkdir_p(path): # Emulate mkdir -p functionality in python
-    import os, errno
+
+def mkdir_p(path):  # Emulate mkdir -p functionality in python
+    import os
+    import errno
     try:
         os.makedirs(path)
     except OSError as exc:
         if exc.errno == errno.EEXIST and os.path.isdir(path):
             pass
-        else: raise
+        else:
+            raise
+
 
 def create_timestamp_and_path(base_path):
     ts = datetime.datetime.utcnow()     # Timestamp information for directory structure
@@ -64,6 +72,7 @@ def create_timestamp_and_path(base_path):
     # Call timestamp again (the directory name will not have changed, but the timestamp will be more accurate)
     ts = datetime.datetime.utcnow()
     return ts, p
+
 
 def get_status_json(tart_instance):
     '''Generate JSON from status'''
@@ -81,8 +90,8 @@ def run_diagnostic(tart, runtime_config):
     print("Setting capture registers:")
 
     num_ant = runtime_config['diagnostic']['num_ant']
-    N_samples = runtime_config['diagnostic']['N_samples']             # Number of samples for each antenna
-    stable_threshold= runtime_config['diagnostic']['stable_threshold'] # 95% in same direction
+    N_samples = runtime_config['diagnostic']['N_samples']                # Number of samples for each antenna
+    stable_threshold = runtime_config['diagnostic']['stable_threshold']  # 95% in same direction
 
     phases = []
 
@@ -91,10 +100,10 @@ def run_diagnostic(tart, runtime_config):
         tart.capture(on=True, source=src, noisy=runtime_config['verbose'])
         tart.centre(runtime_config['centre'], noisy=runtime_config['verbose'])
         tart.start(runtime_config['diagnostic']['N_samples_exp'], True)
-        k=0
+        k = 0
         measured_phases = []
-        while k<N_samples:
-            k+=1
+        while k < N_samples:
+            k += 1
             d, d_json = get_status_json(tart)
             measured_phases.append(d["TC_STATUS"]['phase'])
 
@@ -126,9 +135,9 @@ def run_diagnostic(tart, runtime_config):
     #tart.capture(on=False, noisy=runtime_config['verbose'])
     print((runtime_config['diagnostic']['spectre']['N_samples_exp']))
     data = tart.read_data(num_words=2**runtime_config['diagnostic']['spectre']['N_samples_exp'])
-    data = np.asarray(data,dtype=np.uint8)
-    ant_data = np.flipud(np.unpackbits(data).reshape(-1,24).T)
-    print((ant_data[:,:10]))
+    data = np.asarray(data, dtype=np.uint8)
+    ant_data = np.flipud(np.unpackbits(data).reshape(-1, 24).T)
+    print((ant_data[:, :10]))
     radio_means = []
     mean_threshold = 0.2
     for i in range(num_ant):
@@ -142,11 +151,11 @@ def run_diagnostic(tart, runtime_config):
         channel = {}
         channel['id'] = i
         channel['phase'] = phases[i]
-        channel['radio_mean'] =radio_means[i]
-        power, freq = get_psd(ant_data[i]-ant_data[i].mean(),16e6,runtime_config['diagnostic']['spectre']['NFFT'])
-        power_db = 10.*np.log10(power + 1e-32) # Avoid divide by zero
+        channel['radio_mean'] = radio_means[i]
+        power, freq = get_psd(ant_data[i]-ant_data[i].mean(), 16e6, runtime_config['diagnostic']['spectre']['NFFT'])
+        power_db = 10.*np.log10(power + 1e-32)  # Avoid divide by zero
         power_db = np.nan_to_num(power_db)
-        channel['power'] = (np.asarray(power_db*1000,dtype=int)/1000.        ).tolist()
+        channel['power'] = (np.asarray(power_db*1000, dtype=int)/1000.).tolist()
         channel['freq'] = ((freq/1e6)).tolist()
         channels.append(channel)
 
@@ -154,20 +163,20 @@ def run_diagnostic(tart, runtime_config):
     runtime_config['channels_timestamp'] = datetime.datetime.utcnow()
     runtime_config['status'] = d
 
-
     print("\nDone.")
-    
+
 '''
 RUN TART in raw data acquisition mode
 '''
 
+
 def run_acquire_raw(tart, runtime_config):
     runtime_config['acquire'] = 1
     tart.reset()
-    tart.debug(on=not runtime_config['acquire'], \
-                shift=runtime_config['shifter'], \
-                count=runtime_config['counter'], \
-                noisy=runtime_config['verbose'])
+    tart.debug(on=not runtime_config['acquire'],
+               shift=runtime_config['shifter'],
+               count=runtime_config['counter'],
+               noisy=runtime_config['verbose'])
     tart.capture(on=True, source=0, noisy=runtime_config['verbose'])
     tart.set_sample_delay(runtime_config['sample_delay'])
     tart.centre(runtime_config['centre'], noisy=runtime_config['verbose'])
@@ -186,20 +195,18 @@ def run_acquire_raw(tart, runtime_config):
     tart.reset()
 
     print('reshape antenna data')
-    data = np.asarray(data,dtype=np.uint8)
-    ant_data = np.flipud(np.unpackbits(data).reshape(-1,24).T)
-
+    data = np.asarray(data, dtype=np.uint8)
+    ant_data = np.flipud(np.unpackbits(data).reshape(-1, 24).T)
     if runtime_config['raw']['save']:
         config = settings.from_file(runtime_config['telescope_config_path'])
-        
+
         fname = "data_{}.hdf".format(t_stmp.strftime('%Y-%m-%d_%H_%M_%S.%f'))
-        
+
         filename = path + fname
 
         obs = observation.Observation(t_stmp, config, savedata=ant_data)
         obs.to_hdf5(filename)
         print(('saved to: ', filename))
-        return {'filename':filename, 'sha256':sha256_checksum(filename)}
+        return {'filename': filename, 'sha256': sha256_checksum(filename)}
     return {}
     print('\nDone.')
-

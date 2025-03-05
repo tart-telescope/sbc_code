@@ -16,8 +16,7 @@ The Software runs on three different computers.
 
 ## Local Site Configuration
 
-You should modify the files in software/containers/telescope_web_api/config_data to contain the new telescope configuration information (latitude, longitude, altitude) as 
-well as the callibrated antenna positions.
+You should modify the files in software/containers/telescope_web_api/config_data to contain the new telescope configuration information (latitude, longitude, altitude) as well as the callibrated antenna positions.
 
 ## Installation on a target Raspberry Pi
 

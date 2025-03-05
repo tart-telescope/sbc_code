@@ -41,6 +41,7 @@ services:
         volumes:
             -   data-volume:/telescope_data
             -   ~/tart_web_api_store:/app
+            -   ~/telescope_config:/config_data
         # Comment the following two lines to disable access to the TART hardware (this allows testing of software on a desktop)
         devices:
            - /dev/spidev0.0

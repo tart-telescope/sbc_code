@@ -12,6 +12,9 @@ for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do
 
 curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
 sudo usermod -aG docker $USER
+
+mkdir -p ~/telescope_config
+
 sudo reboot
 
 #Now set up tailscale onto the elec.ac.nz tailcale network. This is done using 

@@ -45,7 +45,8 @@ RUN . /opt/venv/bin/activate && pip3 install   .
 WORKDIR /python_code/tart_web_api
 RUN . /opt/venv/bin/activate && pip3 install  .
 
-COPY ./config_data /config_data
+ENV PERMUTE_DIR=/permute
+COPY ./config_data/permute.txt /permute/permute.txt
 WORKDIR /app
 ENV FLASK_APP=tart_web_api.app
 #ENV FLASK_DEBUG=1

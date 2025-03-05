@@ -2,8 +2,9 @@ import os
 import json
 import socket
 
+
 def init_config(manager):
-    
+
     data_root = '/telescope_data'
     config_root = os.environ["CONFIG_DIR"]
 
@@ -14,7 +15,8 @@ def init_config(manager):
     runtime_config['counter'] = False
     runtime_config['verbose'] = False
     runtime_config['centre'] = True
-    runtime_config['modes_available'] = ['off', 'diag', 'raw', 'vis', 'vis_save', 'cal', 'rt_syn_img']
+    runtime_config['modes_available'] = \
+        ['off', 'diag', 'raw', 'vis', 'vis_save', 'cal', 'rt_syn_img']
     runtime_config['mode'] = 'vis'
     runtime_config['loop_mode'] = 'loop'
     runtime_config['loop_mode_available'] = ['loop', 'single', 'loop_n']
@@ -25,35 +27,37 @@ def init_config(manager):
     runtime_config['data_root'] = data_root
 
     runtime_config['raw'] = {
-        'save': 1, \
-        'N_samples_exp': 20,\
+        'save': 1,
+        'N_samples_exp': 20,
         'base_path': '{}/raw'.format(data_root)
     }
     runtime_config['diagnostic'] = {
-        'num_ant': 24,\
-        'N_samples' : 15,\
-        'stable_threshold' : 0.95,\
-        'N_samples_exp' : 20,\
+        'num_ant': 24,
+        'N_samples': 15,
+        'stable_threshold': 0.95,
+        'N_samples_exp': 20,
         'spectre': {'NFFT': 4096, 'N_samples_exp': 18}
 
     }
     runtime_config['vis'] = {
-        'save' : 1, \
-        'chunksize' : 60,\
-        'N_samples_exp' : 24,\
-        'base_path' : '{}/vis'.format(data_root),
+        'save': 1,
+        'chunksize': 60,
+        'N_samples_exp': 24,
+        'base_path': '{}/vis'.format(data_root)
     }
-    
-    runtime_config['telescope_config_path'] = '{}/telescope_config.json'.format(config_root)
+
+    runtime_config['telescope_config_path'] = \
+        os.path.join(config_root, 'telescope_config.json')
+
     with open(runtime_config['telescope_config_path']) as t_c:
         runtime_config['telescope_config'] = json.load(t_c)
         t_c.close()
 
-    antenna_positions_path = '{}/calibrated_antenna_positions.json'.format(config_root)
+    antenna_positions_path = os.path.join(config_root, 'calibrated_antenna_positions.json')
     with open(antenna_positions_path) as a_c:
         runtime_config['antenna_positions'] = json.load(a_c)
         a_c.close()
-        
+
     runtime_config['calibration_dir'] = '/{}/'.format(config_root)
     runtime_config['realtime_image_path'] = '{}/assets/img/image.png'.format(data_root)
     runtime_config['hostname'] = socket.gethostname()
