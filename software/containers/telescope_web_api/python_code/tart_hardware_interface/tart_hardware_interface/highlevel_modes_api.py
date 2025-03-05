@@ -1,10 +1,10 @@
 import numpy as np
 import datetime
 import json
-import socket
-import datetime
 import hashlib
-import sys
+import os
+import errno
+
 from matplotlib import mlab
 
 from tart.operation import observation
@@ -52,22 +52,14 @@ def mean_stats(vals, mean_threshold):
     return [m, mean_threshold, int(abs(m-0.5) < mean_threshold)]
 
 
-def mkdir_p(path):  # Emulate mkdir -p functionality in python
-    import os
-    import errno
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
+def mkdir_p(path):
+    os.makedirs(path, exist_ok=True)
 
 
 def create_timestamp_and_path(base_path):
     ts = datetime.datetime.utcnow()     # Timestamp information for directory structure
     # Create a meaningful directory structure to organize recorded data
-    p = base_path + '/' + str(ts.year) +'/' + str(ts.month) + '/' + str(ts.day) + '/'
+    p = os.path.join(base_path, str(ts.year), str(ts.month), str(ts.day))
     mkdir_p(p)
     # Call timestamp again (the directory name will not have changed, but the timestamp will be more accurate)
     ts = datetime.datetime.utcnow()
@@ -114,7 +106,7 @@ def run_diagnostic(tart, runtime_config):
         mean_phases.append(phases[i]['measured'])
 
     print(('median:', np.median(mean_phases)))
-    delay_to_be_set = (np.median(mean_phases) + 6) %12
+    delay_to_be_set = (np.median(mean_phases) + 6) % 12
     print(('set delay to:', delay_to_be_set))
 
     runtime_config['sample_delay'] = delay_to_be_set
@@ -141,7 +133,8 @@ def run_diagnostic(tart, runtime_config):
     radio_means = []
     mean_threshold = 0.2
     for i in range(num_ant):
-        radio_means.append(dict(list(zip(['mean','threshold','ok'],mean_stats(ant_data[i],mean_threshold)))))
+        radio_means.append(dict(list(zip(['mean', 'threshold', 'ok'],
+                                         mean_stats(ant_data[i],  mean_threshold)))))
 
     ant_data = np.asarray(ant_data,dtype=np.float16)*2-1.
 
