@@ -85,6 +85,10 @@ ${TS_HOSTNAME} will be the public name of the TART telescope https://api.elec.ac
 
 #### Modify default antenna positions
 
+Create a directory for the telescope configuration:
+
+    mkdir -p ~/telescope_config
+    
 Change the default antenna positions to be the ones for your TART.
 
     telescope_config.json
