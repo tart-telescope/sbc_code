@@ -1,18 +1,21 @@
 # Mostly obtained from:
 # https://github.com/vimalloc/flask-jwt-extended
 
+
 from flask import Flask, request, jsonify 
 from flask_jwt_extended import jwt_required, \
     create_access_token, \
     create_refresh_token, get_jwt_identity
 
 from tart_web_api.app import app, jwt
-
 import os
+
+
 if 'LOGIN_PW' in os.environ:
-  pw = os.environ['LOGIN_PW']
+    pw = os.environ['LOGIN_PW']
 else:
-  pw = 'password'
+    pw = 'password'
+
 
 @app.route('/auth', methods=['POST'])
 def auth():
@@ -43,6 +46,7 @@ def refresh():
         'access_token': create_access_token(identity=current_user)
     }
     return jsonify(ret), 200
+
 
 @jwt.expired_token_loader
 def my_expired_token_callback(jwt_header, jwt_payload):

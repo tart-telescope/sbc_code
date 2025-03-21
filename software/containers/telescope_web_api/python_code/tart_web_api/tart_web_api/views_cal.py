@@ -2,8 +2,8 @@ import datetime
 import json
 import multiprocessing
 
-from flask import Flask, request
-from flask import render_template, jsonify, send_file
+from flask import request
+from flask import jsonify
 from flask_jwt_extended import jwt_required
 
 from tart_web_api.app import app
@@ -12,6 +12,7 @@ import tart_web_api.database as db
 
 
 minimize_process = None
+
 
 @jwt_required()
 @app.route('/calibration/gain', methods=['POST',])
@@ -38,7 +39,6 @@ def set_gain():
     return jsonify({})
 
 
-
 @jwt_required()
 @app.route('/calibration/antenna_positions', methods=['POST',])
 def set_calibration_antenna_positions():
@@ -50,7 +50,8 @@ def set_calibration_antenna_positions():
     @apiHeader (Authorization) {String} Authorization JWT authorization value.
 
     @apiParam {Object}   body
-    @apiParam {Object[]} body.antenna_positions Array of antenna positions in East-North-Up Coordinate system [[e,n,u],[e,n,u],..]].
+    @apiParam {Object[]} body.antenna_positions Array of antenna positions in
+                        East-North-Up Coordinate system [[e,n,u],[e,n,u],..]].
     """
     utc_date = datetime.datetime.utcnow()
     content = request.get_json(silent=False)
@@ -75,12 +76,13 @@ def get_gain():
     """
     runtime_config = app.config['CONFIG']
     num_ant = runtime_config['telescope_config']['num_antenna']
-    rows_dict =  db.get_gain()
+    rows_dict = db.get_gain()
     ret_gain = [rows_dict[i][2] for i in range(num_ant)]
     ret_ph = [rows_dict[i][3] for i in range(num_ant)]
     ret_dict = {"gain": ret_gain,
                 "phase_offset": ret_ph}
     return jsonify(ret_dict)
+
 
 @jwt_required()
 @app.route('/calibrate', methods=['POST',])
@@ -114,7 +116,8 @@ def post_calibration_from_vis():
         minimize_process = multiprocessing.Process(target=service.calibrate_from_vis, args=(cal_measurements, runtime_config))
         minimize_process.start()
         state = db.get_calibration_process_state()
-    return jsonify({'status':state})
+    return jsonify({'status': state})
+
 
 @app.route('/calibrate', methods=['GET',])
 def get_calibrate_status():
@@ -126,5 +129,5 @@ def get_calibrate_status():
     @apiSuccess {String} status Status of optimisation process.
     """
     state = db.get_calibration_process_state()
-    return jsonify({'status':state})
+    return jsonify({'status': state})
 
