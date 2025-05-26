@@ -3,16 +3,16 @@ COMPOSE=/usr/bin/docker compose --progress plain
 USER=tart
 
 build:
-	${COMPOSE} --parallel 1 -f docker-compose-test.yml build
+	${COMPOSE} --parallel 1  build
 
 up:
-	${COMPOSE} -f docker-compose-test.yml up -d
+	${COMPOSE} up -d
 
 down:
-	${COMPOSE} -f docker-compose-test.yml down
+	${COMPOSE} down
 
 logs:
-	${COMPOSE} -f docker-compose-test.yml logs -f
+	${COMPOSE} logs -f
 
 TART=tart@nz-dunedin
 install:

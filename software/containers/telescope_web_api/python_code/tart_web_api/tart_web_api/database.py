@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
 
+
 def connect_to_db():
     con = None
     c = None
@@ -12,6 +13,7 @@ def connect_to_db():
         print(e.args)      # arguments stored in .args
         print(e)
     return con
+
 
 def setup_db(num_ant):
     con = connect_to_db()
@@ -25,30 +27,27 @@ def setup_db(num_ant):
         c.execute("CREATE TABLE IF NOT EXISTS sample_delay (date timestamp, delay REAL)")
         c.execute("CREATE TABLE IF NOT EXISTS calibration (date timestamp, antenna INTEGER, g_abs REAL, g_phase REAL)")
         c.execute("CREATE TABLE IF NOT EXISTS channels (channel_id INTEGER, enabled BOOLEAN)")
-    
     with con:
         c = con.cursor()
         c.execute('SELECT * FROM channels;')
         if len(c.fetchall()) == 0:
             ch = [(i, 1) for i in range(num_ant)]
             c.executemany("INSERT INTO channels(channel_id, enabled) values (?, ?)", ch)
-        
     with con:
         c = con.cursor()
         c.execute('SELECT * FROM calibration_process;')
         if len(c.fetchall()) == 0:
             c.execute("INSERT INTO calibration_process(date, state) values (?, ?)", 
                     (datetime.datetime.utcnow(), 'idle'))
-    
     with con:
         c = con.cursor()
         c.execute('SELECT * FROM calibration;')
-        
         if len(c.fetchall()) == 0:
             utc_date = datetime.datetime.utcnow()
             g = [1,]*num_ant
             ph = [0,]*num_ant
             insert_gain(c, utc_date, g, ph)
+
 
 def get_manual_channel_status():
     con = connect_to_db()
@@ -56,14 +55,16 @@ def get_manual_channel_status():
         c = con.cursor()
         c.execute('SELECT * FROM channels;')
         rows = c.fetchall()
-        ret = [{'channel_id':row[0], 'enabled':row[1]} for row in rows]
+        ret = [{'channel_id': row[0], 'enabled': row[1]} for row in rows]
     return ret
+
 
 def update_manual_channel_status(channel_idx, enable):
     con = connect_to_db()
     with con:
         c = con.cursor()
         c.execute('UPDATE channels SET enabled = ? WHERE channel_id = ?', (enable, channel_idx))
+
 
 def get_sample_delay():
     con = connect_to_db()
@@ -78,6 +79,7 @@ def get_sample_delay():
             ret = rows[0][1]
     return ret
 
+
 def insert_sample_delay(timestamp, sample_delay):
     con = connect_to_db()
     with con:
@@ -86,15 +88,18 @@ def insert_sample_delay(timestamp, sample_delay):
         c.execute(SQL, (timestamp, sample_delay))
     return 1
 
+
 ##################
 #  Antenna Gain  #
 ##################
 
+
 def insert_gain(c, utc_date, g, ph):
     for ant_i in range(len(g)):
-        c.execute("INSERT INTO calibration VALUES (?,?,?,?)", 
-                (utc_date, ant_i, g[ant_i], ph[ant_i]))
-            
+        c.execute("INSERT INTO calibration VALUES (?,?,?,?)",
+                  (utc_date, ant_i, g[ant_i], ph[ant_i]))
+
+
 def get_gain():
     rows_dict = {}
     con = connect_to_db()
@@ -107,15 +112,18 @@ def get_gain():
 
     return rows_dict
 
+
 #########################
 #  Calibration Process  #
 #########################
+
 
 def update_calibration_process_state(state):
     con = connect_to_db()
     with con:
         c = con.cursor()
         c.execute('UPDATE calibration_process SET state = ? WHERE Id = ?', (state, 1))
+
 
 def get_calibration_process_state():
     con = connect_to_db()
@@ -130,9 +138,11 @@ def get_calibration_process_state():
             ret = rows[0][2]
     return ret
 
+
 ####################
 #  Raw Data Cache  #
 ####################
+
 
 def insert_raw_file_handle(filename, checksum):
     con = connect_to_db()
@@ -140,13 +150,15 @@ def insert_raw_file_handle(filename, checksum):
         c = con.cursor()
         timestamp = datetime.datetime.utcnow()
         c.execute("INSERT INTO raw_data(date, filename, checksum) VALUES (?,?,?)",
-                (timestamp, filename, checksum))
+                  (timestamp, filename, checksum))
+
 
 def remove_raw_file_handle_by_Id(Id):
     con = connect_to_db()
     with con:
         c = con.cursor()
         c.execute("DELETE FROM raw_data WHERE Id=?", (Id,))
+
 
 def get_raw_file_handle():
     con = connect_to_db()
@@ -155,8 +167,12 @@ def get_raw_file_handle():
         c = con.cursor()
         c.execute("SELECT * FROM raw_data ORDER BY date DESC")
         rows = c.fetchall()
-        ret = [{'filename':row[2], 'timestamp':row[1], 'checksum':row[3], 'Id':row[0]} for row in rows]
+        ret = [{'filename': row[2],
+                'timestamp': row[1],
+                'checksum': row[3],
+                'Id': row[0]} for row in rows]
     return ret
+
 
 def update_observation_cache_process_state(state):
     con = connect_to_db()
@@ -164,6 +180,7 @@ def update_observation_cache_process_state(state):
         c = con.cursor()
         ts = datetime.datetime.utcnow()
         c.execute('UPDATE observation_cache_process SET state = ?, date = ? WHERE Id = ?', (state, ts, 1))
+
 
 def get_observation_cache_process_state():
     con = connect_to_db()
@@ -177,9 +194,11 @@ def get_observation_cache_process_state():
             ret = {'state':rows[0][2], 'timestamp':rows[0][1]}
     return ret
 
+
 ###########################
 #  Visibility Data Cache  #
 ###########################
+
 
 def insert_vis_file_handle(filename, checksum):
     con = connect_to_db()
@@ -187,13 +206,15 @@ def insert_vis_file_handle(filename, checksum):
         c = con.cursor()
         timestamp = datetime.datetime.utcnow()
         c.execute("INSERT INTO vis_data(date, filename, checksum) VALUES (?,?,?)", 
-                (timestamp, filename, checksum))
+                  (timestamp, filename, checksum))
+
 
 def remove_vis_file_handle_by_Id(Id):
     con = connect_to_db()
     with con:
         c = con.cursor()
         c.execute("DELETE FROM vis_data WHERE Id=?", (Id,))
+
 
 def get_vis_file_handle():
     con = connect_to_db()
@@ -202,8 +223,10 @@ def get_vis_file_handle():
         c = con.cursor()
         c.execute("SELECT * FROM vis_data ORDER BY date DESC")
         rows = c.fetchall()
-        ret = [{'filename':row[2], 'timestamp':row[1], 'checksum':row[3], 'Id':row[0]} for row in rows]
+        ret = [{'filename': row[2], 'timestamp': row[1],
+                'checksum': row[3], 'Id': row[0]} for row in rows]
     return ret
+
 
 def update_vis_cache_process_state(state):
     con = connect_to_db()
@@ -211,6 +234,7 @@ def update_vis_cache_process_state(state):
         c = con.cursor()
         ts = datetime.datetime.utcnow()
         c.execute('UPDATE vis_cache_process SET state = ?, date = ? WHERE Id = ?', (state, ts, 1))
+
 
 def get_vis_cache_process_state():
     con = connect_to_db()
@@ -221,5 +245,5 @@ def get_vis_cache_process_state():
         if len(rows) == 0:
             ret = 'Error'
         else:
-            ret = {'state':rows[0][2], 'timestamp':rows[0][1]}
+            ret = {'state': rows[0][2], 'timestamp': rows[0][1]}
     return ret
