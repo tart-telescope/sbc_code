@@ -28,7 +28,7 @@ install:
 update:
 	rsync --recursive --verbose \
 			--exclude '*.venv*' \
-			--exclude 'telescope_config'
+			--exclude 'telescope_config/*'
 			--exclude '.env'  \
 			--exclude 'node_modules'  \
 			--exclude '*config_data/*.json'  \
