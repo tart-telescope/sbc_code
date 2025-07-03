@@ -32,25 +32,25 @@ RUN python3 -m venv --system-site-packages $VIRTUAL_ENV
 # and this takes hours on an RPi (it can't use system-site-packages)
 # Also fails on 3.11. TODO H5PY fix (when h5py has wheels on aarch64, this will be fine)
 # RUN . /opt/venv/bin/activate && pip3 install  "h5py<=3.10"
-RUN . /opt/venv/bin/activate && pip3 install --no-deps tart  # --no-deps to avoid depending on h5py
-RUN . /opt/venv/bin/activate && pip3 install "minio<=7.1"
-RUN . /opt/venv/bin/activate && pip3 install --no-deps tart_tools   # --no-deps to avoid depending on h5py
+RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir --no-deps tart  # --no-deps to avoid depending on h5py
+RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir "minio<=7.1"
+RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir --no-deps tart_tools   # --no-deps to avoid depending on h5py
 
 ENV CONFIG_DIR=/config_data
 
 COPY ./python_code /python_code
 WORKDIR /python_code/tart_hardware_interface
-RUN . /opt/venv/bin/activate && pip3 install   .
+RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir .
 
 WORKDIR /python_code/tart_web_api
-RUN . /opt/venv/bin/activate && pip3 install  .
+RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir .
 
 ENV PERMUTE_DIR=/permute
 COPY ./config_data/permute.txt /permute/permute.txt
 WORKDIR /app
 ENV FLASK_APP=tart_web_api.app
 #ENV FLASK_DEBUG=1
-RUN . /opt/venv/bin/activate && pip3 install waitress
+RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir waitress
 
 EXPOSE 5000
 CMD ["/opt/venv/bin/waitress-serve", "--threads=1", "--port=5000", "tart_web_api.app:app"]

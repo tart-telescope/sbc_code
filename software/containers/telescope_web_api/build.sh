@@ -1,1 +1,1 @@
-docker build -t tart_web_api .
+docker build -t tmolteno/tart_web_api .

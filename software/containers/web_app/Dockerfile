@@ -2,8 +2,7 @@
 #
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
 FROM node:16 AS build-stage
-LABEL Maintainer: Tim Molteno "tim@elec.ac.nz"
-ARG tart_name
+LABEL Maintainer="Tim Molteno tim@elec.ac.nz"
 
 # ARG DEBIAN_FRONTEND=noninteractive
 # 
@@ -18,7 +17,7 @@ ARG tart_name
 RUN mkdir /code
 WORKDIR /code
 
-ENV PATH /code/node_modules/.bin:$PATH
+ENV PATH=/code/node_modules/.bin:$PATH
 
 COPY ./web-app/package*.json /code/
 COPY ./web-app/api_imaging /code/api_imaging
@@ -38,7 +37,7 @@ RUN npm run ng -- build --prod  --base-href=./ --deploy-url ./
 #
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
 FROM nginx:1
-ARG tart_name
+ARG tart_name=tart
 
 COPY --from=build-stage /code/dist/ /var/www/html
   
