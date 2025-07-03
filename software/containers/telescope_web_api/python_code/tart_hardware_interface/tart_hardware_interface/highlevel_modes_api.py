@@ -195,7 +195,7 @@ def run_acquire_raw(tart, runtime_config):
 
         fname = "data_{}.hdf".format(t_stmp.strftime('%Y-%m-%d_%H_%M_%S.%f'))
 
-        filename = path + fname
+        filename = os.path.join(path, fname)
 
         obs = observation.Observation(t_stmp, config, savedata=ant_data)
         obs.to_hdf5(filename)
