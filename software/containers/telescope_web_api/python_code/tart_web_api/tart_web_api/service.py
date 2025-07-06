@@ -20,7 +20,6 @@ import requests
 
 import numpy as np
 from numpy import concatenate as cc
-from scipy.optimize import minimize
 
 import tart_web_api.database as db
 
