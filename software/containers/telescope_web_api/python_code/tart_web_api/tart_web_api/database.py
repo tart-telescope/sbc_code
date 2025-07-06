@@ -1,5 +1,4 @@
 import sqlite3
-import datetime
 
 
 def connect_to_db():
@@ -37,13 +36,13 @@ def setup_db(num_ant):
         c = con.cursor()
         c.execute('SELECT * FROM calibration_process;')
         if len(c.fetchall()) == 0:
-            c.execute("INSERT INTO calibration_process(date, state) values (?, ?)", 
-                    (datetime.datetime.utcnow(), 'idle'))
+            c.execute("INSERT INTO calibration_process(date, state) values (?, ?)",
+                    (utc.now(), 'idle'))
     with con:
         c = con.cursor()
         c.execute('SELECT * FROM calibration;')
         if len(c.fetchall()) == 0:
-            utc_date = datetime.datetime.utcnow()
+            utc_date = utc.now()
             g = [1,]*num_ant
             ph = [0,]*num_ant
             insert_gain(c, utc_date, g, ph)
@@ -148,7 +147,7 @@ def insert_raw_file_handle(filename, checksum):
     con = connect_to_db()
     with con:
         c = con.cursor()
-        timestamp = datetime.datetime.utcnow()
+        timestamp = utc.now()
         c.execute("INSERT INTO raw_data(date, filename, checksum) VALUES (?,?,?)",
                   (timestamp, filename, checksum))
 
@@ -178,7 +177,7 @@ def update_observation_cache_process_state(state):
     con = connect_to_db()
     with con:
         c = con.cursor()
-        ts = datetime.datetime.utcnow()
+        ts = utc.now()
         c.execute('UPDATE observation_cache_process SET state = ?, date = ? WHERE Id = ?', (state, ts, 1))
 
 
@@ -204,8 +203,8 @@ def insert_vis_file_handle(filename, checksum):
     con = connect_to_db()
     with con:
         c = con.cursor()
-        timestamp = datetime.datetime.utcnow()
-        c.execute("INSERT INTO vis_data(date, filename, checksum) VALUES (?,?,?)", 
+        timestamp = utc.now()
+        c.execute("INSERT INTO vis_data(date, filename, checksum) VALUES (?,?,?)",
                   (timestamp, filename, checksum))
 
 
@@ -232,7 +231,7 @@ def update_vis_cache_process_state(state):
     con = connect_to_db()
     with con:
         c = con.cursor()
-        ts = datetime.datetime.utcnow()
+        ts = utc.now()
         c.execute('UPDATE vis_cache_process SET state = ?, date = ? WHERE Id = ?', (state, ts, 1))
 
 

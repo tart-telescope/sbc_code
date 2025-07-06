@@ -1,7 +1,7 @@
 '''
-    Services for the TART web api. These are background processes that 
+    Services for the TART web api. These are background processes that
     capture visibilities e.t.c.
-    
+
     Author. Max Scheel 2017
             Tim Molteno 2018-2021
 
@@ -11,8 +11,6 @@ import logging
 import sys
 #logging.basicConfig(level=logging.INFO)
 
-import datetime
-import dateutil.parser
 import os
 import stat
 import time
@@ -50,7 +48,7 @@ N_IT = 0
 
 def mkdirp(directory):
     if not os.path.isdir(directory):
-        os.makedirs(directory) 
+        os.makedirs(directory)
 
 # def optimize_phaseNgain(opt_parameters):
 #     """ Set phase offsets in list of calibrated visibility objects.
@@ -108,25 +106,25 @@ def vis_object_from_response(vis, ts, SETTINGS):
 #     #simp (use only when noise present)\
 #     #mini, perfect visibilities.\
 #     #full
-# 
+#
 #     SETTINGS = settings.from_file(runtime_config['telescope_config_path'])
 #     loc = location.get_loc(SETTINGS)
-#     
+#
 #     ANTS = [antennas.Antenna(loc, pos)
 #             for pos in runtime_config['antenna_positions']]
 #     ANT_MODELS = [antenna_model.GpsPatchAntenna() for i in range(SETTINGS.get_num_antenna())]
 #     NOISE_LVLS = 0.0 * np.ones(SETTINGS.get_num_antenna())
 #     RAD = radio.Max2769B(n_samples=2**12, noise_level=NOISE_LVLS)
 #     COR = correlator.Correlator()
-# 
+#
 #     global msd_vis, sim_vis
 #     sim_vis = {}
 #     msd_vis = {}
 #     sim_sky = {}
-# 
+#
 #     for m in cal_measurements:
 #         timestamp = dateutil.parser.parse(m['data']['timestamp'])
-# 
+#
 #         key = '%f,%f,%s' % (m['el'], m['az'], timestamp)
 #         # Generate model visibilities according to specified point source positions
 #         sim_sky[key] = skymodel.Skymodel(0, location=loc,
@@ -134,24 +132,24 @@ def vis_object_from_response(vis, ts, SETTINGS):
 #         sim_sky[key].add_src(radio_source.ArtificialSource(loc, timestamp, r=100.0, el=m['el'], az=m['az']))
 #         v_sim = get_vis(sim_sky[key], COR, RAD, ANTS, ANT_MODELS, SETTINGS, timestamp, mode=MODE)
 #         sim_vis[key] = calibration.CalibratedVisibility(v_sim)
-# 
+#
 #         # Construct (un)calibrated visibility objects from received measured visibilities
 #         vis = vis_object_from_response(m['data']['vis']['data'], timestamp, SETTINGS)
 #         msd_vis[key] = calibration.CalibratedVisibility(vis)
-# 
+#
 #     # Define initial optimisation paramters
-# 
+#
 #     opt_param = np.ones(46)
 #     opt_param[:23] = np.ones(23)
 #     opt_param[23:] = np.zeros(23)
-# 
+#
 #     # Run optimisation
 #     RES = minimize(optimize_phaseNgain, opt_param)
-# 
-#     utc_date = datetime.datetime.utcnow()
+#
+#     utc_date = utc.now()
 #     phases = list(msd_vis.values())[0].get_phase_offset(np.arange(24))
 #     gains = list(msd_vis.values())[0].get_gain(np.arange(24))
-# 
+#
 #     #content =  msd_vis.values()[0].to_json(filename='/dev/null')
 #     db.insert_gain(utc_date, gains, phases)
 #     db.update_calibration_process_state('idle')
@@ -291,11 +289,11 @@ class TartControl():
                 if len(self.vislist) >= chunksize:
                     print('reached chunksize of {}'.format(chunksize))
                     if self.config['vis']['save'] == 1:
-                        fname = "{}/vis_{}.hdf".format(self.config['vis']['base_path'], 
+                        fname = "{}/vis_{}.hdf".format(self.config['vis']['base_path'],
                                                    vis.timestamp.strftime('%Y-%m-%d_%H_%M_%S.%f'))
-                        
+
                         # Get the gains and phases and save them with the visibilities
-                        
+
                         rows_dict = db.get_gain()
                         cal_gain = [rows_dict[i][2] for i in range(24)]
                         cal_ph = [rows_dict[i][3] for i in range(24)]
@@ -303,7 +301,7 @@ class TartControl():
                         ant_pos = self.config['antenna_positions']
 
                         visibility.list_save(self.vislist, ant_pos, cal_gain, cal_ph, fname)
-                        
+
                         print("saved to {}".format(vis, fname))
                         ret['filename'] = fname
                         ret['sha256'] = sha256_checksum(fname)

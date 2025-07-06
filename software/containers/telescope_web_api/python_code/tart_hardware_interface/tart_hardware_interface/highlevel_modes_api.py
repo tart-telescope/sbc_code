@@ -1,5 +1,4 @@
 import numpy as np
-import datetime
 import json
 import hashlib
 import os
@@ -9,6 +8,7 @@ from matplotlib import mlab
 
 from tart.operation import observation
 from tart.operation import settings
+from tart.util import utc
 
 '''
 Helper functions
@@ -23,7 +23,7 @@ def get_psd(d, fs, nfft):
     freq_ret = []
     for i in range(num_bins):
         start = int(i*window_width)
-        stop = start + window_width 
+        stop = start + window_width
         power_ret.append(power[start:stop].max())
         freq_ret.append(freq[start:stop].mean())
     return np.asarray(power_ret), np.asarray(freq_ret)
@@ -57,12 +57,12 @@ def mkdir_p(path):
 
 
 def create_timestamp_and_path(base_path):
-    ts = datetime.datetime.utcnow()     # Timestamp information for directory structure
+    ts = utc.now()     # Timestamp information for directory structure
     # Create a meaningful directory structure to organize recorded data
     p = os.path.join(base_path, str(ts.year), str(ts.month), str(ts.day))
     mkdir_p(p)
     # Call timestamp again (the directory name will not have changed, but the timestamp will be more accurate)
-    ts = datetime.datetime.utcnow()
+    ts = utc.now()
     return ts, p
 
 
@@ -70,7 +70,7 @@ def get_status_json(tart_instance):
     '''Generate JSON from status'''
     vals = tart_instance.read_status(False)
     d = tart_instance.extract(vals)
-    d['timestamp (UTC)'] = datetime.datetime.utcnow().isoformat()
+    d['timestamp (UTC)'] = utc.now().isoformat()
     d_json = json.dumps(d)
     return d, d_json
 
@@ -153,7 +153,7 @@ def run_diagnostic(tart, runtime_config):
         channels.append(channel)
 
     runtime_config['channels'] = channels
-    runtime_config['channels_timestamp'] = datetime.datetime.utcnow()
+    runtime_config['channels_timestamp'] = utc.now()
     runtime_config['status'] = d
 
     print("\nDone.")

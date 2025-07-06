@@ -1,4 +1,3 @@
-import datetime
 import json
 import multiprocessing
 
@@ -10,6 +9,7 @@ from tart_web_api.app import app
 from tart_web_api import service
 import tart_web_api.database as db
 
+from tart.util import utc
 
 minimize_process = None
 
@@ -28,7 +28,7 @@ def set_gain():
     @apiParam {Number[]} body.gain List of channel gains
     @apiParam {Number[]} body.phase_offset List of channel phase offset (rad)
     """
-    utc_date = datetime.datetime.utcnow()
+    utc_date = utc.now()
     content = request.get_json(silent=False)
     g = content['gain']
     ph = content['phase_offset']
@@ -53,7 +53,7 @@ def set_calibration_antenna_positions():
     @apiParam {Object[]} body.antenna_positions Array of antenna positions in
                         East-North-Up Coordinate system [[e,n,u],[e,n,u],..]].
     """
-    utc_date = datetime.datetime.utcnow()
+    utc_date = utc.now()
     content = request.get_json(silent=False)
     runtime_config = app.config['CONFIG']
     app.logger.info(content)
@@ -107,7 +107,7 @@ def post_calibration_from_vis():
     if state in ['idle', 'preparing']:
         db.update_calibration_process_state('preparing')
         cal_measurements = request.get_json(silent=False)
-        t = datetime.datetime.utcnow()
+        t = utc.now()
         cal_request_file_name = t.strftime('Cal_%Y-%m-%d_%H-%M.json')
         with open(cal_request_file_name, 'w') as outfile:
             json.dump(cal_measurements, outfile)
@@ -130,4 +130,3 @@ def get_calibrate_status():
     """
     state = db.get_calibration_process_state()
     return jsonify({'status': state})
-

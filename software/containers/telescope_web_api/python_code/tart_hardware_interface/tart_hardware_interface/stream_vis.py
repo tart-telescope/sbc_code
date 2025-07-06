@@ -2,7 +2,6 @@
 
 '''
 import numpy as np
-import datetime
 
 import os
 import stat
@@ -18,6 +17,7 @@ logger = logging.getLogger(__name__)
 from tart.operation import settings
 from tart.imaging import visibility
 from tart.util import angle
+from tart.util import utc
 
 from tart_hardware_interface.highlevel_modes_api import get_status_json
 
@@ -38,7 +38,7 @@ def get_corr(xnor_sum, n_samples):
 '''
 def get_vis_object(data, runtime_config):
     n_samples = 2**runtime_config['vis']['N_samples_exp']
-    timestamp = datetime.datetime.utcnow()
+    timestamp = utc.now()
     config = settings.from_file(runtime_config['telescope_config_path'])
     num_ant = config.get_num_antenna()
     v = []
@@ -159,4 +159,3 @@ def stream_vis_to_queue(tart, runtime_config):
     vis_calc_process.start()
     capture_process.start()
     return vis_queue, vis_calc_process, capture_process, vis_calc_cmd_queue, capture_cmd_queue
-
