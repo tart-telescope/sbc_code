@@ -13,6 +13,7 @@ setup(
     install_requires=[
         'spidev',
         'numpy',
+        'matplotlib'
     ],
     include_package_data=True,
     package_dir={'tart_hardware_interface': 'tart_hardware_interface'},

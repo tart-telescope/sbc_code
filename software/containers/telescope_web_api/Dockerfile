@@ -34,7 +34,7 @@ COPY ./config_data/permute.txt /permute/permute.txt
 WORKDIR /app
 ENV FLASK_APP=tart_web_api.app
 #ENV FLASK_DEBUG=1
-RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir waitress
+RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir waitress scipy
 
 EXPOSE 5000
 CMD ["/opt/venv/bin/waitress-serve", "--threads=1", "--port=5000", "tart_web_api.app:app"]
