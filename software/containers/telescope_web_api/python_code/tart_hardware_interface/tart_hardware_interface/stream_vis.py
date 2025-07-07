@@ -57,7 +57,7 @@ def get_vis_object(data, runtime_config):
 
             v_com = v_real - 1j * v_imag
             v.append(v_com)
-    vis = visibility.Visibility(config, timestamp)
+    vis = visibility.from_config(config, timestamp)
     vis.set_visibilities(v, baselines)
     return vis, means, timestamp
 
