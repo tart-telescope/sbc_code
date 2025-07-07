@@ -203,7 +203,7 @@ def create_direct_vis_dict(vis):
         i, j = b
         vis_el = {'i': i, 'j': j, 're': v.real, 'im':v.imag}
         vis_list.append(vis_el)
-    vis_dict = {'data':vis_list, 'timestamp':vis.timestamp.isoformat()[:-3]+'Z'}
+    vis_dict = {'data':vis_list, 'timestamp':vis.timestamp.isoformat()}
     return vis_dict
 
 class TartControl():

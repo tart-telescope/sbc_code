@@ -1,9 +1,8 @@
 import sqlite3
-
+from tart.util import utc
 
 def connect_to_db():
     con = None
-    c = None
     try:
         dbfile = 'tart_web_api_database.db'
         con = sqlite3.connect(dbfile)
