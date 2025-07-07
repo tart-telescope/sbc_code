@@ -40,6 +40,7 @@ from tart.simulation import skymodel
 from tart.simulation import antennas
 from tart.simulation import radio
 from tart.simulation.simulator import get_vis_parallel, get_vis
+from tart.util import utc
 
 # msd_vis = []
 # sim_vis = []
@@ -203,7 +204,7 @@ def create_direct_vis_dict(vis):
         i, j = b
         vis_el = {'i': i, 'j': j, 're': v.real, 'im':v.imag}
         vis_list.append(vis_el)
-    vis_dict = {'data':vis_list, 'timestamp':vis.timestamp.isoformat()}
+    vis_dict = {'data':vis_list, 'timestamp':utc.to_string(vis.timestamp)}
     return vis_dict
 
 class TartControl():

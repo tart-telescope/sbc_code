@@ -70,7 +70,7 @@ def get_status_json(tart_instance):
     '''Generate JSON from status'''
     vals = tart_instance.read_status(False)
     d = tart_instance.extract(vals)
-    d['timestamp (UTC)'] = utc.now().isoformat()
+    d['timestamp (UTC)'] = utc.to_string(utc.now())
     d_json = json.dumps(d)
     return d, d_json
 

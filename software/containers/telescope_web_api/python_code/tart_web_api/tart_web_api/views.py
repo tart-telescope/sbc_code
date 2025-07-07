@@ -6,6 +6,8 @@ import numpy as np
 
 from tart_web_api.app import app
 import tart_web_api.database as db
+from tart.util import utc
+
 
 @app.route('/status/fpga', methods=['GET',])
 def get_status_fpga():
@@ -281,7 +283,7 @@ def get_imaging_timestamp():
     """
     runtime_config = app.config['CONFIG']
     if 'vis_timestamp' in runtime_config:
-        return runtime_config['vis_timestamp'].isoformat()[:-3]+'Z'
+        return utc.to_string(runtime_config['vis_timestamp'])
     else:
         return jsonify({})
 
