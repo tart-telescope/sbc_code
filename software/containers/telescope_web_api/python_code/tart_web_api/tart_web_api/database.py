@@ -166,7 +166,7 @@ def get_raw_file_handle():
         c.execute("SELECT * FROM raw_data ORDER BY date DESC")
         rows = c.fetchall()
         ret = [{'filename': row[2],
-                'timestamp': row[1],
+                'timestamp': utc.from_string(row[1]),
                 'checksum': row[3],
                 'Id': row[0]} for row in rows]
     return ret
@@ -221,7 +221,7 @@ def get_vis_file_handle():
         c = con.cursor()
         c.execute("SELECT * FROM vis_data ORDER BY date DESC")
         rows = c.fetchall()
-        ret = [{'filename': row[2], 'timestamp': row[1],
+        ret = [{'filename': row[2], 'timestamp': utc.from_string(row[1]),
                 'checksum': row[3], 'Id': row[0]} for row in rows]
     return ret
 

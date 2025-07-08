@@ -18,13 +18,10 @@ setup(
         'flask-cors',
         'flask-script',
         'tart_hardware_interface',
-        'tart'
+        'tart>=1.3.1'
     ],
     url='http://github.com/tmolteno/TART',
     author='Tim Molteno, Max Scheel, Pat Suggate',
     author_email='tim@elec.ac.nz',
     license='GPLv3',
 )
-
-
-
