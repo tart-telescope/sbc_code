@@ -4,6 +4,7 @@
 '''
 import json
 import os
+import time
 
 import logging
 import numpy as np
@@ -120,6 +121,7 @@ class TartFakeSPI(TartSPI):
         while not self.vis_ready(noisy):
             self.pause()
         vis = self.read_visibilities(noisy)
+        time.sleep(1)
         return vis
 
     def read_visibilities(self, noisy=True):
