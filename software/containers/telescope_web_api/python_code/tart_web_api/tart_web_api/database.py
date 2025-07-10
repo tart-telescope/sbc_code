@@ -4,9 +4,11 @@ from tart.util import utc
 
 
 def connect_to_db():
+    # v1 none utc timestamps
+    # v2 utc timestamps!
     con = None
     try:
-        con = sqlite3.connect("tart_web_api_database.db")
+        con = sqlite3.connect("tart_web_api_database_v2.db")
     except Exception as e:
         print(type(e))  # the exception instance
         print(e.args)  # arguments stored in .args
@@ -18,20 +20,20 @@ def setup_db(num_ant):
     with connect_to_db() as con:
         c = con.cursor()
         c.execute(
-            "CREATE TABLE IF NOT EXISTS raw_data (Id INTEGER PRIMARY KEY, date timestamp, filename TEXT, checksum TEXT)"
+            "CREATE TABLE IF NOT EXISTS raw_data (Id INTEGER PRIMARY KEY, utc_timestamp TEXT, filename TEXT, checksum TEXT)"
         )
         c.execute(
-            "CREATE TABLE IF NOT EXISTS observation_cache_process (Id INTEGER PRIMARY KEY, date timestamp, state TEXT)"
+            "CREATE TABLE IF NOT EXISTS observation_cache_process (Id INTEGER PRIMARY KEY, utc_timestamp TEXT, state TEXT)"
         )
         c.execute(
-            "CREATE TABLE IF NOT EXISTS vis_data (Id INTEGER PRIMARY KEY, date timestamp, filename TEXT, checksum TEXT)"
+            "CREATE TABLE IF NOT EXISTS vis_data (Id INTEGER PRIMARY KEY, utc_timestamp TEXT, filename TEXT, checksum TEXT)"
         )
         c.execute(
-            "CREATE TABLE IF NOT EXISTS vis_cache_process (Id INTEGER PRIMARY KEY, date timestamp, state TEXT)"
+            "CREATE TABLE IF NOT EXISTS vis_cache_process (Id INTEGER PRIMARY KEY, utc_timestamp TEXT, state TEXT)"
         )
-        c.execute("CREATE TABLE IF NOT EXISTS sample_delay (date timestamp, delay REAL)")
+        c.execute("CREATE TABLE IF NOT EXISTS sample_delay (utc_timestamp TEXT, delay REAL)")
         c.execute(
-            "CREATE TABLE IF NOT EXISTS calibration (date timestamp, antenna INTEGER, g_abs REAL, g_phase REAL)"
+            "CREATE TABLE IF NOT EXISTS calibration (utc_timestamp TEXT, antenna INTEGER, g_abs REAL, g_phase REAL)"
         )
         c.execute("CREATE TABLE IF NOT EXISTS channels (channel_id INTEGER, enabled BOOLEAN)")
     with connect_to_db() as con:
@@ -76,7 +78,7 @@ def get_sample_delay():
     ret = 0
     with connect_to_db() as con:
         c = con.cursor()
-        c.execute("SELECT * FROM sample_delay ORDER BY datetime(date) DESC LIMIT 1")
+        c.execute("SELECT * FROM sample_delay ORDER BY datetime(utc_timestamp) DESC LIMIT 1")
         rows = c.fetchall()
         if len(rows) == 0:
             ret = 0
@@ -88,8 +90,8 @@ def get_sample_delay():
 def insert_sample_delay(timestamp, sample_delay):
     with connect_to_db() as con:
         c = con.cursor()
-        SQL = "INSERT INTO sample_delay(date, delay) values (?, ?)"
-        c.execute(SQL, (timestamp, sample_delay))
+        SQL = "INSERT INTO sample_delay(utc_timestamp, delay) values (?, ?)"
+        c.execute(SQL, (utc.to_string(timestamp), sample_delay))
     return 1
 
 
@@ -103,7 +105,7 @@ def insert_gain(c, g, ph):
     for ant_i in range(len(g)):
         c.execute(
             "INSERT INTO calibration VALUES (?,?,?,?)",
-            (utc_date, ant_i, g[ant_i], ph[ant_i]),
+            (utc.to_string(utc_date), ant_i, g[ant_i], ph[ant_i]),
         )
 
 
@@ -112,7 +114,7 @@ def get_gain():
     with connect_to_db() as con:
         c = con.cursor()
         c.execute(
-            "SELECT date, antenna, g_abs, g_phase from calibration WHERE date = (SELECT MAX(date) FROM calibration) ORDER BY antenna;"
+            "SELECT utc_timestamp, antenna, g_abs, g_phase from calibration WHERE utc_timestamp = (SELECT MAX(utc_timestamp) FROM calibration) ORDER BY antenna;"
         )
         rows = c.fetchall()
         for row in rows:
@@ -131,8 +133,8 @@ def insert_raw_file_handle(filename, checksum):
         c = con.cursor()
         timestamp = utc.now()
         c.execute(
-            "INSERT INTO raw_data(date, filename, checksum) VALUES (?,?,?)",
-            (timestamp, filename, checksum),
+            "INSERT INTO raw_data(utc_timestamp, filename, checksum) VALUES (?,?,?)",
+            (utc.to_string(timestamp), filename, checksum),
         )
 
 
@@ -146,7 +148,7 @@ def get_raw_file_handle():
     ret = ""
     with connect_to_db() as con:
         c = con.cursor()
-        c.execute("SELECT * FROM raw_data ORDER BY date DESC")
+        c.execute("SELECT * FROM raw_data ORDER BY utc_timestamp DESC")
         rows = c.fetchall()
         ret = [
             {
@@ -165,8 +167,8 @@ def update_observation_cache_process_state(state):
         c = con.cursor()
         ts = utc.now()
         c.execute(
-            "UPDATE observation_cache_process SET state = ?, date = ? WHERE Id = ?",
-            (state, ts, 1),
+            "UPDATE observation_cache_process SET state = ?, utc_timestamp = ? WHERE Id = ?",
+            (state, utc.to_string(ts), 1),
         )
 
 
@@ -192,8 +194,8 @@ def insert_vis_file_handle(filename, checksum):
         c = con.cursor()
         timestamp = utc.now()
         c.execute(
-            "INSERT INTO vis_data(date, filename, checksum) VALUES (?,?,?)",
-            (timestamp, filename, checksum),
+            "INSERT INTO vis_data(utc_timestamp, filename, checksum) VALUES (?,?,?)",
+            (utc.to_string(timestamp), filename, checksum),
         )
 
 
@@ -207,7 +209,7 @@ def get_vis_file_handle():
     ret = ""
     with connect_to_db() as con:
         c = con.cursor()
-        c.execute("SELECT * FROM vis_data ORDER BY date DESC")
+        c.execute("SELECT * FROM vis_data ORDER BY utc_timestamp DESC")
         rows = c.fetchall()
         ret = [
             {
@@ -226,8 +228,8 @@ def update_vis_cache_process_state(state):
         c = con.cursor()
         ts = utc.now()
         c.execute(
-            "UPDATE vis_cache_process SET state = ?, date = ? WHERE Id = ?",
-            (state, ts, 1),
+            "UPDATE vis_cache_process SET state = ?, utc_timestamp = ? WHERE Id = ?",
+            (state, utc.to_string(ts), 1),
         )
 
 

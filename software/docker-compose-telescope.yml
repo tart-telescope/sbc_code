@@ -14,7 +14,7 @@ services:
             - "8000:80"
         volumes:
             - "./tailscale/var_lib:/var/lib"        # State data will be stored in this directory
-            - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work 
+            - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work
         cap_add:                                    # Required for tailscale to work
             - net_admin
             - sys_module
@@ -34,8 +34,7 @@ services:
             options:
                 max-file: "5"
                 max-size: "10m"
-
-    api_container: # Port 5000
+    api: # Port 5000
         image: tmolteno/tart_web_api
         volumes:
             -   data-volume:/telescope_data
@@ -45,8 +44,11 @@ services:
         devices:
            - /dev/spidev0.0
         environment:
-            # Change the following to be something secure. You will use this to login to your telescope from the web api.
+            # Create a .env file with LOGIN_PW and SECRET_KEY next to the compose file.
+            # Change the following to be something secure.
+            # You will use this to login to your telescope from the web api.
             - LOGIN_PW=${LOGIN_PW}
+            - SECRET_KEY=${SECRET_KEY}
         ports:
             - 5000:5000
         restart: always
@@ -58,20 +60,9 @@ services:
                 max-file: "5"
                 max-size: "10m"
 
-    api_doc_server: # Port 80 internal
-        build:
-            context: ./containers/telescope_web_api
-            dockerfile: Dockerfile.apidoc 
-            args:
-                tart_name: ${TS_HOSTNAME}
-        restart: always
-        depends_on:
-            - tailscale
-
     web_app: # Port 80 on service tailscale
         depends_on:
-            - api_container
-            - api_doc_server
+            - api
         volumes:
             - data-volume:/telescope_data
         environment:
@@ -88,4 +79,3 @@ services:
 volumes:
     # Mounted on each container as /telescope_data, used for raw data and vis data. This is a hardcoded path in each container.
     data-volume:
-

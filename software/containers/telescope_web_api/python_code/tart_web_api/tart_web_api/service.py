@@ -11,6 +11,8 @@ import logging
 import os
 import time
 
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+
 from tart.imaging import visibility
 from tart.util import utc
 
@@ -59,13 +61,13 @@ def cleanup_visibility_cache():
                 try:
                     db.remove_vis_file_handle_by_Id(entry["Id"])
                     print("removed", entry["Id"], entry["filename"], entry["checksum"])
-                except:
-                    print("couldnt remove handle from database")
+                except Exception as e:
+                    print("couldnt remove handle from database", e)
                     pass
                 try:
                     os.remove(entry["filename"])
-                except:
-                    print("couldnt remove file")
+                except Exception as e:
+                    print("couldnt remove file", e)
                     pass
 
         else:
@@ -121,7 +123,7 @@ class TartControl:
                 else:
                     ret = self.vis_stream_acquire()
                     if "filename" in ret:
-                        logging.info(f"vis_stream_acquire = {ret}")
+                        logging.debug(f"vis_stream_acquire = {ret}")
                         db.insert_vis_file_handle(ret["filename"], ret["sha256"])
                     time.sleep(0.005)
             elif self.state == "off":
@@ -160,7 +162,7 @@ class TartControl:
             if vis is not None:
                 self.config["vis_current"] = create_direct_vis_dict(vis)
                 self.vislist.append(vis)
-                logging.info(f"Updated vis list N={len(self.vislist)}")
+                logging.debug(f"Updated vis list N={len(self.vislist)}")
 
                 chunksize = self.config["vis"]["chunksize"]
                 if len(self.vislist) >= chunksize:
