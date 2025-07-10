@@ -1,14 +1,17 @@
-import datetime
-
-from flask import Flask, request
-from flask import render_template, jsonify, send_file
+from flask import jsonify
 from flask_jwt_extended import jwt_required
 
-from tart_web_api.app import app
 import tart_web_api.database as db
+from tart_web_api.app import app
+
 
 @jwt_required()
-@app.route('/channel/<int:channel_idx>/<int:enable>', methods=['PUT',])
+@app.route(
+    "/channel/<int:channel_idx>/<int:enable>",
+    methods=[
+        "PUT",
+    ],
+)
 def set_channel(channel_idx, enable):
     """
     @api {PUT} /channel/<channel_idx>/<enable> Enable/Disable channel manually.
@@ -21,9 +24,15 @@ def set_channel(channel_idx, enable):
     @apiParam {Number={0,1}} enable Enabled: 1; Disabled: 0
     """
     db.update_manual_channel_status(channel_idx, enable)
-    return jsonify({channel_idx:enable})
+    return jsonify({channel_idx: enable})
 
-@app.route('/channel', methods=['GET',])
+
+@app.route(
+    "/channel",
+    methods=[
+        "GET",
+    ],
+)
 def get_all_channels():
     """
     @api {GET} /channel Get all channels and their enabled/disabled status.

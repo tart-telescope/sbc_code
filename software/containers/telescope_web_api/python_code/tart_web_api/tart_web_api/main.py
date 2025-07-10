@@ -4,27 +4,28 @@
 # Maximilian Scheel (c) 2017 max@max.ac.nz
 # Tim Molteno 2018-2019. tim@elec.ac.nz
 #
-import multiprocessing
 import logging
+import multiprocessing
+import os
 
-from flask import Flask, jsonify, request
+from flask import Flask
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
-from flask_cors import CORS, cross_origin
-
-
-from tart_web_api.service import cleanup_observation_cache, cleanup_visibility_cache, TartControl
-from tart_web_api.config import init_config
 import tart_web_api.database as db
+from tart_web_api.config import init_config
+from tart_web_api.service import (
+    TartControl,
+    cleanup_observation_cache,
+    cleanup_visibility_cache,
+)
 
 
 def tart_p(rt_config):
     tart_control = TartControl(rt_config)
     while True:
-        tart_control.set_state(rt_config['mode'])
+        tart_control.set_state(rt_config["mode"])
         tart_control.run(noisy=True)
-
-
 
 
 app = Flask(__name__)
@@ -38,30 +39,20 @@ with app.app_context():
         app.logger.setLevel(logging.INFO)
 
 CORS(app)
-#app.config['SECRET_KEY'] = 'super-secret-cow-key-hsa'
-#from datetime import timedelta as td
-#app.config['JWT_EXPIRATION_DELTA'] = td(seconds=3600)
-#JWT(app, authenticate, identity)
 
-app.secret_key = 'super-secret-123897219379179464asd13khk213'  # Change this!
-app.config['JWT_HEADER_TYPE'] = 'JWT'
+app.secret_key = os.environ.get("SECRET_KEY", "super-secret-123897219379179464asd13khk213")
+app.config["JWT_HEADER_TYPE"] = "JWT"
 jwt = JWTManager(app)
 
-import tart_web_api.views
-import tart_web_api.views_auth
-import tart_web_api.views_acquisition
-import tart_web_api.views_cal
-import tart_web_api.views_cache
-import tart_web_api.views_obs
-#import tart_web_api.views_log
-import tart_web_api.views_channel
 
-#if __name__ == "__main__":
+# import tart_web_api.views_log
+
+# if __name__ == "__main__":
 m = multiprocessing.Manager()
 runtime_config = init_config(m)
-runtime_config['sample_delay'] = db.get_sample_delay()
-app.config['CONFIG'] = runtime_config
-num_ant = runtime_config['telescope_config']['num_antenna']
+runtime_config["sample_delay"] = db.get_sample_delay()
+app.config["CONFIG"] = runtime_config
+num_ant = runtime_config["telescope_config"]["num_antenna"]
 
 db.setup_db(num_ant)
 
