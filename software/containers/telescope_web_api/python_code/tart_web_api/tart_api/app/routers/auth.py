@@ -7,14 +7,13 @@ with the existing Flask-JWT-Extended authentication system.
 
 import os
 from datetime import datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import jwt
-
 from models.auth_models import AuthRequest, AuthResponse, RefreshResponse
 
-from ..config import RuntimeConfig
+from ..config import settings
 from ..dependencies import get_runtime_config
 
 router = APIRouter()
@@ -31,10 +30,10 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return to_encode
 
 
-@router.post("/", response_model=AuthResponse, status_code=200)
+@router.post("", response_model=AuthResponse, status_code=200)
 async def auth(
     login_request: AuthRequest,
-    config: Annotated[RuntimeConfig, Depends(get_runtime_config)],
+    config: Annotated[Any, Depends(get_runtime_config)],
 ):
     """
     Authenticate user and return JWT tokens.
@@ -68,7 +67,7 @@ async def auth(
     )
 
     # Encode tokens using the same secret key as Flask
-    secret_key = config.settings.secret_key
+    secret_key = settings.secret_key
     access_token = jwt.encode(access_token_data, secret_key, algorithm="HS256")
     refresh_token = jwt.encode(refresh_token_data, secret_key, algorithm="HS256")
 
@@ -81,7 +80,7 @@ async def auth(
 @router.post("/refresh", response_model=RefreshResponse, status_code=200)
 async def refresh(
     # TODO: Add refresh token validation
-    config: Annotated[RuntimeConfig, Depends(get_runtime_config)],
+    config: Annotated[Any, Depends(get_runtime_config)],
 ):
     """
     Refresh access token using refresh token.
@@ -98,7 +97,7 @@ async def refresh(
         expires_delta=access_token_expires,
     )
 
-    secret_key = config.settings.secret_key
+    secret_key = settings.secret_key
     access_token = jwt.encode(access_token_data, secret_key, algorithm="HS256")
 
     return RefreshResponse(access_token=access_token)

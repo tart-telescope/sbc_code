@@ -56,7 +56,9 @@ async def set_calibration_antenna_positions(
 
 
 @router.get("/gain", response_model=GetGainResponse)
-async def get_gain(config: ConfigDep, db: Annotated[AsyncDatabase, Depends(get_database)]):
+async def get_gain(
+    config: ConfigDep, db: Annotated[AsyncDatabase, Depends(get_database)]
+):
     """
     Get channel based complex gains.
 

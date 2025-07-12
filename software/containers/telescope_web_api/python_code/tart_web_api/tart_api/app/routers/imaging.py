@@ -32,13 +32,10 @@ async def get_latest_vis(config: ConfigDep):
         ret = dict(config["vis_current"])
 
         # Import database functions to reuse channel filtering logic
-        import os
-        import sys
+        from database import get_database
 
-        sys.path.append(os.path.join(os.path.dirname(__file__), "../../../../tart_web_api"))
-        import database as flask_db
-
-        channel_list = flask_db.get_manual_channel_status()
+        db = get_database()
+        channel_list = await db.get_manual_channel_status()
         active_channels = np.zeros(len(channel_list))
         for ch in channel_list:
             active_channels[ch["channel_id"]] = ch["enabled"]
@@ -65,7 +62,7 @@ async def get_imaging_antenna_positions(config: ConfigDep):
     if "antenna_positions" in config:
         # Convert the antenna positions to the correct format
         positions = config["antenna_positions"]
-        if positions and isinstance(positions[0], (list, tuple)):
+        if positions and isinstance(positions[0], list | tuple):
             return AntennaPositionsResponse(positions)
         else:
             # Fallback to default positions

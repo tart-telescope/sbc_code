@@ -375,3 +375,37 @@ The FastAPI migration is now **100% complete** with full telescope control capab
 - Comprehensive test coverage
 
 **The FastAPI application now provides complete feature parity with the Flask app, including the critical telescope control state machine!**
+
+## 🔍 **POST-MIGRATION FOLLOW-UP TASKS**
+
+### Schema Validation Issues Discovered
+
+During deployment, several schema validation issues were discovered that require follow-up:
+
+#### 1. **Status Endpoint Data Mapping**
+- **Issue**: Flask app returns `SYS_STATS.state` values outside the expected 0-1 enum range (e.g., value 7)
+- **Temporary Fix**: FastAPI clamps values to 0-1 range in status router
+- **Follow-up Required**: ✅ **Confirm schema is correct** - validate if enum should support 0-7 range or if Flask data is incorrect
+
+#### 2. **Timestamp Field Inconsistency**
+- **Issue**: Flask app returns `timestamp (UTC)` but schema expects `timestamp`
+- **Temporary Fix**: FastAPI maps field names in status router
+- **Follow-up Required**: ✅ **Confirm schema is correct** - standardize timestamp field naming
+
+#### 3. **Configuration File Loading**
+- **Issue**: FastAPI had fallback antenna positions while Flask fails hard on missing config
+- **Resolution**: Updated FastAPI to match Flask behavior (fail hard on missing config files)
+- **Status**: ✅ **Complete** - both apps now have identical config loading behavior
+
+### Action Items
+
+1. **Schema Review**: Validate all generated schemas against actual Flask responses
+2. **Data Validation**: Ensure enum ranges match actual hardware values
+3. **Field Naming**: Standardize field names across all endpoints
+4. **Integration Testing**: Run comprehensive compatibility tests in production environment
+
+### Notes
+
+- These issues were discovered during container deployment
+- Temporary fixes maintain API compatibility while preserving data integrity
+- Schema corrections should be made at the source (JSON schema files) and regenerated

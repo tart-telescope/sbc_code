@@ -8,14 +8,13 @@ hardware, reusing the existing TartControl logic from the Flask application.
 import asyncio
 import logging
 import multiprocessing
-import os
-import sys
 from typing import Any
 
-# Add Flask app to path to reuse existing services
-sys.path.append(os.path.join(os.path.dirname(__file__), "../tart_web_api"))
-
-from tart_web_api.service import TartControl, cleanup_observation_cache, cleanup_visibility_cache
+from legacy.telescope_service import (
+    TartControl,
+    cleanup_observation_cache,
+    cleanup_visibility_cache,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -175,7 +174,9 @@ async def get_telescope_service() -> TelescopeControlService:
     return _telescope_service
 
 
-async def init_telescope_service(runtime_config: dict[str, Any]) -> TelescopeControlService:
+async def init_telescope_service(
+    runtime_config: dict[str, Any],
+) -> TelescopeControlService:
     """Initialize the global telescope control service."""
     global _telescope_service
     if _telescope_service is not None:

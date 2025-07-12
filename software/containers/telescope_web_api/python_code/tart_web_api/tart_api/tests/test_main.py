@@ -82,7 +82,15 @@ def test_current_mode_endpoint(client):
     assert response.status_code == 200
     data = response.json()
     assert "mode" in data
-    assert data["mode"] in ["off", "diag", "raw", "vis", "vis_save", "cal", "rt_syn_img"]
+    assert data["mode"] in [
+        "off",
+        "diag",
+        "raw",
+        "vis",
+        "vis_save",
+        "cal",
+        "rt_syn_img",
+    ]
 
 
 def test_status_fpga_endpoint(client):
@@ -129,7 +137,9 @@ def test_protected_endpoint_without_auth(client):
 def test_protected_endpoint_with_auth(client):
     """Test that protected endpoints work with authentication."""
     # First, get a token
-    auth_response = client.post("/auth/", json={"username": "admin", "password": "password"})
+    auth_response = client.post(
+        "/auth/", json={"username": "admin", "password": "password"}
+    )
     token = auth_response.json()["access_token"]
 
     # Then use the token to access protected endpoint

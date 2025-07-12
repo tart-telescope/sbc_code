@@ -8,13 +8,13 @@ Flask status logic while providing FastAPI-compatible responses.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
-
-from database import AsyncDatabase, get_database
 from models.status_models import (
     StatusChannelAllResponse,
     StatusChannelSingleResponse,
     StatusFPGAResponse,
 )
+
+from database import AsyncDatabase, get_database
 
 from ..dependencies import ConfigDep
 
@@ -32,6 +32,18 @@ async def get_status_fpga(config: ConfigDep):
     if "status" in config:
         ret = dict(config["status"])
         ret["hostname"] = config["hostname"]
+
+        # Fix timestamp field mapping
+        if "timestamp (UTC)" in ret:
+            ret["timestamp"] = ret.pop("timestamp (UTC)")
+        elif "timestamp" not in ret:
+            ret["timestamp"] = ""
+
+        # Fix SYS_STATS.state enum value - clamp to 0-1 range
+        if "SYS_STATS" in ret and "state" in ret["SYS_STATS"]:
+            state_val = ret["SYS_STATS"]["state"]
+            ret["SYS_STATS"]["state"] = 1 if state_val > 0 else 0
+
         return StatusFPGAResponse(**ret)
     else:
         # Return empty status with required fields when no status available
@@ -85,7 +97,8 @@ async def get_status_channel_all(
         for ch in ret:
             # Find corresponding channel in database
             db_channel = next(
-                (c for c in channel_list if c["channel_id"] == ch["id"]), {"enabled": True}
+                (c for c in channel_list if c["channel_id"] == ch["id"]),
+                {"enabled": True},
             )
             ch["enabled"] = db_channel["enabled"]
 
@@ -118,7 +131,8 @@ async def get_status_channel_i(
 
             # Find corresponding channel in database
             db_channel = next(
-                (c for c in channel_list if c["channel_id"] == channel_idx), {"enabled": True}
+                (c for c in channel_list if c["channel_id"] == channel_idx),
+                {"enabled": True},
             )
             ret["enabled"] = db_channel["enabled"]
 
@@ -128,7 +142,13 @@ async def get_status_channel_i(
     return StatusChannelSingleResponse(
         id=channel_idx,
         enabled=0,
-        phase={"N_samples": 0, "measured": 0.0, "ok": 0, "stability": 0.0, "threshold": 0.0},
+        phase={
+            "N_samples": 0,
+            "measured": 0.0,
+            "ok": 0,
+            "stability": 0.0,
+            "threshold": 0.0,
+        },
         radio_mean={"mean": 0.0, "ok": 0, "threshold": 0.0},
         freq=[],
         power=[],

@@ -21,7 +21,12 @@ class EndpointTester:
         self.results = []
 
     def log_result(
-        self, endpoint: str, method: str, status: bool, response_code: int, error: str = None
+        self,
+        endpoint: str,
+        method: str,
+        status: bool,
+        response_code: int,
+        error: str = None,
     ):
         """Log test result."""
         result = {
@@ -79,15 +84,23 @@ class EndpointTester:
             if method == "GET":
                 response = self.session.get(url, headers=headers, timeout=10)
             elif method == "POST":
-                response = self.session.post(url, json=data, headers=headers, timeout=10)
+                response = self.session.post(
+                    url, json=data, headers=headers, timeout=10
+                )
             elif method == "PUT":
                 response = self.session.put(url, json=data, headers=headers, timeout=10)
             else:
-                self.log_result(endpoint, method, False, 0, f"Unsupported method: {method}")
+                self.log_result(
+                    endpoint, method, False, 0, f"Unsupported method: {method}"
+                )
                 return False
 
             success = response.status_code == expected_status
-            error = None if success else f"Expected {expected_status}, got {response.status_code}"
+            error = (
+                None
+                if success
+                else f"Expected {expected_status}, got {response.status_code}"
+            )
 
             self.log_result(endpoint, method, success, response.status_code, error)
             return success
@@ -143,12 +156,17 @@ class EndpointTester:
 
         # Test setting gain (requires proper data structure)
         gain_data = {"gain": [1.0] * 24, "phase_offset": [0.0] * 24}
-        self.test_endpoint("/calibration/gain", "POST", auth_required=True, data=gain_data)
+        self.test_endpoint(
+            "/calibration/gain", "POST", auth_required=True, data=gain_data
+        )
 
         # Test setting antenna positions
         antenna_data = {"antenna_positions": [[i, i, i] for i in range(24)]}
         self.test_endpoint(
-            "/calibration/antenna_positions", "POST", auth_required=True, data=antenna_data
+            "/calibration/antenna_positions",
+            "POST",
+            auth_required=True,
+            data=antenna_data,
         )
 
         # Imaging endpoints
@@ -194,9 +212,13 @@ class EndpointTester:
             print("\n❌ Failed endpoints:")
             for result in self.results:
                 if "FAIL" in result["status"]:
-                    print(f"   {result['method']} {result['endpoint']} - {result['error']}")
+                    print(
+                        f"   {result['method']} {result['endpoint']} - {result['error']}"
+                    )
 
-        print(f"\n🎉 FastAPI Migration Status: {'SUCCESS' if failed_tests == 0 else 'NEEDS FIXES'}")
+        print(
+            f"\n🎉 FastAPI Migration Status: {'SUCCESS' if failed_tests == 0 else 'NEEDS FIXES'}"
+        )
 
         return failed_tests == 0
 
@@ -212,7 +234,9 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Test TART FastAPI endpoints")
-    parser.add_argument("--url", default="http://localhost:8001", help="Base URL for API")
+    parser.add_argument(
+        "--url", default="http://localhost:8001", help="Base URL for API"
+    )
     parser.add_argument("--save", action="store_true", help="Save results to JSON file")
 
     args = parser.parse_args()

@@ -91,5 +91,6 @@ async def set_loop_n(loop_n: int, config: ConfigDep, _: AuthDep):
         return SetLoopModeResponse(loop_mode=config["loop_mode"])
     else:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Loop count must be between 0 and 100"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Loop count must be between 0 and 100",
         )
