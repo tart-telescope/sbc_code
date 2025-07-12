@@ -324,7 +324,7 @@ def get_imaging_timestamp():
     """
     runtime_config = app.config["CONFIG"]
     if "vis_timestamp" in runtime_config:
-        return utc.to_string(runtime_config["vis_timestamp"])
+        return jsonify(utc.to_string(runtime_config["vis_timestamp"]))
     else:
         return jsonify({})
 

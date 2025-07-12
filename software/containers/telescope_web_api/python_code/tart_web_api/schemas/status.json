@@ -1,0 +1,484 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "StatusFPGAResponse": {
+      "type": "object",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "Hostname of the RPI"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "UTC Timestamp"
+        },
+        "AQ_STREAM": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "number",
+              "description": "Acquisition data register value"
+            }
+          },
+          "required": ["data"],
+          "additionalProperties": false
+        },
+        "AQ_SYSTEM": {
+          "type": "object",
+          "properties": {
+            "512Mb": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Report flag if firmware is compiled for 512Mb SDRAM"
+            },
+            "SDRAM_ready": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Report flag for SDRAM"
+            },
+            "enabled": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Report flag for Acquisition system being enabled"
+            },
+            "error": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Report flag for Acquisition system error"
+            },
+            "overflow": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Report flag for Acquisition system overflow"
+            },
+            "state": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 7,
+              "description": "Acquisition system state"
+            }
+          },
+          "required": ["512Mb", "SDRAM_ready", "enabled", "error", "overflow", "state"],
+          "additionalProperties": false
+        },
+        "SPI_STATS": {
+          "type": "object",
+          "properties": {
+            "FIFO_overflow": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "FIFO overflow flag"
+            },
+            "FIFO_underrun": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "FIFO underrun flag"
+            },
+            "spi_busy": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "SPI busy flag"
+            }
+          },
+          "required": ["FIFO_overflow", "FIFO_underrun", "spi_busy"],
+          "additionalProperties": false
+        },
+        "SYS_STATS": {
+          "type": "object",
+          "properties": {
+            "acq_en": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Acquisition Unit enabled"
+            },
+            "cap_debug": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Capture debug flag"
+            },
+            "cap_en": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Capture enabled flag"
+            },
+            "state": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "System state"
+            },
+            "viz_en": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Visibility enabled"
+            },
+            "viz_pend": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Visibility pending"
+            }
+          },
+          "required": ["acq_en", "cap_debug", "cap_en", "state", "viz_en", "viz_pend"],
+          "additionalProperties": false
+        },
+        "TC_CENTRE": {
+          "type": "object",
+          "properties": {
+            "centre": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Acquisition centre flag"
+            },
+            "delay": {
+              "type": "number",
+              "description": "Delay value"
+            },
+            "drift": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Acquisition drift flag"
+            },
+            "invert": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Acquisition invert flag"
+            }
+          },
+          "required": ["centre", "delay", "drift", "invert"],
+          "additionalProperties": false
+        },
+        "TC_DEBUG": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Acquisition count flag"
+            },
+            "debug": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Acquisition debug flag"
+            },
+            "numantenna": {
+              "type": "number",
+              "description": "Number of antennas"
+            },
+            "shift": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Acquisition shift flag"
+            }
+          },
+          "required": ["count", "debug", "numantenna", "shift"],
+          "additionalProperties": false
+        },
+        "TC_STATUS": {
+          "type": "object",
+          "properties": {
+            "delta": {
+              "type": "number",
+              "description": "Acquisition delta"
+            },
+            "phase": {
+              "type": "number",
+              "description": "Acquisition phase"
+            }
+          },
+          "required": ["delta", "phase"],
+          "additionalProperties": false
+        },
+        "TC_SYSTEM": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "TC system enabled flag"
+            },
+            "error": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "TC system error flag"
+            },
+            "locked": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "TC system locked flag"
+            },
+            "source": {
+              "type": "number",
+              "description": "TC system source"
+            }
+          },
+          "required": ["enabled", "error", "locked", "source"],
+          "additionalProperties": false
+        },
+        "VX_DEBUG": {
+          "type": "object",
+          "properties": {
+            "limp": {
+              "type": "number",
+              "description": "VX debug limp value"
+            },
+            "stuck": {
+              "type": "number",
+              "description": "VX debug stuck value"
+            }
+          },
+          "required": ["limp", "stuck"],
+          "additionalProperties": false
+        },
+        "VX_STATUS": {
+          "type": "object",
+          "properties": {
+            "accessed": {
+              "type": "number",
+              "description": "VX status accessed"
+            },
+            "available": {
+              "type": "number",
+              "description": "VX status available"
+            },
+            "bank": {
+              "type": "number",
+              "description": "VX status bank"
+            },
+            "overflow": {
+              "type": "number",
+              "description": "VX status overflow"
+            }
+          },
+          "required": ["accessed", "available", "bank", "overflow"],
+          "additionalProperties": false
+        },
+        "VX_STREAM": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "number",
+              "description": "Byte of data"
+            }
+          },
+          "required": ["data"],
+          "additionalProperties": false
+        },
+        "VX_SYSTEM": {
+          "type": "object",
+          "properties": {
+            "blocksize": {
+              "type": "number",
+              "description": "VX system blocksize"
+            },
+            "enabled": {
+              "type": "number",
+              "description": "VX system enabled"
+            },
+            "overwrite": {
+              "type": "number",
+              "description": "VX system overwrite"
+            }
+          },
+          "required": ["blocksize", "enabled", "overwrite"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "hostname",
+        "timestamp",
+        "AQ_STREAM",
+        "AQ_SYSTEM",
+        "SPI_STATS",
+        "SYS_STATS",
+        "TC_CENTRE",
+        "TC_DEBUG",
+        "TC_STATUS",
+        "TC_SYSTEM",
+        "VX_DEBUG",
+        "VX_STATUS",
+        "VX_STREAM",
+        "VX_SYSTEM"
+      ],
+      "additionalProperties": false
+    },
+    "StatusChannelAllResponse": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23,
+            "description": "Channel ID"
+          },
+          "enabled": {
+            "type": "integer",
+            "enum": [0, 1],
+            "description": "Channel enabled flag"
+          },
+          "phase": {
+            "type": "object",
+            "properties": {
+              "N_samples": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Number of samples"
+              },
+              "measured": {
+                "type": "number",
+                "description": "Measured phase value"
+              },
+              "ok": {
+                "type": "integer",
+                "enum": [0, 1],
+                "description": "Phase measurement OK flag"
+              },
+              "stability": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Phase stability value"
+              },
+              "threshold": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Phase threshold value"
+              }
+            },
+            "required": ["N_samples", "measured", "ok", "stability", "threshold"],
+            "additionalProperties": false
+          },
+          "radio_mean": {
+            "type": "object",
+            "properties": {
+              "mean": {
+                "type": "number",
+                "description": "Radio mean value"
+              },
+              "ok": {
+                "type": "integer",
+                "enum": [0, 1],
+                "description": "Radio mean OK flag"
+              },
+              "threshold": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Radio mean threshold"
+              }
+            },
+            "required": ["mean", "ok", "threshold"],
+            "additionalProperties": false
+          },
+          "freq": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "Frequency array"
+          },
+          "power": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "Power array"
+          }
+        },
+        "required": ["id", "enabled", "phase", "radio_mean", "freq", "power"],
+        "additionalProperties": false
+      }
+    },
+    "StatusChannelSingleResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23,
+          "description": "Channel ID"
+        },
+        "enabled": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "Channel enabled flag"
+        },
+        "phase": {
+          "type": "object",
+          "properties": {
+            "N_samples": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of samples"
+            },
+            "measured": {
+              "type": "number",
+              "description": "Measured phase value"
+            },
+            "ok": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Phase measurement OK flag"
+            },
+            "stability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Phase stability value"
+            },
+            "threshold": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Phase threshold value"
+            }
+          },
+          "required": ["N_samples", "measured", "ok", "stability", "threshold"],
+          "additionalProperties": false
+        },
+        "radio_mean": {
+          "type": "object",
+          "properties": {
+            "mean": {
+              "type": "number",
+              "description": "Radio mean value"
+            },
+            "ok": {
+              "type": "integer",
+              "enum": [0, 1],
+              "description": "Radio mean OK flag"
+            },
+            "threshold": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Radio mean threshold"
+            }
+          },
+          "required": ["mean", "ok", "threshold"],
+          "additionalProperties": false
+        },
+        "freq": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Frequency array"
+        },
+        "power": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Power array"
+        }
+      },
+      "required": ["id", "enabled", "phase", "radio_mean", "freq", "power"],
+      "additionalProperties": false
+    },
+    "EmptyResponse": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  }
+}

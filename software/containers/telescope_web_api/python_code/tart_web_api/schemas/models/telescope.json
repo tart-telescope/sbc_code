@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Location": {
+      "type": "object",
+      "properties": {
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Longitude"
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "Latitude"
+        },
+        "alt": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 8848,
+          "description": "Altitude in meters above sea level (0 to 8848m - Mt. Everest height)"
+        }
+      },
+      "required": ["lon", "lat", "alt"],
+      "additionalProperties": false
+    },
+    "TelescopeInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Telescope site name"
+        },
+        "operating_frequency": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Operating frequency of the radio"
+        },
+        "L0_frequency": {
+          "type": "number",
+          "minimum": 0,
+          "description": "L0 frequency of the radio"
+        },
+        "baseband_frequency": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Baseband frequency of the radio"
+        },
+        "sampling_frequency": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Sampling frequency of the radio"
+        },
+        "bandwidth": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Bandwidth of the radio"
+        },
+        "num_antenna": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of antennas in the telescope"
+        },
+        "location": {
+          "$ref": "#/definitions/Location"
+        }
+      },
+      "required": [
+        "name",
+        "operating_frequency",
+        "L0_frequency",
+        "baseband_frequency",
+        "sampling_frequency",
+        "bandwidth",
+        "num_antenna",
+        "location"
+      ],
+      "additionalProperties": false
+    },
+    "TelescopeInfoResponse": {
+      "type": "object",
+      "properties": {
+        "info": {
+          "$ref": "#/definitions/TelescopeInfo"
+        }
+      },
+      "required": ["info"],
+      "additionalProperties": false
+    },
+    "VisibilityData": {
+      "type": "object",
+      "properties": {
+        "i": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23,
+          "description": "First antenna index"
+        },
+        "j": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23,
+          "description": "Second antenna index"
+        }
+      },
+      "required": ["i", "j"],
+      "additionalProperties": true
+    },
+    "VisibilityResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VisibilityData"
+          }
+        }
+      },
+      "required": ["data"],
+      "additionalProperties": true
+    },
+    "GainCalibration": {
+      "type": "object",
+      "properties": {
+        "gain": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "List of channel gains"
+        },
+        "phase_offset": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "List of channel phase offsets in radians"
+        }
+      },
+      "required": ["gain", "phase_offset"],
+      "additionalProperties": false
+    },
+    "AntennaPositionsCalibration": {
+      "type": "object",
+      "properties": {
+        "antenna_positions": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "description": "Array of antenna positions in East-North-Up coordinate system"
+        }
+      },
+      "required": ["antenna_positions"],
+      "additionalProperties": false
+    },
+    "FileHandle": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "description": "Filename"
+        },
+        "checksum": {
+          "type": "string",
+          "description": "SHA256 checksum"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "File timestamp"
+        }
+      },
+      "required": ["filename", "checksum", "timestamp"],
+      "additionalProperties": false
+    },
+    "DataFileResponse": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FileHandle"
+      }
+    }
+  }
+}

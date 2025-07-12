@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ChannelToggleResponse": {
+      "type": "object",
+      "patternProperties": {
+        "^[0-9]+$": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "Channel enable status: 0=disabled, 1=enabled"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ChannelStatus": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23,
+          "description": "Channel ID"
+        },
+        "enabled": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "Channel enabled status: 0=disabled, 1=enabled"
+        }
+      },
+      "required": ["channel_id", "enabled"],
+      "additionalProperties": false
+    },
+    "AllChannelsResponse": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ChannelStatus"
+      }
+    }
+  }
+}
