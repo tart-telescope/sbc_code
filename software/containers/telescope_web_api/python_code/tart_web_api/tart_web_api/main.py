@@ -22,13 +22,12 @@ def tart_p(rt_config):
     tart_control = TartControl(rt_config)
     while True:
         tart_control.set_state(rt_config['mode'])
-        tart_control.run()
+        tart_control.run(noisy=True)
 
 
 
 
 app = Flask(__name__)
-CORS(app)
 
 # Set up logging
 
@@ -38,6 +37,7 @@ with app.app_context():
         app.logger.addHandler(logging.StreamHandler())
         app.logger.setLevel(logging.INFO)
 
+CORS(app)
 #app.config['SECRET_KEY'] = 'super-secret-cow-key-hsa'
 #from datetime import timedelta as td
 #app.config['JWT_EXPIRATION_DELTA'] = td(seconds=3600)
@@ -59,11 +59,11 @@ import tart_web_api.views_channel
 #if __name__ == "__main__":
 m = multiprocessing.Manager()
 runtime_config = init_config(m)
+runtime_config['sample_delay'] = db.get_sample_delay()
 app.config['CONFIG'] = runtime_config
 num_ant = runtime_config['telescope_config']['num_antenna']
-db.setup_db(num_ant)
 
-runtime_config['sample_delay'] = db.get_sample_delay()
+db.setup_db(num_ant)
 
 observation_cache_process = multiprocessing.Process(target=cleanup_observation_cache, args=())
 observation_cache_process.start()

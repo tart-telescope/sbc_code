@@ -2,36 +2,33 @@
 # https://github.com/vimalloc/flask-jwt-extended
 
 
+from flask import Flask, request, jsonify 
+from flask_jwt_extended import jwt_required, \
+    create_access_token, \
+    create_refresh_token, get_jwt_identity
+
+from tart_web_api.app import app, jwt
 import os
 
-from flask import jsonify, request
-from flask_jwt_extended import (
-    create_access_token,
-    create_refresh_token,
-    get_jwt_identity,
-    jwt_required,
-)
 
-from tart_web_api.app import app
-
-if "LOGIN_PW" in os.environ:
-    pw = os.environ["LOGIN_PW"]
+if 'LOGIN_PW' in os.environ:
+    pw = os.environ['LOGIN_PW']
 else:
-    pw = "password"
+    pw = 'password'
 
 
-@app.route("/auth", methods=["POST"])
+@app.route('/auth', methods=['POST'])
 def auth():
-    username = request.json.get("username", None)
-    password = request.json.get("password", None)
-    if username != "admin" or password != pw:
+    username = request.json.get('username', None)
+    password = request.json.get('password', None)
+    if username != 'admin' or password != pw:
         return jsonify({"msg": "Bad username or password"}), 401
 
     # Use create_access_token() and create_refresh_token() to create our
     # access and refresh tokens
     ret = {
-        "access_token": create_access_token(identity=username),
-        "refresh_token": create_refresh_token(identity=username),
+        'access_token': create_access_token(identity=username),
+        'refresh_token': create_refresh_token(identity=username)
     }
     return jsonify(ret), 200
 
@@ -41,9 +38,22 @@ def auth():
 # can use the get_jwt_identity() function to get the identity of
 # the refresh token, and use the create_access_token() function again
 # to make a new access token for this identity.
-@app.route("/refresh", methods=["POST"])
+@app.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh():
     current_user = get_jwt_identity()
-    ret = {"access_token": create_access_token(identity=current_user)}
+    ret = {
+        'access_token': create_access_token(identity=current_user)
+    }
     return jsonify(ret), 200
+
+
+@jwt.expired_token_loader
+def my_expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({
+        'status': 401,
+        'sub_status': 101,
+        'msg': 'The token has expired'
+    }), 401
+
+
