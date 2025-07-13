@@ -8,38 +8,43 @@
 #   Author: Tim Molteno (c) 2019-2024.
 
 services:
-    api: # Port 5000 internal only
-        ports:
-            - 5000:5000
-        expose:
-            - 5000
-        build:
-            context: ./containers/telescope_api
-            dockerfile: Dockerfile
+
+    api_container: # Port 5000 internal only
+        build: 
+            context: ./containers/telescope_web_api
         volumes:
             -   data-volume:/telescope_data
-            -   ~/tart_web_api_store:/app/store
+            -   ~/tart_web_api_store:/app
             -   ~/telescope_config:/config_data
         environment:
             # Change the following to be something secure. You will use this to login to your telescope from the web api.
             - LOGIN_PW=${LOGIN_PW}
-            - SECRET_KEY=${SECRET_KEY}
         restart: always
         logging:
             driver: "json-file"
             options:
                 max-file: "5"
                 max-size: "10m"
+
+    api_doc_server: # Port 80 internally only
+        build:
+            context: ./containers/telescope_web_api
+            dockerfile: Dockerfile.apidoc 
+            args:
+                tart_name: ${TS_HOSTNAME}
+        restart: always
+
     web_app:
         depends_on:
-            - api
+            - api_container
+            - api_doc_server
         volumes:
             - data-volume:/telescope_data
         environment:
             - NODE_ENV=production
-        ports:
+        ports: 
             - 80:80
-        build:
+        build: 
             context: ./containers/web_app
             args:
                 # Change this if you desire. Really only needed for running multiple TART telescopes and reverse proxying.
@@ -54,3 +59,4 @@ services:
 volumes:
     # Mounted on each container as /telescope_data, used for raw data and vis data. This is a hardcoded path in each container.
     data-volume:
+
