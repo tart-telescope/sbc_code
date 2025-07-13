@@ -10,7 +10,7 @@ from datetime import UTC
 import numpy as np
 from fastapi import APIRouter
 
-from models.imaging_models import (
+from generated_models.imaging_models import (
     AntennaPositionsResponse,
     VisibilityResponse,
 )

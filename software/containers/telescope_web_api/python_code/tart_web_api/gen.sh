@@ -1,9 +1,9 @@
 # Build container
 docker build -f Dockerfile.generate -t tart-schema-generator .
-mkdir -p generated_models
+mkdir -p tart_api/generated_models
 
 # Generate models
 docker run --rm \
   -v $(pwd)/schemas:/app/schemas:ro \
-  -v $(pwd)/generated_models:/app/generated_models \
+  -v $(pwd)/tart_api/generated_models:/app/tart_api/generated_models \
   tart-schema-generator

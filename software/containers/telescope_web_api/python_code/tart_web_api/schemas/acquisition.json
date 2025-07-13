@@ -5,8 +5,7 @@
       "type": "object",
       "properties": {
         "save": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "models/common.json#/definitions/BinaryFlag",
           "description": "Save flag: 0=disabled, 1=enabled"
         }
       },
@@ -17,9 +16,7 @@
       "type": "object",
       "properties": {
         "N_samples_exp": {
-          "type": "integer",
-          "minimum": 16,
-          "maximum": 24,
+          "$ref": "models/common.json#/definitions/SampleExponent",
           "description": "Exponent for number of samples (2^exp)"
         }
       },

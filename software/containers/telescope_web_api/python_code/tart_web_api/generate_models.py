@@ -12,7 +12,7 @@ from pathlib import Path
 
 def generate_single_model(schema_file):
     """Generate a single model file from a schema."""
-    output_dir = Path("/app/generated_models")
+    output_dir = Path("/app/tart_api/generated_models")
     output_filename = schema_file.stem + "_models.py"
     output_path = output_dir / output_filename
 
@@ -69,11 +69,11 @@ def add_do_not_edit_headers(output_dir):
 
 
 def generate_models():
-    """Generate Python models from JSON schemas in parallel."""
+    """Generate Python models from JSON schemas - common first, then others in parallel."""
 
     # Define paths
     schemas_dir = Path("/app/schemas")
-    output_dir = Path("/app/generated_models")
+    output_dir = Path("/app/tart_api/generated_models")
 
     # Ensure output directory exists
     output_dir.mkdir(exist_ok=True)
@@ -91,34 +91,61 @@ def generate_models():
         sys.exit(1)
 
     print(f"Found {len(schema_files)} schema files")
-    print("Processing schemas in parallel...")
 
-    # Process files in parallel
+    # Separate common schema from others
+    common_schema = None
+    other_schemas = []
+
+    for schema_file in schema_files:
+        if schema_file.name == "common.json":
+            common_schema = schema_file
+        else:
+            other_schemas.append(schema_file)
+
     success_count = 0
     error_count = 0
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        # Submit all tasks
-        future_to_file = {
-            executor.submit(generate_single_model, schema_file): schema_file
-            for schema_file in schema_files
-        }
+    # Step 1: Generate common schema first (if it exists)
+    if common_schema:
+        print("Step 1: Generating common schema first...")
+        success, output_filename, error = generate_single_model(common_schema)
+        if success:
+            print(f"✓ Generated {output_filename}")
+            success_count += 1
+        else:
+            print(f"✗ Error generating {output_filename}:")
+            print(f"  Error: {error}")
+            error_count += 1
+            print("⚠️ Common schema failed - continuing anyway")
+    else:
+        print("ℹ️ No common.json schema found")
 
-        # Process results as they complete
-        for future in as_completed(future_to_file):
-            schema_file = future_to_file[future]
-            try:
-                success, output_filename, error = future.result()
-                if success:
-                    print(f"✓ Generated {output_filename}")
-                    success_count += 1
-                else:
-                    print(f"✗ Error generating {output_filename}:")
-                    print(f"  Error: {error}")
+    # Step 2: Process remaining files in parallel
+    if other_schemas:
+        print("Step 2: Processing remaining schemas in parallel...")
+
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            # Submit all tasks
+            future_to_file = {
+                executor.submit(generate_single_model, schema_file): schema_file
+                for schema_file in other_schemas
+            }
+
+            # Process results as they complete
+            for future in as_completed(future_to_file):
+                schema_file = future_to_file[future]
+                try:
+                    success, output_filename, error = future.result()
+                    if success:
+                        print(f"✓ Generated {output_filename}")
+                        success_count += 1
+                    else:
+                        print(f"✗ Error generating {output_filename}:")
+                        print(f"  Error: {error}")
+                        error_count += 1
+                except Exception as e:
+                    print(f"✗ Unexpected error processing {schema_file.name}: {e}")
                     error_count += 1
-            except Exception as e:
-                print(f"✗ Unexpected error processing {schema_file.name}: {e}")
-                error_count += 1
 
     print(f"\nCompleted: {success_count} successful, {error_count} errors")
 

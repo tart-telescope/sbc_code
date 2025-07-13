@@ -10,14 +10,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from database import AsyncDatabase, get_database
-from models.channel_models import ChannelStatusResponse, ChannelToggleResponse1
+from generated_models.channel_models import ChannelStatusResponse, ChannelToggleResponse
 
 from ..dependencies import AuthDep
 
 router = APIRouter()
 
 
-@router.put("/{channel_idx}/{enable}", response_model=ChannelToggleResponse1)
+@router.put("/{channel_idx}/{enable}", response_model=ChannelToggleResponse)
 async def set_channel(
     channel_idx: int,
     enable: int,
@@ -31,7 +31,7 @@ async def set_channel(
     Requires JWT authentication.
     """
     await db.update_manual_channel_status(channel_idx, bool(enable))
-    return ChannelToggleResponse1({str(channel_idx): enable})
+    return ChannelToggleResponse({str(channel_idx): enable})
 
 
 @router.get("", response_model=ChannelStatusResponse)

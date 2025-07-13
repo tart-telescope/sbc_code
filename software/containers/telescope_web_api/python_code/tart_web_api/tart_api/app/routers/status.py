@@ -8,13 +8,13 @@ Flask status logic while providing FastAPI-compatible responses.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
-from models.status_models import (
+
+from database import AsyncDatabase, get_database
+from generated_models.status_models import (
     StatusChannelAllResponse,
     StatusChannelSingleResponse,
     StatusFPGAResponse,
 )
-
-from database import AsyncDatabase, get_database
 
 from ..dependencies import ConfigDep
 

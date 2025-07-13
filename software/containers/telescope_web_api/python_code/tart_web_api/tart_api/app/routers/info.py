@@ -7,7 +7,7 @@ Flask info logic while providing FastAPI-compatible responses.
 
 from fastapi import APIRouter
 
-from models.info_models import InfoResponse
+from generated_models.info_models import InfoResponse
 
 from ..dependencies import ConfigDep
 

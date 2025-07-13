@@ -5,8 +5,7 @@
       "type": "object",
       "properties": {
         "mode": {
-          "type": "string",
-          "enum": ["off", "diag", "raw", "vis", "vis_save", "cal", "rt_syn_img"],
+          "$ref": "models/common.json#/definitions/TelescopeMode",
           "description": "Current mode of the telescope"
         }
       },
@@ -19,8 +18,7 @@
         "modes": {
           "type": "array",
           "items": {
-            "type": "string",
-            "enum": ["off", "diag", "raw", "vis", "vis_save", "cal", "rt_syn_img"]
+            "$ref": "models/common.json#/definitions/TelescopeMode"
           },
           "description": "Available operating modes"
         }
@@ -32,8 +30,7 @@
       "type": "object",
       "properties": {
         "mode": {
-          "type": "string",
-          "enum": ["off", "diag", "raw", "vis", "vis_save", "cal", "rt_syn_img"],
+          "$ref": "models/common.json#/definitions/TelescopeMode",
           "description": "Current mode of the telescope"
         }
       },
@@ -44,8 +41,7 @@
       "type": "object",
       "properties": {
         "loop_mode": {
-          "type": "string",
-          "enum": ["loop", "single", "loop_n"],
+          "$ref": "models/common.json#/definitions/LoopMode",
           "description": "Current loop mode of the telescope"
         }
       },
@@ -56,8 +52,7 @@
       "type": "object",
       "properties": {
         "loop_mode": {
-          "type": "string",
-          "enum": ["loop", "single", "loop_n"],
+          "$ref": "models/common.json#/definitions/LoopMode",
           "description": "Current loop mode of the telescope"
         }
       },
@@ -65,32 +60,10 @@
       "additionalProperties": false
     },
     "EmptyResponse": {
-      "type": "object",
-      "properties": {},
-      "additionalProperties": false
+      "$ref": "models/common.json#/definitions/EmptyResponse"
     },
     "JWTErrorResponse": {
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "object",
-          "properties": {
-            "description": {
-              "type": "string"
-            },
-            "error": {
-              "type": "string"
-            },
-            "status_code": {
-              "type": "integer"
-            }
-          },
-          "required": ["description", "error", "status_code"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["message"],
-      "additionalProperties": false
+      "$ref": "models/common.json#/definitions/JWTErrorResponse"
     }
   }
 }

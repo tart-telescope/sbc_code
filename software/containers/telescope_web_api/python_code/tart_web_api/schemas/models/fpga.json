@@ -16,34 +16,27 @@
       "type": "object",
       "properties": {
         "512Mb": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Report flag if firmware is compiled for 512Mb SDRAM"
         },
         "SDRAM_ready": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Report flag for SDRAM"
         },
         "enabled": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Report flag for Acquisition system being enabled"
         },
         "error": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Report flag for Acquisition system error"
         },
         "overflow": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Report flag for Acquisition system overflow"
         },
         "state": {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 7,
+          "$ref": "common.json#/definitions/FPGAStateFlag",
           "description": "Acquisition system state"
         }
       },
@@ -54,18 +47,15 @@
       "type": "object",
       "properties": {
         "FIFO_overflow": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "FIFO overflow flag"
         },
         "FIFO_underrun": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "FIFO underrun flag"
         },
         "spi_busy": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "SPI busy flag"
         }
       },
@@ -76,33 +66,27 @@
       "type": "object",
       "properties": {
         "acq_en": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Acquisition Unit enabled"
         },
         "cap_debug": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Capture debug flag"
         },
         "cap_en": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Capture enabled flag"
         },
         "state": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "System state"
         },
         "viz_en": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Visibility enabled"
         },
         "viz_pend": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Visibility pending"
         }
       },
@@ -113,8 +97,7 @@
       "type": "object",
       "properties": {
         "centre": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Acquisition centre flag"
         },
         "delay": {
@@ -122,13 +105,11 @@
           "description": "Delay value"
         },
         "drift": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Acquisition drift flag"
         },
         "invert": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Acquisition invert flag"
         }
       },
@@ -139,13 +120,11 @@
       "type": "object",
       "properties": {
         "count": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Acquisition count flag"
         },
         "debug": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Acquisition debug flag"
         },
         "numantenna": {
@@ -153,8 +132,7 @@
           "description": "Number of antennas"
         },
         "shift": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "Acquisition shift flag"
         }
       },
@@ -180,18 +158,15 @@
       "type": "object",
       "properties": {
         "enabled": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "TC system enabled flag"
         },
         "error": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "TC system error flag"
         },
         "locked": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
           "description": "TC system locked flag"
         },
         "source": {

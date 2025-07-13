@@ -5,8 +5,7 @@
       "type": "object",
       "patternProperties": {
         "^[0-9]+$": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "models/common.json#/definitions/BinaryFlag",
           "description": "Channel enable status: 0=disabled, 1=enabled"
         }
       },
@@ -16,14 +15,11 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 23,
+          "$ref": "models/common.json#/definitions/ChannelIndex",
           "description": "Channel ID"
         },
         "enabled": {
-          "type": "integer",
-          "enum": [0, 1],
+          "$ref": "models/common.json#/definitions/BinaryFlag",
           "description": "Channel enabled status: 0=disabled, 1=enabled"
         }
       },

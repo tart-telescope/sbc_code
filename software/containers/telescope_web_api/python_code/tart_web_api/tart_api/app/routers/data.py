@@ -10,7 +10,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from database import AsyncDatabase, get_database
-from models.data_models import RawDataResponse, VisDataResponse
+from generated_models.data_models import RawDataResponse, VisDataResponse
 
 from ..dependencies import ConfigDep
 

@@ -7,7 +7,7 @@ Flask acquisition logic while providing FastAPI-compatible responses.
 
 from fastapi import APIRouter
 
-from models.acquisition_models import (
+from generated_models.acquisition_models import (
     SampleExponentResponse,
     SaveFlagResponse,
 )

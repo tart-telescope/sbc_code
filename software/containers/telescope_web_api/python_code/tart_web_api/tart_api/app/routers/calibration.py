@@ -10,12 +10,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from database import AsyncDatabase, get_database
-from models.calibration_models import (
+from generated_models.calibration_models import (
     GetGainResponse,
     SetAntennaPositionsRequest,
     SetGainRequest,
 )
-from models.common_models import EmptyResponse
+from generated_models.common_models import EmptyResponse
 
 from ..dependencies import AuthDep, ConfigDep
 
@@ -56,9 +56,7 @@ async def set_calibration_antenna_positions(
 
 
 @router.get("/gain", response_model=GetGainResponse)
-async def get_gain(
-    config: ConfigDep, db: Annotated[AsyncDatabase, Depends(get_database)]
-):
+async def get_gain(config: ConfigDep, db: Annotated[AsyncDatabase, Depends(get_database)]):
     """
     Get channel based complex gains.
 

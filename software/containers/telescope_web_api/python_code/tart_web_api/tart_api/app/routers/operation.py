@@ -6,13 +6,14 @@ Flask operation logic while providing FastAPI-compatible responses.
 """
 
 from fastapi import APIRouter, HTTPException, status
-from models.operation_models import (
+
+from generated_models.operation_models import (
     AvailableModesResponse,
     CurrentModeResponse,
     LoopMode,
-    Mode2,
     SetLoopModeResponse,
     SetModeResponse,
+    TelescopeMode,
 )
 
 from ..dependencies import AuthDep, ConfigDep
@@ -41,7 +42,7 @@ async def get_mode(config: ConfigDep):
 
 
 @router.post("/mode/{mode}", response_model=SetModeResponse)
-async def set_mode(mode: Mode2, config: ConfigDep, _: AuthDep):
+async def set_mode(mode: TelescopeMode, config: ConfigDep, _: AuthDep):
     """
     Set telescope operating mode.
 

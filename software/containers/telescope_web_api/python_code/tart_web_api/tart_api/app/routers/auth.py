@@ -11,9 +11,9 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import jwt
-from models.auth_models import AuthRequest, AuthResponse, RefreshResponse
 
-from ..config import settings
+from generated_models.auth_models import AuthRequest, AuthResponse, RefreshResponse
+
 from ..dependencies import get_runtime_config
 
 router = APIRouter()

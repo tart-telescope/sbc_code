@@ -45,10 +45,8 @@ ENV PERMUTE_DIR=/permute
 
 COPY ./config_data/permute.txt /permute/permute.txt
 
-# Copy the entire tart_api directory structure
+# Copy the entire tart_api directory structure (includes generated_models now)
 COPY python_code/tart_web_api/tart_api/ ./
-COPY python_code/tart_web_api/generated_models/ ./models/
-COPY python_code/tart_web_api/generated_models/ ./app/models/
 
 # COPY --from=builder /app /app
 
