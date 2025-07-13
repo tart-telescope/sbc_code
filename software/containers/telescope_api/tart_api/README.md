@@ -4,7 +4,7 @@ FastAPI-based web API for TART telescope control and data access.
 
 ## Overview
 
-This application provides a modern, async FastAPI interface for the TART telescope system while maintaining full compatibility with the existing Flask-based API.
+Modern async FastAPI interface for the TART telescope system, maintaining full compatibility with the existing Flask-based API.
 
 ## Features
 
@@ -14,42 +14,37 @@ This application provides a modern, async FastAPI interface for the TART telesco
 - **Database integration** - Async wrappers around existing SQLite operations
 - **API compatibility** - Drop-in replacement for Flask API endpoints
 
-## Installation
+## Development
+
+All development should be done in Docker containers.
+
+### Quick Start
 
 ```bash
-uv sync
+# From software/containers/telescope_api/
+make up
 ```
 
-## Usage
+### Development Commands
 
 ```bash
-# Development (local)
-uvicorn app.main:app --reload
+# Generate Pydantic models from schemas
+make codegen
 
-# Production (Docker)
-docker build -f Dockerfile -t tart-fastapi ../
-docker run -p 8000:8000 tart-fastapi
+# Format and fix code
+make format
 
-# With Docker Compose
-docker-compose up --build
+# Type checking
+make check
+
+# Stop environment
+make down
 ```
 
 ## API Documentation
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
-
-## Development
-
-Format code:
-```bash
-uv run ruff check --fix
-```
-
-Type checking:
-```bash
-uvx ty check --output-format concise
-```
 
 ## Migration Status - 95% Complete! 🎉
 
@@ -67,12 +62,10 @@ uvx ty check --output-format concise
 - Performance benchmarking vs Flask
 
 ### 🚀 Docker Deployment
-```bash
-# Build from parent directory
-docker build -f tart_api/Dockerfile -t tart-fastapi .
 
-# Run with health checks
-docker-compose up --build
+```bash
+# From software/containers/telescope_api/
+make up
 
 # Access API docs at http://localhost:8000/docs
 ```

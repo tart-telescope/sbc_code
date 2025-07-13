@@ -1,5 +1,5 @@
 # Build stage
-FROM python:3.13 as builder
+FROM python:3.13 AS builder
 # Set working directory
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN find /usr/local/lib/python3.13/site-packages -name '*dist-info' -type d -exe
 
 
 # Runtime stage
-FROM python:3.13-slim as runtime
+FROM python:3.13-slim AS runtime
 
 # Set working directory
 WORKDIR /app

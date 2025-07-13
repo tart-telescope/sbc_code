@@ -1,0 +1,46 @@
+services:
+  tart-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tart-fastapi-dev
+    ports:
+      - "8000:5000"
+    environment:
+      - CONFIG_DIR=/config
+      - DATA_ROOT=/telescope_data
+      - LOGIN_PW=password
+      - SECRET_KEY=super-secret-123897219379179464asd13khk213
+      - LOGLEVEL=DEBUG
+    volumes:
+      - ./tart_api:/app:rw
+      - ./hardware_interface:/hardware_interface:ro
+      - ../../telescope_config.json:/config/telescope_config.json
+      - ../../calibrated_antenna_positions.json:/config/calibrated_antenna_positions.json
+      - telescope_data:/telescope_data
+
+    restart: unless-stopped
+    command: ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"] #, "--reload"]
+    networks:
+      - tart-network
+
+  codegen:
+    build:
+      context: .
+      dockerfile: tart_codegen/Dockerfile.generate
+    container_name: tart-codegen
+    volumes:
+      - ./schemas:/app/schemas:ro
+      - ./tart_api/generated_models:/app/tart_api/generated_models:rw
+    profiles:
+      - codegen
+    networks:
+      - tart-network
+
+volumes:
+  telescope_data:
+    driver: local
+
+networks:
+  tart-network:
+    driver: bridge
