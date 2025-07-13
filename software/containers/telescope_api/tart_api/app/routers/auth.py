@@ -18,6 +18,8 @@ from ..dependencies import get_runtime_config
 
 router = APIRouter()
 
+from ..config import settings
+
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     """Create a JWT access token."""
@@ -37,13 +39,11 @@ async def auth(
 ):
     """
     Authenticate user and return JWT tokens.
-
-    This endpoint reuses the existing Flask authentication logic:
     - Username must be "admin"
     - Password is from LOGIN_PW environment variable
     """
-    # Get password from environment or use default (same as Flask)
-    login_password = os.environ.get("LOGIN_PW", "password")
+    # Get password from environment
+    login_password = os.environ.get("LOGIN_PW")
 
     if login_request.username != "admin" or login_request.password != login_password:
         raise HTTPException(

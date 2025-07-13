@@ -22,7 +22,7 @@ tart_api/
 │       ├── channel.py       # Channel management
 │       ├── acquisition.py   # Data acquisition endpoints
 │       └── data.py          # Raw/vis data endpoints
-├── models/                  # Symlink to ../generated_models
+├── generated_models/        # generated_models
 ├── database/
 │   ├── __init__.py
 │   └── connection.py        # Database connection wrapper
@@ -360,7 +360,7 @@ The FastAPI migration is now **100% complete** with full telescope control capab
 - Database operations with async wrappers
 - Generated Pydantic models integrated
 
-### ✅ **Telescope Control Features** 
+### ✅ **Telescope Control Features**
 - **State machine**: Background TartControl process managing telescope modes
 - **Data acquisition**: Raw and visibility data capture and processing
 - **Hardware interface**: SPI, FPGA control via tart-hardware-interface

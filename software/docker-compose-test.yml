@@ -14,8 +14,8 @@ services:
         expose:
             - 5000
         build:
-            context: ./containers/telescope_web_api
-            dockerfile: Dockerfile.fastapi
+            context: ./containers/telescope_api
+            dockerfile: Dockerfile
         volumes:
             -   data-volume:/telescope_data
             -   ~/tart_web_api_store:/app/store

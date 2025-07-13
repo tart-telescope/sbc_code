@@ -6,13 +6,12 @@ WORKDIR /app
 RUN pip install uv
 
 # Copy pyproject.toml first for dependency caching
-COPY python_code/tart_web_api/tart_api/pyproject.toml ./
+COPY tart_api/pyproject.toml ./
 RUN uv pip install --system -r pyproject.toml
 
 
-COPY ./python_code/tart_hardware_interface /python_code/tart_hardware_interface
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip3 install /python_code/tart_hardware_interface
+COPY ./hardware_interface /hardware_interface
+RUN --mount=type=cache,target=/root/.cache/pip pip install /hardware_interface
 
 RUN find /usr/local/lib/python3.13/site-packages -name 'tests' -type d -exec rm -rf {} +
 RUN find /usr/local/lib/python3.13/site-packages -name '*dist-info' -type d -exec rm -rf {} +
@@ -29,6 +28,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+ARG LOGIN_PW
+ENV LOGIN_PW=$LOGIN_PW
 
 ARG SECRET_KEY
 ENV SECRET_KEY=$SECRET_KEY
@@ -38,17 +39,18 @@ ENV LOGLEVEL=$LOGLEVEL
 
 # Set environment variables
 ENV PYTHONPATH=/app:/app/app
+
+# Path shared with the nginx to serve static files
 ENV DATA_ROOT=/telescope_data
 
+# Default path for the configuration files
 ENV CONFIG_DIR=/config_data
-ENV PERMUTE_DIR=/permute
 
-COPY ./config_data/permute.txt /permute/permute.txt
+ENV PERMUTE_DIR=/permute
+COPY ./permute.txt /permute/permute.txt
 
 # Copy the entire tart_api directory structure (includes generated_models now)
-COPY python_code/tart_web_api/tart_api/ ./
-
-# COPY --from=builder /app /app
+COPY tart_api/ ./
 
 # Copy Python environment from builder
 COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
