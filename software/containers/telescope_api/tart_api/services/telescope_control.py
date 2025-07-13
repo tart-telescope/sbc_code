@@ -10,7 +10,7 @@ import logging
 import multiprocessing
 from typing import Any
 
-from legacy.telescope_service import (
+from .tart_control import (
     TartControl,
     cleanup_observation_cache,
     cleanup_visibility_cache,
