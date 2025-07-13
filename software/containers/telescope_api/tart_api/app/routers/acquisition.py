@@ -25,7 +25,10 @@ async def set_raw_save_flag(flag: int, config: ConfigDep, _: AuthDep):
     This endpoint reuses the existing Flask logic for raw data save configuration.
     Requires JWT authentication.
     """
-    config["raw"]["save"] = flag
+    # For managed dict, we need to update nested dict properly
+    raw_config = config["raw"]
+    raw_config["save"] = flag
+    config["raw"] = raw_config
     return SaveFlagResponse(save=config["raw"]["save"])
 
 
@@ -37,7 +40,10 @@ async def set_vis_save_flag(flag: int, config: ConfigDep, _: AuthDep):
     This endpoint reuses the existing Flask logic for visibility data save configuration.
     Requires JWT authentication.
     """
-    config["vis"]["save"] = flag
+    # For managed dict, we need to update nested dict properly
+    vis_config = config["vis"]
+    vis_config["save"] = flag
+    config["vis"] = vis_config
     return SaveFlagResponse(save=config["vis"]["save"])
 
 
@@ -50,7 +56,10 @@ async def set_raw_num_samples_exp(exp: int, config: ConfigDep, _: AuthDep):
     Requires JWT authentication.
     """
     if 16 <= exp <= 24:
-        config["raw"]["N_samples_exp"] = exp
+        # For managed dict, we need to update nested dict properly
+        raw_config = config["raw"]
+        raw_config["N_samples_exp"] = exp
+        config["raw"] = raw_config
     return SampleExponentResponse(N_samples_exp=config["raw"]["N_samples_exp"])
 
 
@@ -63,7 +72,10 @@ async def set_vis_num_samples_exp(exp: int, config: ConfigDep, _: AuthDep):
     Requires JWT authentication.
     """
     if 16 <= exp <= 24:
-        config["vis"]["N_samples_exp"] = exp
+        # For managed dict, we need to update nested dict properly
+        vis_config = config["vis"]
+        vis_config["N_samples_exp"] = exp
+        config["vis"] = vis_config
     return SampleExponentResponse(N_samples_exp=config["vis"]["N_samples_exp"])
 
 

@@ -6,7 +6,6 @@ compatibility while providing FastAPI-compatible configuration.
 """
 
 import json
-import multiprocessing
 import os
 import socket
 from typing import Any
@@ -37,12 +36,10 @@ def create_runtime_config() -> Any:
     """
     Create runtime configuration compatible with existing Flask config.
 
-    This function reuses the existing init_config logic and uses
-    multiprocessing.Manager() for shared state between processes.
+    This function reuses the existing init_config logic.
     """
-    # Use multiprocessing.Manager().dict() for shared state
-    manager = multiprocessing.Manager()
-    config_dict = manager.dict()
+    # Use regular dict - shared state will be handled by telescope service
+    config_dict = {}
 
     # Copy all the existing config initialization logic
     data_root = "/telescope_data"

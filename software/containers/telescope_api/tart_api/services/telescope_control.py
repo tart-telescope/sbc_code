@@ -18,6 +18,24 @@ from legacy.telescope_service import (
 
 logger = logging.getLogger(__name__)
 
+# Global shared config manager
+_config_manager = None
+_shared_config = None
+
+
+def get_shared_config():
+    """Get the shared configuration dict."""
+    global _shared_config
+    return _shared_config
+
+
+def init_shared_config(config_dict: dict[str, Any]):
+    """Initialize the shared configuration."""
+    global _config_manager, _shared_config
+    _config_manager = multiprocessing.Manager()
+    _shared_config = _config_manager.dict(config_dict)
+    return _shared_config
+
 
 class TelescopeControlService:
     """
@@ -28,7 +46,8 @@ class TelescopeControlService:
     """
 
     def __init__(self, runtime_config: dict[str, Any]):
-        self.runtime_config = runtime_config
+        # Initialize shared config
+        self.shared_config = init_shared_config(runtime_config)
         self.tart_process: multiprocessing.Process | None = None
         self.observation_cache_process: multiprocessing.Process | None = None
         self.visibility_cache_process: multiprocessing.Process | None = None
@@ -57,9 +76,8 @@ class TelescopeControlService:
             logger.info("Started visibility cache cleanup process")
 
             # Start main telescope control process
-            self.tart_process = multiprocessing.Process(
-                target=self._tart_control_loop, args=(self.runtime_config,)
-            )
+            # Pass no arguments - the process will access shared config via global
+            self.tart_process = multiprocessing.Process(target=self._tart_control_loop)
             self.tart_process.start()
             logger.info("Started telescope control state machine")
 
@@ -112,25 +130,39 @@ class TelescopeControlService:
         except Exception as e:
             logger.error(f"Error stopping telescope control service: {e}")
 
-    def _tart_control_loop(self, runtime_config: dict[str, Any]) -> None:
+    def _tart_control_loop(self) -> None:
         """
         Main telescope control loop (runs in separate process).
 
         This reuses the exact same logic as the Flask application.
         """
         try:
-            tart_control = TartControl(runtime_config)
+            # Get shared config in the child process
+            shared_config = get_shared_config()
+            if shared_config is None:
+                logger.error("Shared config not available in child process")
+                return
+
+            # Convert to regular dict for TartControl initialization
+            config_dict = dict(shared_config)
+            tart_control = TartControl(config_dict)
             logger.info("TartControl initialized, starting control loop")
 
             while True:
                 # Read current mode from shared config
-                current_mode = runtime_config.get("mode", "off")
+                current_mode = shared_config.get("mode", "off")
 
                 # Update state machine
                 tart_control.set_state(current_mode)
 
                 # Execute current state
                 tart_control.run()
+
+                # Sync visibility data back to shared config
+                if "vis_current" in tart_control.config:
+                    shared_config["vis_current"] = tart_control.config["vis_current"]
+                if "vis_timestamp" in tart_control.config:
+                    shared_config["vis_timestamp"] = tart_control.config["vis_timestamp"]
 
         except KeyboardInterrupt:
             logger.info("Telescope control loop interrupted")
@@ -151,7 +183,7 @@ class TelescopeControlService:
             "visibility_cache_alive": (
                 self.visibility_cache_process.is_alive() if self.visibility_cache_process else False
             ),
-            "current_mode": self.runtime_config.get("mode", "unknown"),
+            "current_mode": self.shared_config.get("mode", "unknown"),
         }
 
     async def restart(self) -> None:
@@ -185,6 +217,13 @@ async def init_telescope_service(
     _telescope_service = TelescopeControlService(runtime_config)
     await _telescope_service.start()
     return _telescope_service
+
+
+def update_config(key: str, value: Any) -> None:
+    """Update a configuration value in the shared config."""
+    shared_config = get_shared_config()
+    if shared_config is not None:
+        shared_config[key] = value
 
 
 async def cleanup_telescope_service() -> None:

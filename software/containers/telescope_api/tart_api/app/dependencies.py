@@ -55,6 +55,17 @@ security = JWTBearer()
 
 def get_runtime_config(request: Request) -> Any:
     """Dependency to get the runtime configuration from app state."""
+    # Try to get shared config first (for mode switching to work)
+    try:
+        from services.telescope_control import get_shared_config
+
+        shared_config = get_shared_config()
+        if shared_config is not None:
+            return shared_config
+    except ImportError:
+        pass
+
+    # Fallback to app state config
     return request.app.state.config
 
 

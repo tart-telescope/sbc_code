@@ -12,6 +12,7 @@ services:
       - CONFIG_DIR=/config
       - DATA_ROOT=/telescope_data
       - LOGIN_PW=password
+      - PERMUTE_DIR=/permute
       - SECRET_KEY=super-secret-123897219379179464asd13khk213
     volumes:
       - ./config:/config:ro

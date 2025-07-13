@@ -1,3 +1,4 @@
+import os
 import sqlite3
 
 from tart.util import utc
@@ -8,7 +9,8 @@ def connect_to_db():
     # v2 utc timestamps!
     con = None
     try:
-        con = sqlite3.connect("tart_web_api_database_v2.db")
+        db_path = os.getenv("DB_PATH", "tart_web_api_database_v2.db")
+        con = sqlite3.connect(db_path)
     except Exception as e:
         print(type(e))  # the exception instance
         print(e.args)  # arguments stored in .args

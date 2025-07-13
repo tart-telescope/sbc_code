@@ -1,12 +1,12 @@
 services:
-  tart-api:
+  tart-api-test:
     build:
       context: .
       dockerfile: Dockerfile
       target: builder
-    container_name: tart-fastapi-dev
+    container_name: tart-fastapi-test
     ports:
-      - "8000:5000"
+      - "8001:5000"
     environment:
       - CONFIG_DIR=/config
       - DATA_ROOT=/telescope_data
@@ -14,15 +14,15 @@ services:
       - SECRET_KEY=super-secret-123897219379179464asd13khk213
       - LOGLEVEL=DEBUG
       - PERMUTE_DIR=/permute
+      - DB_PATH=/app/test_database.db
     volumes:
       - ./tart_api:/app:rw
       - ./hardware_interface:/hardware_interface:ro
       - ../../telescope_config.json:/config/telescope_config.json
       - ../../calibrated_antenna_positions.json:/config/calibrated_antenna_positions.json
       - ./permute.txt:/permute/permute.txt:ro
-      - telescope_data:/telescope_data
-
-    restart: unless-stopped
+      - telescope_data_test:/telescope_data
+    restart: "no"
     command: ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
@@ -31,38 +31,35 @@ services:
       retries: 5
       start_period: 20s
     networks:
-      - tart-network
+      - tart-test-network
 
-  codegen:
-    container_name: tart_codegen
-    image: tart_codegen
+
+
+  test-runner:
     build:
-      context: tart_codegen
-      dockerfile: Dockerfile
-    volumes:
-      - ./schemas:/app/schemas:ro
-      - ./tart_api/generated_models:/app/tart_api/generated_models:rw
-    profiles:
-      - codegen
-
-
-
-  ui:
-    image: ghcr.io/tart-telescope/web_app/viewer-root:sha-95f3a7e-amd64
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - telescope_data:/telescope_data:ro
-    ports:
-      - "8080:80"
-    networks:
-      - tart-network
+      context: .
+      dockerfile: test/Dockerfile
+    container_name: tart-test-runner
     depends_on:
-      - tart-api
+      tart-api-test:
+        condition: service_healthy
+    environment:
+      - API_BASE_URL=http://tart-api-test:5000
+      - TEST_USERNAME=admin
+      - TEST_PASSWORD=password
+    volumes:
+      - ./test:/app/test:ro
+      - ./test/reports:/app/test/reports:rw
+      - ./test/.pytest_cache:/app/test/.pytest_cache:rw
+    networks:
+      - tart-test-network
+    tty: true
+    stdin_open: true
 
 volumes:
-  telescope_data:
+  telescope_data_test:
     driver: local
 
 networks:
-  tart-network:
+  tart-test-network:
     driver: bridge
