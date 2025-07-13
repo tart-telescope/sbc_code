@@ -27,7 +27,7 @@ from tart_hardware_interface.highlevel_modes_api import (
 from tart_hardware_interface.stream_vis import stream_vis_to_queue
 from tart_hardware_interface.util import create_spi_object
 
-from ..database import operations as db
+from database import operations as db
 
 N_IT = 0
 
