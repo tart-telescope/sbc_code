@@ -61,37 +61,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-
-# Override OpenAPI schema to define JWT security scheme (matches Flask app)
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-
-    from fastapi.openapi.utils import get_openapi
-
-    openapi_schema = get_openapi(
-        title=app.title,
-        version=app.version,
-        description=app.description,
-        routes=app.routes,
-    )
-
-    # Add security schemes for both JWT and Bearer formats
-    openapi_schema["components"]["securitySchemes"] = {
-        "JWTAuth": {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "JWT",
-            "description": "JWT Authorization header. Accepts both formats: 'Authorization: JWT {token}' or 'Authorization: Bearer {token}'",
-        }
-    }
-
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
-
-
-app.openapi = custom_openapi
-
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -129,7 +98,9 @@ async def health_check():
         telescope_status = service.get_status()
 
         # Overall health is healthy if service is running
-        overall_status = "healthy" if telescope_status["service_running"] else "degraded"
+        overall_status = (
+            "healthy" if telescope_status["service_running"] else "degraded"
+        )
 
         return {"status": overall_status, "telescope_service": telescope_status}
     except Exception as e:

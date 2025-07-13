@@ -40,7 +40,7 @@ async def auth(
 
     This endpoint reuses the existing Flask authentication logic:
     - Username must be "admin"
-    - Password is from LOGIN_PW environment variable or "password"
+    - Password is from LOGIN_PW environment variable
     """
     # Get password from environment or use default (same as Flask)
     login_password = os.environ.get("LOGIN_PW", "password")

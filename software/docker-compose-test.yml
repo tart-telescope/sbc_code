@@ -15,9 +15,10 @@ services:
             - 5000
         build:
             context: ./containers/telescope_web_api
+            dockerfile: Dockerfile.fastapi
         volumes:
             -   data-volume:/telescope_data
-            -   ~/tart_web_api_store:/app
+            -   ~/tart_web_api_store:/app/store
             -   ~/telescope_config:/config_data
         environment:
             # Change the following to be something secure. You will use this to login to your telescope from the web api.

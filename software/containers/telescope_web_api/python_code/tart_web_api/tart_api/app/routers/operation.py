@@ -6,10 +6,11 @@ Flask operation logic while providing FastAPI-compatible responses.
 """
 
 from fastapi import APIRouter, HTTPException, status
-
 from models.operation_models import (
     AvailableModesResponse,
     CurrentModeResponse,
+    LoopMode,
+    Mode2,
     SetLoopModeResponse,
     SetModeResponse,
 )
@@ -40,39 +41,29 @@ async def get_mode(config: ConfigDep):
 
 
 @router.post("/mode/{mode}", response_model=SetModeResponse)
-async def set_mode(mode: str, config: ConfigDep, _: AuthDep):
+async def set_mode(mode: Mode2, config: ConfigDep, _: AuthDep):
     """
     Set telescope operating mode.
 
     This endpoint reuses the existing Flask logic for mode setting.
     Requires JWT authentication.
     """
-    if mode in config["modes_available"]:
-        config["mode"] = mode
-        return SetModeResponse(mode=config["mode"])
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid mode. Available modes: {config['modes_available']}",
-        )
+    # Enum validation happens automatically, so we can directly set the mode
+    config["mode"] = mode.value
+    return SetModeResponse(mode=mode)
 
 
 @router.post("/loop/{loop_mode}", response_model=SetLoopModeResponse)
-async def set_loop_mode(loop_mode: str, config: ConfigDep, _: AuthDep):
+async def set_loop_mode(loop_mode: LoopMode, config: ConfigDep, _: AuthDep):
     """
     Set telescope loop mode.
 
     This endpoint reuses the existing Flask logic for loop mode setting.
     Requires JWT authentication.
     """
-    if loop_mode in config["loop_mode_available"]:
-        config["loop_mode"] = loop_mode
-        return SetLoopModeResponse(loop_mode=config["loop_mode"])
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid loop mode. Available modes: {config['loop_mode_available']}",
-        )
+    # Enum validation happens automatically, so we can directly set the loop mode
+    config["loop_mode"] = loop_mode.value
+    return SetLoopModeResponse(loop_mode=loop_mode)
 
 
 @router.post("/loop/count/{loop_n}", response_model=SetLoopModeResponse)
