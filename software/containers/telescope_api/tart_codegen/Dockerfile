@@ -6,20 +6,11 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 # Set working directory
 WORKDIR /app
 
-# Copy pyproject.toml for dependencies
-COPY pyproject.toml .
-
 # Install datamodel-code-generator and ruff using uv
 RUN uv pip install --system datamodel-code-generator ruff
 
-# Create output directory
-RUN mkdir -p generated_models
-
 # Copy generation script
 COPY generate_models.py .
-
-# Mount point for schemas
-VOLUME ["/app/schemas"]
 
 # Default command to generate models
 CMD ["python", "generate_models.py"]
