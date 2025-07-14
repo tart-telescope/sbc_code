@@ -1,0 +1,315 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AQStream": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "number",
+          "description": "Acquisition data register value"
+        }
+      },
+      "required": ["data"],
+      "additionalProperties": false
+    },
+    "AQSystem": {
+      "type": "object",
+      "properties": {
+        "512Mb": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Report flag if firmware is compiled for 512Mb SDRAM"
+        },
+        "SDRAM_ready": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Report flag for SDRAM"
+        },
+        "enabled": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Report flag for Acquisition system being enabled"
+        },
+        "error": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Report flag for Acquisition system error"
+        },
+        "overflow": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Report flag for Acquisition system overflow"
+        },
+        "state": {
+          "$ref": "common.json#/definitions/FPGAStateFlag",
+          "description": "Acquisition system state"
+        }
+      },
+      "required": ["512Mb", "SDRAM_ready", "enabled", "error", "overflow", "state"],
+      "additionalProperties": false
+    },
+    "SPIStats": {
+      "type": "object",
+      "properties": {
+        "FIFO_overflow": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "FIFO overflow flag"
+        },
+        "FIFO_underrun": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "FIFO underrun flag"
+        },
+        "spi_busy": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "SPI busy flag"
+        }
+      },
+      "required": ["FIFO_overflow", "FIFO_underrun", "spi_busy"],
+      "additionalProperties": false
+    },
+    "SysStats": {
+      "type": "object",
+      "properties": {
+        "acq_en": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Acquisition Unit enabled"
+        },
+        "cap_debug": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Capture debug flag"
+        },
+        "cap_en": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Capture enabled flag"
+        },
+        "state": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "System state"
+        },
+        "viz_en": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Visibility enabled"
+        },
+        "viz_pend": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Visibility pending"
+        }
+      },
+      "required": ["acq_en", "cap_debug", "cap_en", "state", "viz_en", "viz_pend"],
+      "additionalProperties": false
+    },
+    "TCCentre": {
+      "type": "object",
+      "properties": {
+        "centre": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Acquisition centre flag"
+        },
+        "delay": {
+          "type": "number",
+          "description": "Delay value"
+        },
+        "drift": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Acquisition drift flag"
+        },
+        "invert": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Acquisition invert flag"
+        }
+      },
+      "required": ["centre", "delay", "drift", "invert"],
+      "additionalProperties": false
+    },
+    "TCDebug": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Acquisition count flag"
+        },
+        "debug": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Acquisition debug flag"
+        },
+        "numantenna": {
+          "type": "number",
+          "description": "Number of antennas"
+        },
+        "shift": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "Acquisition shift flag"
+        }
+      },
+      "required": ["count", "debug", "numantenna", "shift"],
+      "additionalProperties": false
+    },
+    "TCStatus": {
+      "type": "object",
+      "properties": {
+        "delta": {
+          "type": "number",
+          "description": "Acquisition delta"
+        },
+        "phase": {
+          "type": "number",
+          "description": "Acquisition phase"
+        }
+      },
+      "required": ["delta", "phase"],
+      "additionalProperties": false
+    },
+    "TCSystem": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "TC system enabled flag"
+        },
+        "error": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "TC system error flag"
+        },
+        "locked": {
+          "$ref": "common.json#/definitions/FPGABinaryFlag",
+          "description": "TC system locked flag"
+        },
+        "source": {
+          "type": "number",
+          "description": "TC system source"
+        }
+      },
+      "required": ["enabled", "error", "locked", "source"],
+      "additionalProperties": false
+    },
+    "VXDebug": {
+      "type": "object",
+      "properties": {
+        "limp": {
+          "type": "number",
+          "description": "VX debug limp value"
+        },
+        "stuck": {
+          "type": "number",
+          "description": "VX debug stuck value"
+        }
+      },
+      "required": ["limp", "stuck"],
+      "additionalProperties": false
+    },
+    "VXStatus": {
+      "type": "object",
+      "properties": {
+        "accessed": {
+          "type": "number",
+          "description": "VX status accessed"
+        },
+        "available": {
+          "type": "number",
+          "description": "VX status available"
+        },
+        "bank": {
+          "type": "number",
+          "description": "VX status bank"
+        },
+        "overflow": {
+          "type": "number",
+          "description": "VX status overflow"
+        }
+      },
+      "required": ["accessed", "available", "bank", "overflow"],
+      "additionalProperties": false
+    },
+    "VXStream": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "number",
+          "description": "Byte of data"
+        }
+      },
+      "required": ["data"],
+      "additionalProperties": false
+    },
+    "VXSystem": {
+      "type": "object",
+      "properties": {
+        "blocksize": {
+          "type": "number",
+          "description": "VX system blocksize"
+        },
+        "enabled": {
+          "type": "number",
+          "description": "VX system enabled"
+        },
+        "overwrite": {
+          "type": "number",
+          "description": "VX system overwrite"
+        }
+      },
+      "required": ["blocksize", "enabled", "overwrite"],
+      "additionalProperties": false
+    },
+    "FPGAStatusResponse": {
+      "type": "object",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "description": "Hostname of the RPI"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "UTC Timestamp"
+        },
+        "AQ_STREAM": {
+          "$ref": "#/definitions/AQStream"
+        },
+        "AQ_SYSTEM": {
+          "$ref": "#/definitions/AQSystem"
+        },
+        "SPI_STATS": {
+          "$ref": "#/definitions/SPIStats"
+        },
+        "SYS_STATS": {
+          "$ref": "#/definitions/SysStats"
+        },
+        "TC_CENTRE": {
+          "$ref": "#/definitions/TCCentre"
+        },
+        "TC_DEBUG": {
+          "$ref": "#/definitions/TCDebug"
+        },
+        "TC_STATUS": {
+          "$ref": "#/definitions/TCStatus"
+        },
+        "TC_SYSTEM": {
+          "$ref": "#/definitions/TCSystem"
+        },
+        "VX_DEBUG": {
+          "$ref": "#/definitions/VXDebug"
+        },
+        "VX_STATUS": {
+          "$ref": "#/definitions/VXStatus"
+        },
+        "VX_STREAM": {
+          "$ref": "#/definitions/VXStream"
+        },
+        "VX_SYSTEM": {
+          "$ref": "#/definitions/VXSystem"
+        }
+      },
+      "required": [
+        "hostname",
+        "timestamp",
+        "AQ_STREAM",
+        "AQ_SYSTEM",
+        "SPI_STATS",
+        "SYS_STATS",
+        "TC_CENTRE",
+        "TC_DEBUG",
+        "TC_STATUS",
+        "TC_SYSTEM",
+        "VX_DEBUG",
+        "VX_STATUS",
+        "VX_STREAM",
+        "VX_SYSTEM"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CurrentModeResponse": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "$ref": "models/common.json#/definitions/TelescopeMode",
+          "description": "Current mode of the telescope"
+        }
+      },
+      "required": ["mode"],
+      "additionalProperties": false
+    },
+    "AvailableModesResponse": {
+      "type": "object",
+      "properties": {
+        "modes": {
+          "type": "array",
+          "items": {
+            "$ref": "models/common.json#/definitions/TelescopeMode"
+          },
+          "description": "Available operating modes"
+        }
+      },
+      "required": ["modes"],
+      "additionalProperties": false
+    },
+    "SetModeResponse": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "$ref": "models/common.json#/definitions/TelescopeMode",
+          "description": "Current mode of the telescope"
+        }
+      },
+      "required": ["mode"],
+      "additionalProperties": false
+    },
+    "SetLoopModeResponse": {
+      "type": "object",
+      "properties": {
+        "loop_mode": {
+          "$ref": "models/common.json#/definitions/LoopMode",
+          "description": "Current loop mode of the telescope"
+        }
+      },
+      "required": ["loop_mode"],
+      "additionalProperties": false
+    },
+    "SetLoopCountResponse": {
+      "type": "object",
+      "properties": {
+        "loop_mode": {
+          "$ref": "models/common.json#/definitions/LoopMode",
+          "description": "Current loop mode of the telescope"
+        }
+      },
+      "required": ["loop_mode"],
+      "additionalProperties": false
+    },
+    "EmptyResponse": {
+      "$ref": "models/common.json#/definitions/EmptyResponse"
+    },
+    "JWTErrorResponse": {
+      "$ref": "models/common.json#/definitions/JWTErrorResponse"
+    }
+  }
+}

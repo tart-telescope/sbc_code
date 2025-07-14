@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "FileHandle": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "description": "Filename"
+        },
+        "checksum": {
+          "type": "string",
+          "description": "SHA256 checksum"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "File timestamp"
+        }
+      },
+      "required": ["filename", "checksum", "timestamp"],
+      "additionalProperties": false
+    },
+    "RawDataResponse": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FileHandle"
+      }
+    },
+    "VisDataResponse": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FileHandle"
+      }
+    }
+  }
+}

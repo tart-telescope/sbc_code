@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "SetGainRequest": {
+      "type": "object",
+      "properties": {
+        "gain": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "List of channel gains"
+        },
+        "phase_offset": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "List of channel phase offsets in radians"
+        }
+      },
+      "required": ["gain", "phase_offset"],
+      "additionalProperties": false
+    },
+    "SetAntennaPositionsRequest": {
+      "type": "object",
+      "properties": {
+        "antenna_positions": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "description": "Array of antenna positions in East-North-Up coordinate system [[e,n,u],[e,n,u],..]"
+        }
+      },
+      "required": ["antenna_positions"],
+      "additionalProperties": false
+    },
+    "GetGainResponse": {
+      "type": "object",
+      "properties": {
+        "gain": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "List of channel gains"
+        },
+        "phase_offset": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "List of channel phase offsets in radians"
+        }
+      },
+      "required": ["gain", "phase_offset"],
+      "additionalProperties": false
+    },
+    "EmptyResponse": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  }
+}

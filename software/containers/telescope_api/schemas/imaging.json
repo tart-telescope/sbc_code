@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "VisibilityData": {
+      "type": "object",
+      "properties": {
+        "i": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23,
+          "description": "First antenna index"
+        },
+        "j": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23,
+          "description": "Second antenna index"
+        }
+      },
+      "required": ["i", "j"],
+      "additionalProperties": true
+    },
+    "VisibilityResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VisibilityData"
+          }
+        }
+      },
+      "required": ["data"],
+      "additionalProperties": true
+    },
+    "AntennaPositionsResponse": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 3,
+        "maxItems": 3,
+        "description": "Antenna position in East-North-Up coordinate system [e,n,u]"
+      }
+    },
+    "TimestampResponse": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": ".*[Z]$|.*[+-]\\d{2}:\\d{2}$",
+      "description": "UTC timestamp of latest visibilities in ISO format with timezone (must end with Z or +/-HH:MM)"
+    },
+    "EmptyResponse": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  }
+}

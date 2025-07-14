@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ChannelToggleResponse": {
+      "type": "object",
+      "patternProperties": {
+        "^[0-9]+$": {
+          "$ref": "models/common.json#/definitions/BinaryFlag",
+          "description": "Channel enable status: 0=disabled, 1=enabled"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ChannelStatus": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "$ref": "models/common.json#/definitions/ChannelIndex",
+          "description": "Channel ID"
+        },
+        "enabled": {
+          "$ref": "models/common.json#/definitions/BinaryFlag",
+          "description": "Channel enabled status: 0=disabled, 1=enabled"
+        }
+      },
+      "required": ["channel_id", "enabled"],
+      "additionalProperties": false
+    },
+    "AllChannelsResponse": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ChannelStatus"
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+services:
+  tart-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: tart-fastapi-dev
+    ports:
+      - "8000:5000"
+    environment:
+      - CONFIG_DIR=/config
+      - DATA_ROOT=/telescope_data
+      - LOGIN_PW=password
+      - SECRET_KEY=super-secret-123897219379179464asd13khk213
+      - LOGLEVEL=DEBUG
+      - PERMUTE_DIR=/permute
+    volumes:
+      - ./tart_api:/app:rw
+      - ./hardware_interface:/hardware_interface:ro
+      - ../../telescope_config.json:/config/telescope_config.json
+      - ../../calibrated_antenna_positions.json:/config/calibrated_antenna_positions.json
+      - ./permute.txt:/permute/permute.txt:ro
+      - telescope_data:/telescope_data
+
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - tart-network
+
+  codegen:
+    container_name: tart_codegen
+    image: tart_codegen
+    build:
+      context: tart_codegen
+      dockerfile: Dockerfile
+    volumes:
+      - ./schemas:/app/schemas:ro
+      - ./tart_api/generated_models:/app/tart_api/generated_models:rw
+    profiles:
+      - codegen
+
+
+
+  ui:
+    image: ghcr.io/tart-telescope/web_app/viewer-root:sha-95f3a7e-amd64
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - telescope_data:/telescope_data:ro
+    ports:
+      - "8080:80"
+    networks:
+      - tart-network
+    depends_on:
+      - tart-api
+
+volumes:
+  telescope_data:
+    driver: local
+
+networks:
+  tart-network:
+    driver: bridge

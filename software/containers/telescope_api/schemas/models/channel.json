@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "PhaseInfo": {
+      "type": "object",
+      "properties": {
+        "N_samples": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of samples"
+        },
+        "measured": {
+          "type": "number",
+          "description": "Measured phase value"
+        },
+        "ok": {
+          "$ref": "common.json#/definitions/BinaryFlag",
+          "description": "Phase measurement OK flag"
+        },
+        "stability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Phase stability value"
+        },
+        "threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Phase threshold value"
+        }
+      },
+      "required": ["N_samples", "measured", "ok", "stability", "threshold"],
+      "additionalProperties": false
+    },
+    "RadioMean": {
+      "type": "object",
+      "properties": {
+        "mean": {
+          "type": "number",
+          "description": "Radio mean value"
+        },
+        "ok": {
+          "$ref": "common.json#/definitions/BinaryFlag",
+          "description": "Radio mean OK flag"
+        },
+        "threshold": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Radio mean threshold"
+        }
+      },
+      "required": ["mean", "ok", "threshold"],
+      "additionalProperties": false
+    },
+    "ChannelInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/definitions/ChannelIndex",
+          "description": "Channel ID"
+        },
+        "enabled": {
+          "$ref": "common.json#/definitions/BinaryFlag",
+          "description": "Channel enabled flag"
+        },
+        "phase": {
+          "$ref": "#/definitions/PhaseInfo"
+        },
+        "radio_mean": {
+          "$ref": "#/definitions/RadioMean"
+        },
+        "freq": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Frequency array"
+        },
+        "power": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Power array"
+        }
+      },
+      "required": ["id", "enabled", "phase", "radio_mean", "freq", "power"],
+      "additionalProperties": false
+    },
+    "ChannelStatus": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "$ref": "common.json#/definitions/ChannelIndex",
+          "description": "Channel ID"
+        },
+        "enabled": {
+          "$ref": "common.json#/definitions/BinaryFlag",
+          "description": "Channel enabled status"
+        }
+      },
+      "required": ["channel_id", "enabled"],
+      "additionalProperties": false
+    },
+    "ChannelStatusResponse": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ChannelStatus"
+      }
+    },
+    "ChannelInfoResponse": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ChannelInfo"
+      }
+    },
+    "SingleChannelResponse": {
+      "$ref": "#/definitions/ChannelInfo"
+    },
+    "ChannelToggleResponse": {
+      "type": "object",
+      "patternProperties": {
+        "^[0-9]+$": {
+          "$ref": "common.json#/definitions/BinaryFlag"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

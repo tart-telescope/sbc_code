@@ -1,0 +1,65 @@
+services:
+  tart-api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: tart-fastapi-test
+    ports:
+      - "8001:5000"
+    environment:
+      - CONFIG_DIR=/config
+      - DATA_ROOT=/telescope_data
+      - LOGIN_PW=password
+      - SECRET_KEY=super-secret-123897219379179464asd13khk213
+      - LOGLEVEL=DEBUG
+      - PERMUTE_DIR=/permute
+      - DB_PATH=/app/test_database.db
+    volumes:
+      - ./tart_api:/app:rw
+      - ./hardware_interface:/hardware_interface:ro
+      - ../../telescope_config.json:/config/telescope_config.json
+      - ../../calibrated_antenna_positions.json:/config/calibrated_antenna_positions.json
+      - ./permute.txt:/permute/permute.txt:ro
+      - telescope_data_test:/telescope_data
+    restart: "no"
+    command: ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - tart-test-network
+
+
+
+  test-runner:
+    build:
+      context: .
+      dockerfile: test/Dockerfile
+    container_name: tart-test-runner
+    depends_on:
+      tart-api-test:
+        condition: service_healthy
+    environment:
+      - API_BASE_URL=http://tart-api-test:5000
+      - TEST_USERNAME=admin
+      - TEST_PASSWORD=password
+    volumes:
+      - ./test:/app/test:ro
+      - ./test/reports:/app/test/reports:rw
+      - ./test/.pytest_cache:/app/test/.pytest_cache:rw
+    networks:
+      - tart-test-network
+    tty: true
+    stdin_open: true
+
+volumes:
+  telescope_data_test:
+    driver: local
+
+networks:
+  tart-test-network:
+    driver: bridge

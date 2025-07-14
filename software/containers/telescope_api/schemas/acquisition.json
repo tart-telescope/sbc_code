@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "SaveFlagResponse": {
+      "type": "object",
+      "properties": {
+        "save": {
+          "$ref": "models/common.json#/definitions/BinaryFlag",
+          "description": "Save flag: 0=disabled, 1=enabled"
+        }
+      },
+      "required": ["save"],
+      "additionalProperties": false
+    },
+    "SampleExponentResponse": {
+      "type": "object",
+      "properties": {
+        "N_samples_exp": {
+          "$ref": "models/common.json#/definitions/SampleExponent",
+          "description": "Exponent for number of samples (2^exp)"
+        }
+      },
+      "required": ["N_samples_exp"],
+      "additionalProperties": false
+    }
+  }
+}
