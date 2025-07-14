@@ -25,13 +25,7 @@ FROM python:3.13-slim AS runtime
 RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
-ARG LOGIN_PW
-ENV LOGIN_PW=$LOGIN_PW
 
-ARG SECRET_KEY
-ENV SECRET_KEY=$SECRET_KEY
-ARG LOGLEVEL=INFO
-ENV LOGLEVEL=$LOGLEVEL
 
 
 # Set environment variables
