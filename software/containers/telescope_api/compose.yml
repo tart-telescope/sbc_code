@@ -44,10 +44,8 @@ services:
     profiles:
       - codegen
 
-
-
   ui:
-    image: ghcr.io/tart-telescope/web_app/viewer-root:sha-95f3a7e-amd64
+    image: ghcr.io/tart-telescope/web_app/viewer-root:latest
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - telescope_data:/telescope_data:ro
