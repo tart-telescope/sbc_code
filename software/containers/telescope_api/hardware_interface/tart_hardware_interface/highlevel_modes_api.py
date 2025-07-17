@@ -1,5 +1,4 @@
 import hashlib
-import json
 import os
 
 import numpy as np
@@ -63,13 +62,12 @@ def create_timestamp_and_path(base_path):
     return ts, p
 
 
-def get_status_json(tart_instance):
+def get_status(tart_instance):
     """Generate JSON from status"""
     vals = tart_instance.read_status(False)
     d = tart_instance.extract(vals)
-    d["timestamp (UTC)"] = utc.to_string(utc.now())
-    d_json = json.dumps(d)
-    return d, d_json
+    d["timestamp"] = utc.now()
+    return d
 
 
 def run_diagnostic(tart, runtime_config):
@@ -98,7 +96,7 @@ def run_diagnostic(tart, runtime_config):
         measured_phases = []
         while k < N_samples:
             k += 1
-            d, d_json = get_status_json(tart)
+            d = get_status(tart)
             measured_phases.append(d["TC_STATUS"]["phase"])
 
         phases.append(
@@ -130,7 +128,7 @@ def run_diagnostic(tart, runtime_config):
     tart.centre(runtime_config["centre"], noisy=runtime_config["verbose"])
     tart.start_acquisition(1.1, True)
 
-    d, d_json = get_status_json(tart)
+    d = get_status(tart)
 
     while not tart.data_ready():
         tart.pause(duration=0.005, noisy=True)
@@ -200,7 +198,7 @@ def run_acquire_raw(tart, runtime_config):
 
     data = tart.read_data(num_words=np.power(2, runtime_config["raw"]["N_samples_exp"]))
 
-    d, d_json = get_status_json(tart)
+    d = get_status(tart)
     runtime_config["status"] = d
     tart.reset()
 

@@ -20,6 +20,8 @@ from ..dependencies import ConfigDep
 
 router = APIRouter()
 
+from tart.utils import utc
+
 
 @router.get("/fpga", response_model=StatusFPGAResponse)
 async def get_status_fpga(config: ConfigDep):
@@ -33,12 +35,6 @@ async def get_status_fpga(config: ConfigDep):
         ret = dict(config["status"])
         ret["hostname"] = config["hostname"]
 
-        # Fix timestamp field mapping
-        if "timestamp (UTC)" in ret:
-            ret["timestamp"] = ret.pop("timestamp (UTC)")
-        elif "timestamp" not in ret:
-            ret["timestamp"] = ""
-
         # Fix SYS_STATS.state enum value - clamp to 0-1 range
         if "SYS_STATS" in ret and "state" in ret["SYS_STATS"]:
             state_val = ret["SYS_STATS"]["state"]
@@ -49,7 +45,7 @@ async def get_status_fpga(config: ConfigDep):
         # Return empty status with required fields when no status available
         return StatusFPGAResponse(
             hostname=config["hostname"],
-            timestamp="",
+            timestamp=utc.now(),
             AQ_STREAM={"data": 0.0},
             AQ_SYSTEM={
                 "512Mb": 0,

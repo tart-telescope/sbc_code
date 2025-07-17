@@ -13,7 +13,7 @@ from tart.imaging import visibility
 from tart.operation import settings
 from tart.util import utc
 
-from tart_hardware_interface.highlevel_modes_api import get_status_json
+from tart_hardware_interface.highlevel_modes_api import get_status
 
 """
     This function performs the van_vleck_correction for two-level quantization.
@@ -91,7 +91,7 @@ def capture_loop(
                     active = 0
             # Add the data to the process queue
             data = get_data(tart)
-            d, d_json = get_status_json(tart)
+            d = get_status(tart)
             runtime_config["status"] = d
             process_queue.put(data)
             logger.info(("Capture Loop: Acquired"))
