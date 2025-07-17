@@ -20,7 +20,7 @@ from ..dependencies import ConfigDep
 
 router = APIRouter()
 
-from tart.utils import utc
+from tart.util import utc
 
 
 @router.get("/fpga", response_model=StatusFPGAResponse)

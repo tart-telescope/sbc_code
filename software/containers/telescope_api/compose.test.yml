@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: builder
+      target: test-builder
     container_name: tart-fastapi-test
     ports:
       - "8001:5000"

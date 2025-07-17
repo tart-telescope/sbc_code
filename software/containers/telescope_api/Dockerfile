@@ -14,6 +14,11 @@ COPY ./hardware_interface /hardware_interface
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --system /hardware_interface
 
+# Test builder stage - includes test extras
+FROM builder AS test-builder
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --system "/hardware_interface[test]"
+
 RUN find /usr/local/lib/python3.13/site-packages -name 'tests' -type d -exec rm -rf {} +
 RUN find /usr/local/lib/python3.13/site-packages -name '*dist-info' -type d -exec rm -rf {} +
 
