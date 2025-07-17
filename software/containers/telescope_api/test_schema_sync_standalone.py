@@ -123,7 +123,9 @@ def test_schema_sync():
 
         if removed_files:
             differences_found = True
-            diff_summary.append(f"Files no longer generated: {', '.join(removed_files)}")
+            diff_summary.append(
+                f"Files no longer generated: {', '.join(removed_files)}"
+            )
 
         # Compare content of common files
         common_files = current_files & fresh_files

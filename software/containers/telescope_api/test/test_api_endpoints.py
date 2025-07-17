@@ -54,12 +54,16 @@ class TARTAPITestClient:
             # Save original raw num samples exp
             response = requests.get(f"{self.base_url}/acquire/raw/num_samples_exp")
             if response.status_code == 200:
-                self.original_state["raw_num_samples_exp"] = response.json().get("N_samples_exp")
+                self.original_state["raw_num_samples_exp"] = response.json().get(
+                    "N_samples_exp"
+                )
 
             # Save original vis num samples exp
             response = requests.get(f"{self.base_url}/acquire/vis/num_samples_exp")
             if response.status_code == 200:
-                self.original_state["vis_num_samples_exp"] = response.json().get("N_samples_exp")
+                self.original_state["vis_num_samples_exp"] = response.json().get(
+                    "N_samples_exp"
+                )
 
             # Save original channel states
             response = requests.get(f"{self.base_url}/channel")
@@ -76,7 +80,8 @@ class TARTAPITestClient:
             if "mode" in self.original_state:
                 self.authenticate()
                 requests.post(
-                    f"{self.base_url}/mode/{self.original_state['mode']}", headers=self.headers
+                    f"{self.base_url}/mode/{self.original_state['mode']}",
+                    headers=self.headers,
                 )
 
             # Restore original raw save flag
@@ -210,7 +215,9 @@ class TARTAPITestClient:
 
         # Test refresh token
         refresh_headers = {"Authorization": f"Bearer {data['refresh_token']}"}
-        response = requests.post(f"{self.base_url}/auth/refresh", headers=refresh_headers)
+        response = requests.post(
+            f"{self.base_url}/auth/refresh", headers=refresh_headers
+        )
         assert response.status_code == 200
 
         refresh_data = response.json()
@@ -240,14 +247,16 @@ class TARTAPITestClient:
 
         data = response.json()
         assert "mode" in data
-        original_mode = data["mode"]
+        data["mode"]
 
         # Test mode switching
         test_modes = ["off", "diag"]  # Test fewer modes to reduce interference
         for mode in test_modes:
             if mode in available_modes:
                 self.authenticate()
-                response = requests.post(f"{self.base_url}/mode/{mode}", headers=self.headers)
+                response = requests.post(
+                    f"{self.base_url}/mode/{mode}", headers=self.headers
+                )
                 assert response.status_code == 200
 
                 data = response.json()
@@ -272,7 +281,9 @@ class TARTAPITestClient:
 
         for loop_mode in loop_modes:
             self.authenticate()
-            response = requests.post(f"{self.base_url}/loop/{loop_mode}", headers=self.headers)
+            response = requests.post(
+                f"{self.base_url}/loop/{loop_mode}", headers=self.headers
+            )
             assert response.status_code == 200
 
             data = response.json()
@@ -328,13 +339,14 @@ class TARTAPITestClient:
 
         data = response.json()
         assert "N_samples_exp" in data
-        original_exp = data["N_samples_exp"]
+        data["N_samples_exp"]
 
         # Test setting valid exponent
         test_exp = 20
         self.authenticate()
         response = requests.put(
-            f"{self.base_url}/acquire/raw/num_samples_exp/{test_exp}", headers=self.headers
+            f"{self.base_url}/acquire/raw/num_samples_exp/{test_exp}",
+            headers=self.headers,
         )
         assert response.status_code == 200
 
@@ -397,16 +409,22 @@ class TARTAPITestClient:
         if len(data) > 0:
             # Test enabling/disabling first channel
             self.authenticate()
-            response = requests.put(f"{self.base_url}/channel/0/1", headers=self.headers)
+            response = requests.put(
+                f"{self.base_url}/channel/0/1", headers=self.headers
+            )
             assert response.status_code == 200
 
             self.authenticate()
-            response = requests.put(f"{self.base_url}/channel/0/0", headers=self.headers)
+            response = requests.put(
+                f"{self.base_url}/channel/0/0", headers=self.headers
+            )
             assert response.status_code == 200
 
             # Always re-enable the channel after testing
             self.authenticate()
-            response = requests.put(f"{self.base_url}/channel/0/1", headers=self.headers)
+            response = requests.put(
+                f"{self.base_url}/channel/0/1", headers=self.headers
+            )
             assert response.status_code == 200
 
     def test_data_endpoints(self):
@@ -443,7 +461,9 @@ class TARTAPITestClient:
             elif method == "PUT":
                 response = requests.put(f"{self.base_url}{endpoint}")
 
-            assert response.status_code == 401, f"Endpoint {endpoint} should require authentication"
+            assert response.status_code == 401, (
+                f"Endpoint {endpoint} should require authentication"
+            )
 
     def test_openapi_docs(self):
         """Test that OpenAPI documentation is accessible."""
@@ -470,7 +490,9 @@ class TARTAPITestClient:
         """Test error handling for invalid requests."""
         # Test invalid mode
         self.authenticate()
-        response = requests.post(f"{self.base_url}/mode/invalid_mode", headers=self.headers)
+        response = requests.post(
+            f"{self.base_url}/mode/invalid_mode", headers=self.headers
+        )
         assert response.status_code == 422  # Validation error
 
         # Test invalid channel
@@ -512,7 +534,9 @@ class TARTAPITestClient:
         assert "data" in data
 
         # Should have visibility data after being in vis mode
-        assert len(data["data"]) > 0, "No visibility data collected after 3 seconds in vis mode"
+        assert len(data["data"]) > 0, (
+            "No visibility data collected after 3 seconds in vis mode"
+        )
 
         # Check data structure
         if data["data"]:
@@ -536,7 +560,9 @@ class TARTAPITestClient:
 
         for channel_id in test_channels:
             self.authenticate()
-            response = requests.put(f"{self.base_url}/channel/{channel_id}/0", headers=self.headers)
+            response = requests.put(
+                f"{self.base_url}/channel/{channel_id}/0", headers=self.headers
+            )
             assert response.status_code == 200
 
         # Verify they are disabled
@@ -553,7 +579,9 @@ class TARTAPITestClient:
         # Re-enable all channels
         for channel_id in test_channels:
             self.authenticate()
-            response = requests.put(f"{self.base_url}/channel/{channel_id}/1", headers=self.headers)
+            response = requests.put(
+                f"{self.base_url}/channel/{channel_id}/1", headers=self.headers
+            )
             assert response.status_code == 200
 
         # Verify they are enabled

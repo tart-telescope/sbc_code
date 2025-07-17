@@ -11,14 +11,8 @@ import logging
 import os
 import time
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
-
 from tart.imaging import visibility
 from tart.util import utc
-
-# prepare to replace with utility
-save_vis_list = visibility.list_save
-
 from tart_hardware_interface.highlevel_modes_api import (
     run_acquire_raw,
     run_diagnostic,
@@ -29,6 +23,11 @@ from tart_hardware_interface.util import create_spi_object
 
 from database import operations as db
 
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+
+# prepare to replace with utility
+save_vis_list = visibility.list_save
+
 N_IT = 0
 
 
@@ -38,15 +37,20 @@ def cleanup_observation_cache():
         if len(resp) > 10:
             for entry in resp[10:]:
                 try:
-                    db.remove_raw_file_handle_by_Id(entry["Id"])
-                    print("removed", entry["Id"], entry["filename"], entry["checksum"])
+                    db.remove_raw_file_handle_by_id(entry["Id"])
+                    logging.info(
+                        "Removed raw file handle %s: %s (checksum: %s)",
+                        entry["Id"],
+                        entry["filename"],
+                        entry["checksum"],
+                    )
                 except Exception as e:
-                    print("couldnt remove handle from database", e)
+                    logging.error("Could not remove handle from database: %s", e)
                     pass
                 try:
                     os.remove(entry["filename"])
                 except Exception as e:
-                    print("couldnt remove file", e)
+                    logging.error("Could not remove file: %s", e)
                     pass
         else:
             db.update_observation_cache_process_state("OK")
@@ -59,15 +63,20 @@ def cleanup_visibility_cache():
         if len(resp) > 10:
             for entry in resp[10:]:
                 try:
-                    db.remove_vis_file_handle_by_Id(entry["Id"])
-                    print("removed", entry["Id"], entry["filename"], entry["checksum"])
+                    db.remove_vis_file_handle_by_id(entry["Id"])
+                    logging.info(
+                        "Removed vis file handle %s: %s (checksum: %s)",
+                        entry["Id"],
+                        entry["filename"],
+                        entry["checksum"],
+                    )
                 except Exception as e:
-                    print("couldnt remove handle from database", e)
+                    logging.error("Could not remove handle from database: %s", e)
                     pass
                 try:
                     os.remove(entry["filename"])
                 except Exception as e:
-                    print("couldnt remove file", e)
+                    logging.error("Could not remove file: %s", e)
                     pass
 
         else:
@@ -194,7 +203,7 @@ class TartControl:
         self.process_vis_calc.join()
         self.queue_vis = None
         self.vislist = []
-        print("Stop visibility acquisition processes.")
+        logging.info("Stopped visibility acquisition processes")
 
     def vis_stream_reconfigure(self):
         self.vis_stream_finish()

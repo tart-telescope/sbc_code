@@ -10,8 +10,13 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     packages=["tart_hardware_interface"],
-    install_requires=["spidev", "numpy", "tart", "requests", "matplotlib"],
-    extras_require={"test": []},
+    install_requires=[
+        "spidev",
+        "numpy",
+        "tart",
+        "requests",
+    ],
+    extras_require={"test": ["matplotlib"]},
     include_package_data=True,
     package_dir={"tart_hardware_interface": "tart_hardware_interface"},
     package_data={

@@ -14,24 +14,17 @@ COPY ./hardware_interface /hardware_interface
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --system /hardware_interface
 
+RUN find /usr/local/lib/python3.13/site-packages -name 'tests' -type d -exec rm -rf {} +
+RUN find /usr/local/lib/python3.13/site-packages -name '*dist-info' -type d -exec rm -rf {} +
+
 # Test builder stage - includes test extras
 FROM builder AS test-builder
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --system "/hardware_interface[test]"
 
-RUN find /usr/local/lib/python3.13/site-packages -name 'tests' -type d -exec rm -rf {} +
-RUN find /usr/local/lib/python3.13/site-packages -name '*dist-info' -type d -exec rm -rf {} +
 
 # Runtime stage
 FROM python:3.13-slim AS runtime
-
-
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    && rm -rf /var/lib/apt/lists/*
-
-
-
 
 # Set environment variables
 ENV PYTHONPATH=/app:/app/app

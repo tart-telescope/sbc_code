@@ -14,11 +14,10 @@ from jose import jwt
 
 from generated_models.auth_models import AuthRequest, AuthResponse, RefreshResponse
 
+from ..config import settings
 from ..dependencies import get_runtime_config
 
 router = APIRouter()
-
-from ..config import settings
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):

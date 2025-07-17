@@ -108,7 +108,10 @@ class TelescopeControlService:
                 logger.info("Stopped telescope control process")
 
             # Stop cache cleanup processes
-            if self.observation_cache_process and self.observation_cache_process.is_alive():
+            if (
+                self.observation_cache_process
+                and self.observation_cache_process.is_alive()
+            ):
                 self.observation_cache_process.terminate()
                 self.observation_cache_process.join(timeout=5)
                 if self.observation_cache_process.is_alive():
@@ -116,7 +119,10 @@ class TelescopeControlService:
                     self.observation_cache_process.join()
                 logger.info("Stopped observation cache process")
 
-            if self.visibility_cache_process and self.visibility_cache_process.is_alive():
+            if (
+                self.visibility_cache_process
+                and self.visibility_cache_process.is_alive()
+            ):
                 self.visibility_cache_process.terminate()
                 self.visibility_cache_process.join(timeout=5)
                 if self.visibility_cache_process.is_alive():
@@ -198,14 +204,18 @@ class TelescopeControlService:
         """Get status of all background processes."""
         return {
             "service_running": self.running,
-            "tart_process_alive": (self.tart_process.is_alive() if self.tart_process else False),
+            "tart_process_alive": (
+                self.tart_process.is_alive() if self.tart_process else False
+            ),
             "observation_cache_alive": (
                 self.observation_cache_process.is_alive()
                 if self.observation_cache_process
                 else False
             ),
             "visibility_cache_alive": (
-                self.visibility_cache_process.is_alive() if self.visibility_cache_process else False
+                self.visibility_cache_process.is_alive()
+                if self.visibility_cache_process
+                else False
             ),
             "current_mode": self.shared_config.get("mode", "unknown"),
         }

@@ -79,7 +79,7 @@ class AsyncDatabase:
     async def remove_raw_file_handle_by_id(self, file_id: int) -> None:
         """Async wrapper for remove_raw_file_handle_by_Id."""
         await asyncio.get_event_loop().run_in_executor(
-            None, db_ops.remove_raw_file_handle_by_Id, file_id
+            None, db_ops.remove_raw_file_handle_by_id, file_id
         )
 
     async def get_raw_file_handle(self) -> list[dict[str, Any]]:
@@ -107,7 +107,7 @@ class AsyncDatabase:
     async def remove_vis_file_handle_by_id(self, file_id: int) -> None:
         """Async wrapper for remove_vis_file_handle_by_Id."""
         await asyncio.get_event_loop().run_in_executor(
-            None, db_ops.remove_vis_file_handle_by_Id, file_id
+            None, db_ops.remove_vis_file_handle_by_id, file_id
         )
 
     async def get_vis_file_handle(self) -> list[dict[str, Any]]:

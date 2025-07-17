@@ -88,7 +88,9 @@ def create_runtime_config() -> Any:
         "base_path": os.path.join(data_root, "vis"),
     }
 
-    config_dict["telescope_config_path"] = os.path.join(config_root, "telescope_config.json")
+    config_dict["telescope_config_path"] = os.path.join(
+        config_root, "telescope_config.json"
+    )
 
     # Load telescope config if file exists
     try:
@@ -110,7 +112,9 @@ def create_runtime_config() -> Any:
         }
 
     # Load antenna positions - fail hard if file doesn't exist (like Flask app)
-    antenna_positions_path = os.path.join(config_root, "calibrated_antenna_positions.json")
+    antenna_positions_path = os.path.join(
+        config_root, "calibrated_antenna_positions.json"
+    )
     with open(antenna_positions_path) as a_c:
         config_dict["antenna_positions"] = json.load(a_c)
         a_c.close()

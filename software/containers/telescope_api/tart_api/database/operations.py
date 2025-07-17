@@ -1,3 +1,4 @@
+import logging
 import os
 import sqlite3
 
@@ -12,9 +13,8 @@ def connect_to_db():
         db_path = os.getenv("DB_PATH", "tart_web_api_database_v2.db")
         con = sqlite3.connect(db_path)
     except Exception as e:
-        print(type(e))  # the exception instance
-        print(e.args)  # arguments stored in .args
-        print(e)
+        logging.error("Database connection failed: %s (%s)", e, type(e).__name__)
+        logging.debug("Exception args: %s", e.args)
     return con
 
 
@@ -92,8 +92,8 @@ def get_sample_delay():
 def insert_sample_delay(timestamp, sample_delay):
     with connect_to_db() as con:
         c = con.cursor()
-        SQL = "INSERT INTO sample_delay(utc_timestamp, delay) values (?, ?)"
-        c.execute(SQL, (utc.to_string(timestamp), sample_delay))
+        sql = "INSERT INTO sample_delay(utc_timestamp, delay) values (?, ?)"
+        c.execute(sql, (utc.to_string(timestamp), sample_delay))
     return 1
 
 
@@ -140,10 +140,10 @@ def insert_raw_file_handle(filename, checksum):
         )
 
 
-def remove_raw_file_handle_by_Id(Id):
+def remove_raw_file_handle_by_id(file_id):
     with connect_to_db() as con:
         c = con.cursor()
-        c.execute("DELETE FROM raw_data WHERE Id=?", (Id,))
+        c.execute("DELETE FROM raw_data WHERE Id=?", (file_id,))
 
 
 def get_raw_file_handle():
@@ -201,10 +201,10 @@ def insert_vis_file_handle(filename, checksum):
         )
 
 
-def remove_vis_file_handle_by_Id(Id):
+def remove_vis_file_handle_by_id(file_id):
     with connect_to_db() as con:
         c = con.cursor()
-        c.execute("DELETE FROM vis_data WHERE Id=?", (Id,))
+        c.execute("DELETE FROM vis_data WHERE Id=?", (file_id,))
 
 
 def get_vis_file_handle():
