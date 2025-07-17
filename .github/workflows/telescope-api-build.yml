@@ -1,5 +1,5 @@
 name: Build Telescope API
-
+# https://dev.to/pradumnasaraf/publishing-multi-arch-docker-images-to-ghcr-using-buildx-and-github-actions-2k7j
 on:
   releases:
     types: [published]
