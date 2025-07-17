@@ -45,7 +45,7 @@ def generate_single_model(schema_file):
 
     try:
         # Run the command
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        subprocess.run(cmd, capture_output=True, text=True, check=True)
         return True, output_filename, None
     except subprocess.CalledProcessError as e:
         return False, output_filename, e.stderr

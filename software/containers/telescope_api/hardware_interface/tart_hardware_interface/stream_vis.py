@@ -6,14 +6,13 @@ import time
 import traceback
 
 import numpy as np
-
-logger = logging.getLogger(__name__)
-
 from tart.imaging import visibility
 from tart.operation import settings
 from tart.util import utc
 
 from tart_hardware_interface.highlevel_modes_api import get_status
+
+logger = logging.getLogger(__name__)
 
 """
     This function performs the van_vleck_correction for two-level quantization.
@@ -156,7 +155,8 @@ def stream_vis_to_queue(tart, runtime_config):
     vis_calc_cmd_queue = multiprocessing.Queue()
 
     capture_process = multiprocessing.Process(
-        target=capture_loop, args=(tart, raw_data_queue, capture_cmd_queue, runtime_config, logger)
+        target=capture_loop,
+        args=(tart, raw_data_queue, capture_cmd_queue, runtime_config, logger),
     )
     vis_calc_process = multiprocessing.Process(
         target=process_loop,
@@ -165,4 +165,10 @@ def stream_vis_to_queue(tart, runtime_config):
 
     vis_calc_process.start()
     capture_process.start()
-    return vis_queue, vis_calc_process, capture_process, vis_calc_cmd_queue, capture_cmd_queue
+    return (
+        vis_queue,
+        vis_calc_process,
+        capture_process,
+        vis_calc_cmd_queue,
+        capture_cmd_queue,
+    )

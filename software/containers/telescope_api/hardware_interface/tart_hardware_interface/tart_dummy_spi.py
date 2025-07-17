@@ -155,7 +155,8 @@ class TartDummySPI(object):
             # Capture registers:
             self.TC_CENTRE: "TC_CENTRE:\tcentre = %s, drift = %s, invert = %s, delay = %d"
             % (bits[7], bits[6], bits[5], val & 0x0F),
-            self.TC_STATUS: "TC_STATUS:\tdelta = %d, phase = %d" % (vals[4] & 0x0F, val & 0x0F),
+            self.TC_STATUS: "TC_STATUS:\tdelta = %d, phase = %d"
+            % (vals[4] & 0x0F, val & 0x0F),
             self.TC_DEBUG: "TC_DEBUG: \tdebug = %s, count = %s, shift = %s, #antenna = %d"
             % (bits[7], bits[6], bits[5], val & 0x1F),
             self.TC_SYSTEM: "TC_SYSTEM:\tenabled = %s, error = %s, locked = %s, source = %d"
@@ -184,14 +185,15 @@ class TartDummySPI(object):
         return msgs.get(reg, "WARNING: Not a status register.")
 
     def extract(self, vals):
-        unpack = lambda x: np.unpackbits(
-            np.array(
-                [
-                    x,
-                ],
-                dtype=np.uint8,
-            )
-        )[::-1]
+        def unpack(x):
+            return np.unpackbits(
+                    np.array(
+                        [
+                            x,
+                        ],
+                        dtype=np.uint8,
+                    )
+                )[::-1]
         extractors = {
             self.TC_CENTRE: lambda val: dict(
                 zip(
@@ -261,7 +263,9 @@ class TartDummySPI(object):
                     ],
                 )
             ),
-            self.VX_DEBUG: lambda val: dict(zip(["stuck", "limp"], unpack(val)[[7, 6]].tolist())),
+            self.VX_DEBUG: lambda val: dict(
+                zip(["stuck", "limp"], unpack(val)[[7, 6]].tolist())
+            ),
             self.VX_SYSTEM: lambda val: dict(
                 zip(
                     ["enabled", "overwrite", "blocksize"],
@@ -281,7 +285,10 @@ class TartDummySPI(object):
                 )
             ),
             self.SPI_STATS: lambda val: dict(
-                zip(["FIFO_overflow", "FIFO_underrun", "spi_busy"], unpack(val)[[7, 6, 0]].tolist())
+                zip(
+                    ["FIFO_overflow", "FIFO_underrun", "spi_busy"],
+                    unpack(val)[[7, 6, 0]].tolist(),
+                )
             ),
             self.SPI_RESET: lambda val: dict(
                 zip(
@@ -332,7 +339,7 @@ class TartDummySPI(object):
                 val = val | 0x40
             else:
                 val = val & 0xBF
-            ret = self.setbyte(self.TC_DEBUG, val)
+            self.setbyte(self.TC_DEBUG, val)
             if noisy:
                 print(" debug now ON")
         else:
@@ -371,7 +378,7 @@ class TartDummySPI(object):
         if phase < 12 and phase >= 0:
             val = self.getbyte(self.TC_CENTRE, noisy)
             val = (val & 0xF0) | (int(phase) & 0x0F)
-            ret = self.setbyte(self.TC_CENTRE, val, noisy)
+            self.setbyte(self.TC_CENTRE, val, noisy)
             self.pause()
             if noisy:
                 self.getbyte(self.TC_CENTRE, True)
@@ -459,7 +466,7 @@ class TartDummySPI(object):
                 ow = 0x40
             else:
                 ow = 0x00
-            bs = 0x80 | ow | int(blocksize)
+            0x80 | ow | int(blocksize)
             self.blocksize = blocksize
             ret = 0xFF
             self.pause()
@@ -504,7 +511,12 @@ class TartDummySPI(object):
         arr = np.zeros(576, dtype="int")
         for i in range(0, 576):
             j = i * 4
-            x = viz[j] | (viz[j + 1] << 8) | (viz[j + 2] << 16) | ((viz[j + 3] & 0x7F) << 24)
+            x = (
+                viz[j]
+                | (viz[j + 1] << 8)
+                | (viz[j + 2] << 16)
+                | ((viz[j + 3] & 0x7F) << 24)
+            )
             if viz[j + 3] > 0x7F:
                 x = -x
             arr[i] = x

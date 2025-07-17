@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import os
 
 import numpy as np
@@ -11,7 +12,7 @@ Helper functions
 
 
 def get_psd_ext(d, fs, nfft):
-    print("DEPRECATED: Use get_psd_np instead.")
+    logging.warning("DEPRECATED: Use get_psd_np instead.")
     from matplotlib import mlab
 
     power, freq = mlab.psd(d, Fs=fs, NFFT=nfft)
@@ -184,14 +185,14 @@ def get_status(tart_instance):
 
 def run_diagnostic(tart, runtime_config):
     # pp = tart.load_permute()
-    print("Enabling DEBUG mode")
+    logging.info("Enabling DEBUG mode")
     tart.debug(
         on=not runtime_config["acquire"],
         shift=runtime_config["shifter"],
         count=runtime_config["counter"],
         noisy=runtime_config["verbose"],
     )
-    print("Setting capture registers:")
+    logging.info("Setting capture registers")
 
     num_ant = runtime_config["diagnostic"]["num_ant"]
     N_samples = runtime_config["diagnostic"]["N_samples"]  # Number of samples for each antenna
@@ -226,13 +227,13 @@ def run_diagnostic(tart, runtime_config):
     for i in range(num_ant):
         mean_phases.append(phases[i]["measured"])
 
-    print(("median:", np.median(mean_phases)))
+    logging.info("Median phase: %s", np.median(mean_phases))
     delay_to_be_set = (np.median(mean_phases) + 6) % 12
-    print(("set delay to:", delay_to_be_set))
+    logging.info("Set delay to: %s", delay_to_be_set)
 
     runtime_config["sample_delay"] = delay_to_be_set
 
-    print("small test acquisition")
+    logging.info("Starting small test acquisition")
     tart.reset()
     tart.debug(on=False, noisy=runtime_config["verbose"])
     tart.set_sample_delay(delay_to_be_set)
@@ -244,18 +245,25 @@ def run_diagnostic(tart, runtime_config):
 
     while not tart.data_ready():
         tart.pause(duration=0.005, noisy=True)
-    print("\nAcquisition complete, beginning read-back.")
+    logging.info("Acquisition complete, beginning read-back")
     # tart.capture(on=False, noisy=runtime_config['verbose'])
-    print((runtime_config["diagnostic"]["spectre"]["N_samples_exp"]))
+    logging.debug("N_samples_exp: %s", runtime_config["diagnostic"]["spectre"]["N_samples_exp"])
     data = tart.read_data(num_words=2 ** runtime_config["diagnostic"]["spectre"]["N_samples_exp"])
     data = np.asarray(data, dtype=np.uint8)
     ant_data = np.flipud(np.unpackbits(data).reshape(-1, 24).T)
-    print((ant_data[:, :10]))
+    logging.debug("Antenna data shape: %s, first 10 samples: %s", ant_data.shape, ant_data[:, :10])
     radio_means = []
     mean_threshold = 0.2
     for i in range(num_ant):
         radio_means.append(
-            dict(list(zip(["mean", "threshold", "ok"], mean_stats(ant_data[i], mean_threshold))))
+            dict(
+                list(
+                    zip(
+                        ["mean", "threshold", "ok"],
+                        mean_stats(ant_data[i], mean_threshold),
+                    )
+                )
+            )
         )
 
     ant_data = np.asarray(ant_data, dtype=np.float16) * 2 - 1.0
@@ -268,7 +276,9 @@ def run_diagnostic(tart, runtime_config):
         channel["phase"] = phases[i]
         channel["radio_mean"] = radio_means[i]
         power, freq = get_psd(
-            ant_data[i] - ant_data[i].mean(), 16e6, runtime_config["diagnostic"]["spectre"]["NFFT"]
+            ant_data[i] - ant_data[i].mean(),
+            16e6,
+            runtime_config["diagnostic"]["spectre"]["NFFT"],
         )
         power_db = 10.0 * np.log10(power + 1e-32)  # Avoid divide by zero
         power_db = np.nan_to_num(power_db)
@@ -279,7 +289,7 @@ def run_diagnostic(tart, runtime_config):
     runtime_config["channels"] = channels
     runtime_config["channels_timestamp"] = utc.now()
     runtime_config["status"] = d
-    print("\nDone.")
+    logging.info("Diagnostic complete")
 
 
 """
@@ -304,7 +314,7 @@ def run_acquire_raw(tart, runtime_config):
 
     while not tart.data_ready():
         tart.pause(duration=0.005, noisy=True)
-    print("\nAcquisition complete, beginning read-back.")
+    logging.info("Acquisition complete, beginning read-back")
     # tart.capture(on=False, noisy=runtime_config['verbose'])
 
     data = tart.read_data(num_words=np.power(2, runtime_config["raw"]["N_samples_exp"]))
@@ -313,7 +323,7 @@ def run_acquire_raw(tart, runtime_config):
     runtime_config["status"] = d
     tart.reset()
 
-    print("reshape antenna data")
+    logging.info("Reshaping antenna data")
     data = np.asarray(data, dtype=np.uint8)
     ant_data = np.flipud(np.unpackbits(data).reshape(-1, 24).T)
     if runtime_config["raw"]["save"]:
@@ -325,7 +335,6 @@ def run_acquire_raw(tart, runtime_config):
 
         obs = observation.Observation(t_stmp, config, savedata=ant_data)
         obs.to_hdf5(filename)
-        print(("saved to: ", filename))
+        logging.info("Saved raw data to: %s", filename)
         return {"filename": filename, "sha256": sha256_checksum(filename)}
     return {}
-    print("\nDone.")
