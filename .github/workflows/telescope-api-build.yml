@@ -7,7 +7,7 @@ on:
 env:
   REGISTRY: ghcr.io
   NAMESPACE: tart-telescope
-  IMAGE_NAME: ${{ github.repository_owner }}/telescope_api
+  IMAGE_NAME: tart-telescope/telescope_api
 
 jobs:
   build:
