@@ -152,17 +152,41 @@ class TelescopeControlService:
                 # Read current mode from shared config
                 current_mode = shared_config.get("mode", "off")
 
+                # Update TartControl config with current shared config values
+                # to preserve API changes before executing hardware interface
+                api_updatable_fields = [
+                    "raw",
+                    "vis",
+                    "antenna_positions",
+                    "mode",
+                    "loop_mode",
+                    "loop_n",
+                ]
+                for field in api_updatable_fields:
+                    if field in shared_config:
+                        tart_control.config[field] = shared_config[field]
+
                 # Update state machine
                 tart_control.set_state(current_mode)
 
                 # Execute current state
                 tart_control.run()
 
-                # Sync visibility data back to shared config
-                if "vis_current" in tart_control.config:
-                    shared_config["vis_current"] = tart_control.config["vis_current"]
-                if "vis_timestamp" in tart_control.config:
-                    shared_config["vis_timestamp"] = tart_control.config["vis_timestamp"]
+                # Sync hardware interface updates back to shared config
+                # (but don't overwrite API changes)
+                hardware_updatable_fields = [
+                    "vis_current",
+                    "vis_timestamp",
+                    "status",
+                    "channels",
+                    "channels_timestamp",
+                    "sample_delay",
+                    "acquire",
+                ]
+
+                for field in hardware_updatable_fields:
+                    if field in tart_control.config:
+                        shared_config[field] = tart_control.config[field]
 
         except KeyboardInterrupt:
             logger.info("Telescope control loop interrupted")

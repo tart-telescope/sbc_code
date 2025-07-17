@@ -2,7 +2,6 @@ import hashlib
 import os
 
 import numpy as np
-from matplotlib import mlab
 from tart.operation import observation, settings
 from tart.util import utc
 
@@ -11,7 +10,10 @@ Helper functions
 """
 
 
-def get_psd(d, fs, nfft):
+def get_psd_ext(d, fs, nfft):
+    print("DEPRECATED: Use get_psd_np instead.")
+    from matplotlib import mlab
+
     power, freq = mlab.psd(d, Fs=fs, NFFT=nfft)
     num_bins = 128
     window_width = len(power) // num_bins
@@ -23,6 +25,117 @@ def get_psd(d, fs, nfft):
         power_ret.append(power[start:stop].max())
         freq_ret.append(freq[start:stop].mean())
     return np.asarray(power_ret), np.asarray(freq_ret)
+
+
+def get_psd_np(d, fs, nfft):
+    """
+    Drop-in replacement for matplotlib.mlab.psd() using pure numpy.
+
+    This function provides equivalent functionality to matplotlib.mlab.psd()
+    without requiring matplotlib as a dependency. It computes the power
+    spectral density using FFT with Hanning windowing and proper scaling
+    to match the original behavior exactly.
+
+    Args:
+        d: Input signal data
+        fs: Sampling frequency
+        nfft: FFT size
+
+    Returns:
+        tuple: (power, freq) arrays after binning into 128 frequency bins
+    """
+    # Validate nfft is large enough for 128 frequency bins
+    expected_freq_bins = nfft // 2 + 1
+    assert expected_freq_bins >= 128, (
+        f"nfft={nfft} produces only {expected_freq_bins} frequency bins, need at least 128"
+    )
+    # Handle different signal lengths like matplotlib.mlab.psd
+    if len(d) < nfft:
+        # Zero-pad if signal is shorter than nfft
+        d = np.concatenate([d, np.zeros(nfft - len(d))])
+
+    # For signals longer than nfft, use Welch's method with non-overlapping segments
+    if len(d) > nfft:
+        # Calculate number of non-overlapping segments
+        num_segments = len(d) // nfft
+
+        # Initialize power accumulator
+        power_sum = np.zeros(nfft // 2 + 1)
+
+        # Process each segment
+        for i in range(num_segments):
+            start = i * nfft
+            segment = d[start : start + nfft]
+
+            # Apply window and compute FFT
+            window = np.hanning(nfft)
+            segment_windowed = segment * window
+            X = np.fft.fft(segment_windowed, nfft)
+            window_norm = np.sum(window**2)
+            segment_power = (X * np.conj(X)).real / (fs * window_norm)
+            segment_power = segment_power[: nfft // 2 + 1]
+
+            # Apply scaling for positive frequencies
+            if nfft % 2 == 0:  # Even nfft
+                segment_power[1:-1] *= 2
+            else:  # Odd nfft
+                segment_power[1:] *= 2
+
+            power_sum += segment_power
+
+        # Average across segments
+        power = power_sum / num_segments
+    else:
+        # Signal length equals nfft or was zero-padded
+        window = np.hanning(nfft)
+        d_windowed = d * window
+        X = np.fft.fft(d_windowed, nfft)
+        window_norm = np.sum(window**2)
+        power = (X * np.conj(X)).real / (fs * window_norm)
+        power = power[: nfft // 2 + 1]
+        if nfft % 2 == 0:  # Even nfft
+            power[1:-1] *= 2
+        else:  # Odd nfft
+            power[1:] *= 2
+
+    # Generate frequency array to match matplotlib.mlab.psd behavior
+    freq = np.fft.fftfreq(nfft, 1 / fs)[: nfft // 2 + 1]
+    # Fix negative Nyquist frequency for even nfft
+    if nfft % 2 == 0:
+        freq[-1] = abs(freq[-1])
+
+    num_bins = 128
+    window_width = len(power) // num_bins
+    power_ret = []
+    freq_ret = []
+
+    # Handle case where power array is smaller than num_bins
+    if window_width == 0:
+        # If power array is too small, pad with zeros and repeat last frequency
+        power_ret = power.tolist() + [0.0] * (num_bins - len(power))
+        freq_ret = freq.tolist() + [freq[-1]] * (num_bins - len(freq))
+    else:
+        for i in range(num_bins):
+            start = int(i * window_width)
+            stop = start + window_width
+            if start < len(power):
+                power_ret.append(power[start:stop].max())
+                freq_ret.append(freq[start:stop].mean())
+            else:
+                # If we've run out of data, pad with zeros
+                power_ret.append(0.0)
+                freq_ret.append(freq[-1] if len(freq) > 0 else 0.0)
+
+    return np.asarray(power_ret), np.asarray(freq_ret)
+
+
+def get_psd(d, fs, nfft):
+    # Validate nfft is large enough for 128 frequency bins
+    expected_freq_bins = nfft // 2 + 1
+    assert expected_freq_bins >= 128, (
+        f"nfft={nfft} produces only {expected_freq_bins} frequency bins, need at least 128"
+    )
+    return get_psd_np(d, fs, nfft)
 
 
 def sha256_checksum(filename, block_size=65536):
@@ -63,7 +176,6 @@ def create_timestamp_and_path(base_path):
 
 
 def get_status(tart_instance):
-    """Generate JSON from status"""
     vals = tart_instance.read_status(False)
     d = tart_instance.extract(vals)
     d["timestamp"] = utc.now()
@@ -167,7 +279,6 @@ def run_diagnostic(tart, runtime_config):
     runtime_config["channels"] = channels
     runtime_config["channels_timestamp"] = utc.now()
     runtime_config["status"] = d
-
     print("\nDone.")
 
 

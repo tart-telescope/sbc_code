@@ -8,6 +8,7 @@ Flask status logic while providing FastAPI-compatible responses.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from tart.util import utc
 
 from database import AsyncDatabase, get_database
 from generated_models.status_models import (
@@ -19,8 +20,6 @@ from generated_models.status_models import (
 from ..dependencies import ConfigDep
 
 router = APIRouter()
-
-from tart.util import utc
 
 
 @router.get("/fpga", response_model=StatusFPGAResponse)
