@@ -10,7 +10,7 @@ def connect_to_db():
     # v2 utc timestamps!
     con = None
     try:
-        db_path = os.getenv("DB_PATH", "tart_web_api_database_v2.db")
+        db_path = os.getenv("DB_PATH", "/database/tart_web_api_database_v2.db")
         con = sqlite3.connect(db_path)
     except Exception as e:
         logging.error("Database connection failed: %s (%s)", e, type(e).__name__)

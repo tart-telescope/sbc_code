@@ -21,7 +21,7 @@ class AsyncDatabase:
     """Async wrapper for existing SQLite database operations."""
 
     def __init__(self, db_path: str | None = None):
-        self.db_path = db_path or os.getenv("DB_PATH", "tart_web_api_database_v2.db")
+        self.db_path = db_path or os.getenv("DB_PATH", "/database/tart_web_api_database_v2.db")
 
     @asynccontextmanager
     async def get_connection(self):

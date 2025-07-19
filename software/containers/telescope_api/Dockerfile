@@ -38,6 +38,7 @@ ENV CONFIG_DIR=/config_data
 ENV PERMUTE_DIR=/permute
 COPY ./permute.txt /permute/permute.txt
 
+RUN mkdir -p /database
 
 # Set working directory
 WORKDIR /app

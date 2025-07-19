@@ -51,11 +51,11 @@ services:
 
     # Port 5000
     telescope-api:
-        image: ghcr.io/tart-telescope/sbc_code:v0.1.9.5
+        image: ghcr.io/tart-telescope/sbc_code:v0.1.9.6
         volumes:
-            -   data-volume:/telescope_data
-            -   ~/tart_web_api_store:/database/
-            -   ~/telescope_config:/config_data
+            -   ~/tart_web_api_store:/database/ # dir where the sqlite database is stored
+            -   ~/telescope_config:/config_data # dir where telescope_config.json and calibratied_antenna_positions.json are expected
+            -   data-volume:/telescope_data # shared between containers. serving vis and raw hdf files as static files through nginx
         # Comment the following two lines to disable access to the TART hardware (this allows testing of software on a desktop)
         devices:
            - /dev/spidev0.0
