@@ -3,6 +3,7 @@
 FROM python:3.13 AS builder
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
+ENV UV_LINK_MODE=copy
 
 # Copy pyproject.toml first for dependency caching
 COPY tart_api/pyproject.toml ./
