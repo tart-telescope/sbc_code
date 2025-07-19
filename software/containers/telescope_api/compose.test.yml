@@ -11,16 +11,9 @@ services:
       - LOGIN_PW=password
       - SECRET_KEY=super-secret-123897219379179464asd13khk213
       - LOGLEVEL=DEBUG
-      - DATA_ROOT=/telescope_data
-      - CONFIG_DIR=/config_data
-      - PERMUTE_DIR=/permute
-      - DB_PATH=/app/test_database.db
     volumes:
-      - ./tart_api:/app:rw
-      - ./hardware_interface:/hardware_interface:ro
       - ../../telescope_config.json:/config_data/telescope_config.json
       - ../../calibrated_antenna_positions.json:/config_data/calibrated_antenna_positions.json
-      - ./permute.txt:/permute/permute.txt:ro
       - telescope_data_test:/telescope_data
     restart: "no"
     command: ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"]

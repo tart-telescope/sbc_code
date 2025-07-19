@@ -8,7 +8,7 @@ from .tartspi import TartSPI
 
 def load_permute(noisy=False):
     """Load a permutation vector from the file at the given filepath."""
-    filepath = os.path.join(os.environ["PERMUTE_DIR"], "permute.txt")
+    filepath = os.environ.get("PERMUTE_PATH", "/permute/permute.txt")
     pp = np.loadtxt(filepath, dtype="int")
     return pp
 

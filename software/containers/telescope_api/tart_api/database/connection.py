@@ -6,7 +6,6 @@ operations while maintaining compatibility with the Flask codebase.
 """
 
 import asyncio
-import os
 
 # Import existing database functions to reuse logic
 from contextlib import asynccontextmanager
@@ -21,7 +20,7 @@ class AsyncDatabase:
     """Async wrapper for existing SQLite database operations."""
 
     def __init__(self, db_path: str | None = None):
-        self.db_path = db_path or os.getenv("DB_PATH", "/database/tart_web_api_database_v2.db")
+        self.db_path = db_ops.get_db_path()
 
     @asynccontextmanager
     async def get_connection(self):

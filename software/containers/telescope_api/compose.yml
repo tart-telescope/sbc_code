@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runtime
-    container_name: tart-fastapi-dev
+    container_name: telescope-api-dev
     ports:
       - "8000:5000"
     environment:

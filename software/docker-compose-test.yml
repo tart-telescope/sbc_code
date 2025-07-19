@@ -8,55 +8,46 @@
 #   Author: Tim Molteno (c) 2019-2024.
 
 services:
-
-    api_container: # Port 5000 internal only
-        build: 
-            context: ./containers/telescope_web_api
-        volumes:
-            -   data-volume:/telescope_data
-            -   ~/tart_web_api_store:/app
-            -   ~/telescope_config:/config_data
-        environment:
-            # Change the following to be something secure. You will use this to login to your telescope from the web api.
-            - LOGIN_PW=${LOGIN_PW}
-        restart: always
-        logging:
-            driver: "json-file"
-            options:
-                max-file: "5"
-                max-size: "10m"
-
-    api_doc_server: # Port 80 internally only
-        build:
-            context: ./containers/telescope_web_api
-            dockerfile: Dockerfile.apidoc 
-            args:
-                tart_name: ${TS_HOSTNAME}
-        restart: always
-
-    web_app:
+    ui: # Port 80 on service tailscale
+        image:  ghcr.io/tart-telescope/web_app/viewer-root:main
         depends_on:
-            - api_container
-            - api_doc_server
+            - telescope-api
+            - tailscale
         volumes:
             - data-volume:/telescope_data
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        network_mode: "service:tailscale"
+        restart: unless-stopped
+
+    # Port 5000
+    telescope-api:
+        image: ghcr.io/tart-telescope/sbc_code:v0.1.9.6
+        build:
+            context: ./containers/telescope_api
+        volumes:
+            -   ~/tart_web_api_store:/database/ # dir where the sqlite database is stored
+            -   ~/telescope_config:/config_data # dir where telescope_config.json and calibratied_antenna_positions.json are expected
+            -   data-volume:/telescope_data # shared between containers. serving vis and raw hdf files as static files through nginx
+        # Comment the following two lines to disable access to the TART hardware (this allows testing of software on a desktop)
+        devices:
+           - /dev/spidev0.0
         environment:
-            - NODE_ENV=production
-        ports: 
-            - 80:80
-        build: 
-            context: ./containers/web_app
-            args:
-                # Change this if you desire. Really only needed for running multiple TART telescopes and reverse proxying.
-                tart_name: ${TS_HOSTNAME}
-        restart: always
-        logging:
-            driver: "json-file"
-            options:
-                max-file: "5"
-                max-size: "10m"
+            # Change the following env vars or create a .env. You will use this to login to your telescope from the Web UI or CLI.
+            - LOGIN_PW=${LOGIN_PW}
+            - SECRET_KEY=${SECRET_KEY}
+            # Optional environment variables for configuring the telescope
+            # - CONFIG_DIR=/config
+            # - DATA_ROOT=/telescope_data
+            # - LOGLEVEL=DEBUG
+        ports:
+            - 5000:5000
+        restart: unless-stopped
+        depends_on:
+            - tailscale
+
+
+
 
 volumes:
     # Mounted on each container as /telescope_data, used for raw data and vis data. This is a hardcoded path in each container.
-    data-volume:
-
+    data-volume-test:

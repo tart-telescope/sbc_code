@@ -1,4 +1,4 @@
-FROM python:3.13-bullseye
+FROM python:3.13-slim
 
 # Install curl for health checks and testing
 RUN apt-get update && apt-get install -y \
@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install uv for package management
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+ENV UV_LINK_MODE=copy
 
 # Set working directory
 WORKDIR /app
@@ -15,7 +16,9 @@ WORKDIR /app
 COPY test/requirements.txt .
 
 # Install test dependencies
-RUN uv pip install --system -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/uv uv pip install --system -r requirements.txt
+
+COPY tart_api ./
 
 # Copy test files
 COPY test/ ./test/
