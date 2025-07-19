@@ -4,24 +4,12 @@ This directory contains Dockerfiles that automate the execution of the parts of 
 
 Author: Tim Molteno (tim@elec.ac.nz)
 
-### Web Application (web_app)
+### Web Application (ui)
 
-This is a javascript application that runs in a browser (anywhere on earth) and communicates with the web API to view the telescope. 
-This docker image should be installed on the raspberry pi with the telescope hardware.
+This is a containerized javascript application served by a web server on the raspberry pi that runs in a browser and communicates with the Telescope API to view the telescope.
+This docker image should be installed on the raspberry pi with the telescope hardware and/or on a remote server.
 
-### Telescope Web API
+### Telescope API (telescope_api)
 
 This allows remote control of the telescope via a Restful interface. The web front end uses this API to configure and get data from the telescope.
-
 This docker image should be installed on the raspberry pi with the telescope hardware.
-
-### Calibration Server
-
-A server that runs at regular intervals and uses known objects in the sky to calibrate the telescope.
-
-This docker image should be installed on a reasonably powerful server with access to the telescope web api server.
-
-
-### Object Position Server
-
-A restful API server that returns the positions in the sky of known L1 sources for a telescope at any position on earth.

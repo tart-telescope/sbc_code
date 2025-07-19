@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     secret_key: str = "super-secret-123897219379179464asd13khk213"
     jwt_header_type: str = "JWT"
     login_password: str = "password"
-    config_dir: str = "/config"
+    config_root: str = "/config_data"
     data_root: str = "/telescope_data"
 
     class Config:
@@ -42,8 +42,8 @@ def create_runtime_config() -> Any:
     config_dict = {}
 
     # Copy all the existing config initialization logic
-    data_root = "/telescope_data"
-    config_root = os.environ["CONFIG_DIR"]
+    config_root = settings.config_root
+    data_root = settings.data_root
 
     config_dict["spi_speed"] = 32000000
     config_dict["acquire"] = False
@@ -88,9 +88,7 @@ def create_runtime_config() -> Any:
         "base_path": os.path.join(data_root, "vis"),
     }
 
-    config_dict["telescope_config_path"] = os.path.join(
-        config_root, "telescope_config.json"
-    )
+    config_dict["telescope_config_path"] = os.path.join(config_root, "telescope_config.json")
 
     # Load telescope config if file exists
     try:
@@ -99,7 +97,7 @@ def create_runtime_config() -> Any:
     except (FileNotFoundError, json.JSONDecodeError):
         # Fallback config for development
         config_dict["telescope_config"] = {
-            "name": "TART",
+            "name": "TART - Fallback Config",
             "frequency": 1575.42e6,
             "L0_frequency": 1575.42e6,
             "baseband_frequency": 0.0,
@@ -112,9 +110,7 @@ def create_runtime_config() -> Any:
         }
 
     # Load antenna positions - fail hard if file doesn't exist (like Flask app)
-    antenna_positions_path = os.path.join(
-        config_root, "calibrated_antenna_positions.json"
-    )
+    antenna_positions_path = os.path.join(config_root, "calibrated_antenna_positions.json")
     with open(antenna_positions_path) as a_c:
         config_dict["antenna_positions"] = json.load(a_c)
         a_c.close()

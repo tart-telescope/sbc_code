@@ -34,11 +34,6 @@ async def get_status_fpga(config: ConfigDep):
         ret = dict(config["status"])
         ret["hostname"] = config["hostname"]
 
-        # Fix SYS_STATS.state enum value - clamp to 0-1 range
-        if "SYS_STATS" in ret and "state" in ret["SYS_STATS"]:
-            state_val = ret["SYS_STATS"]["state"]
-            ret["SYS_STATS"]["state"] = 1 if state_val > 0 else 0
-
         return StatusFPGAResponse(**ret)
     else:
         # Return empty status with required fields when no status available
