@@ -17,6 +17,8 @@ COPY test/requirements.txt .
 # Install test dependencies
 RUN uv pip install --system -r requirements.txt
 
+COPY tart_api ./
+
 # Copy test files
 COPY test/ ./test/
 

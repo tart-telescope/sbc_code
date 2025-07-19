@@ -19,6 +19,8 @@ RUN find /usr/local/lib/python3.13/site-packages -name '*dist-info' -type d -exe
 
 # Test builder stage - includes test extras
 FROM builder AS test-builder
+COPY ./permute.txt /permute/permute.txt
+COPY tart_api/ /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --system "/hardware_interface[test]"
 
@@ -29,15 +31,7 @@ FROM python:3.13-slim AS runtime
 # Set environment variables
 ENV PYTHONPATH=/app:/app/app
 
-# Path shared with the nginx to serve static files
-ENV DATA_ROOT=/telescope_data
-
-# Default path for the configuration files
-ENV CONFIG_DIR=/config_data
-
-ENV PERMUTE_DIR=/permute
 COPY ./permute.txt /permute/permute.txt
-
 RUN mkdir -p /database
 
 # Set working directory
