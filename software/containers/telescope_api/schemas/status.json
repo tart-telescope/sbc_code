@@ -89,7 +89,7 @@
               "description": "Capture enabled flag"
             },
             "state": {
-              "$ref": "models/common.json#/definitions/FPGABinaryFlag",
+              "$ref": "models/common.json#/definitions/FPGAStateFlag",
               "description": "System state"
             },
             "viz_en": {
