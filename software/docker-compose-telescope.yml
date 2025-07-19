@@ -1,11 +1,16 @@
 ### This set of services is for the TART telescope. It orchestrates the following services:
-#
-#   RESTful API (api_container)
-#   TART web front end app (web_app)
-#   RESTful API documentation (api_doc_server). Connect to this via http://localhost:5000.
-#   VPN connection to the cloud
+#   Tailscale Sidecar: tailscale
+#   Web UI and API proxy(nginx): ui
+#   API container: telescope-api
 #
 #   Author: Tim Molteno (c) 2019-2024.
+#   Updates: Max Scheel - 2025
+
+x-logging: &default-logging
+    driver: "json-file"
+    options:
+        max-file: "5"
+        max-size: "10m"
 
 services:
     tailscale:
@@ -14,7 +19,7 @@ services:
             - "8000:80"
         volumes:
             - "./tailscale/var_lib:/var/lib"        # State data will be stored in this directory
-            - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work 
+            - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work
         cap_add:                                    # Required for tailscale to work
             - net_admin
             - sys_module
@@ -29,63 +34,46 @@ services:
             retries: 3 # Number of retries before marking as unhealthy
             start_period: 10s # Time to wait before starting health checks
         restart: unless-stopped
-        logging:
-            driver: "json-file"
-            options:
-                max-file: "5"
-                max-size: "10m"
+        logging: *default-logging
 
-    api_container: # Port 5000
-        image: tmolteno/tart_web_api
+    # UI and Proxy for API.
+    ui: # Port 80 on service tailscale
+        image:  ghcr.io/tart-telescope/web_app/viewer-root:main
+        depends_on:
+            - telescope-api
+            - tailscale
+        volumes:
+            - data-volume:/telescope_data
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        network_mode: "service:tailscale"
+        restart: unless-stopped
+        logging: *default-logging
+
+    # Port 5000
+    telescope-api:
+        image: ghcr.io/tart-telescope/sbc_code:v0.1.9.5
         volumes:
             -   data-volume:/telescope_data
-            -   ~/tart_web_api_store:/app
+            -   ~/tart_web_api_store:/database/
             -   ~/telescope_config:/config_data
         # Comment the following two lines to disable access to the TART hardware (this allows testing of software on a desktop)
         devices:
            - /dev/spidev0.0
         environment:
-            # Change the following to be something secure. You will use this to login to your telescope from the web api.
+            # Change the following env vars or create a .env. You will use this to login to your telescope from the Web UI or CLI.
             - LOGIN_PW=${LOGIN_PW}
+            - SECRET_KEY=${SECRET_KEY}
+            # Optional environment variables for configuring the telescope
+            # - CONFIG_DIR=/config
+            # - DATA_ROOT=/telescope_data
+            # - LOGLEVEL=DEBUG
         ports:
             - 5000:5000
-        restart: always
+        restart: unless-stopped
         depends_on:
             - tailscale
-        logging:
-            driver: "json-file"
-            options:
-                max-file: "5"
-                max-size: "10m"
-
-    api_doc_server: # Port 80 internal
-        build:
-            context: ./containers/telescope_web_api
-            dockerfile: Dockerfile.apidoc 
-            args:
-                tart_name: ${TS_HOSTNAME}
-        restart: always
-        depends_on:
-            - tailscale
-
-    web_app: # Port 80 on service tailscale
-        depends_on:
-            - api_container
-            - api_doc_server
-        volumes:
-            - data-volume:/telescope_data
-        environment:
-            - NODE_ENV=production
-        image: docker.io/tmolteno/tart_web_front_end:1.0.1
-        network_mode: "service:tailscale"
-        restart: always
-        logging:
-            driver: "json-file"
-            options:
-                max-file: "5"
-                max-size: "10m"
+        logging: *default-logging
 
 volumes:
     # Mounted on each container as /telescope_data, used for raw data and vis data. This is a hardcoded path in each container.
     data-volume:
-

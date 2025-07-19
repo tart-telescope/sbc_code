@@ -1,25 +1,25 @@
 services:
-  tart-api-test:
+  telescope-api-test:
     build:
       context: .
       dockerfile: Dockerfile
       target: test-builder
-    container_name: tart-fastapi-test
+    container_name: telescope-api-test
     ports:
       - "8001:5000"
     environment:
-      - CONFIG_DIR=/config
-      - DATA_ROOT=/telescope_data
       - LOGIN_PW=password
       - SECRET_KEY=super-secret-123897219379179464asd13khk213
       - LOGLEVEL=DEBUG
+      - DATA_ROOT=/telescope_data
+      - CONFIG_DIR=/config_data
       - PERMUTE_DIR=/permute
       - DB_PATH=/app/test_database.db
     volumes:
       - ./tart_api:/app:rw
       - ./hardware_interface:/hardware_interface:ro
-      - ../../telescope_config.json:/config/telescope_config.json
-      - ../../calibrated_antenna_positions.json:/config/calibrated_antenna_positions.json
+      - ../../telescope_config.json:/config_data/telescope_config.json
+      - ../../calibrated_antenna_positions.json:/config_data/calibrated_antenna_positions.json
       - ./permute.txt:/permute/permute.txt:ro
       - telescope_data_test:/telescope_data
     restart: "no"
@@ -33,18 +33,16 @@ services:
     networks:
       - tart-test-network
 
-
-
   test-runner:
     build:
       context: .
       dockerfile: test/Dockerfile
     container_name: tart-test-runner
     depends_on:
-      tart-api-test:
+      telescope-api-test:
         condition: service_healthy
     environment:
-      - API_BASE_URL=http://tart-api-test:5000
+      - API_BASE_URL=http://telescope-api-test:5000
       - TEST_USERNAME=admin
       - TEST_PASSWORD=password
     volumes:

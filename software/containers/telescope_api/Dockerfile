@@ -52,5 +52,9 @@ COPY tart_api/ ./
 # Expose port
 EXPOSE 5000
 
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=5s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"
+
 # Run the application
 CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"]
