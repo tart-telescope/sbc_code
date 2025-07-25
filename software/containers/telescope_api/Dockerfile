@@ -1,5 +1,8 @@
 # Build stage
-FROM python:3.13 AS builder
+FROM --platform=$BUILDPLATFORM python:3.13 AS builder
+
+# Platform build arguments
+ARG BUILDPLATFORM
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL="/bin/" sh
 WORKDIR /app
