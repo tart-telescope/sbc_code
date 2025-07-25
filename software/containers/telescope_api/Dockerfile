@@ -1,7 +1,7 @@
-# syntax=docker/dockerfile:1
 # Build stage
 FROM python:3.13 AS builder
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL="/bin/" sh
 WORKDIR /app
 ENV UV_LINK_MODE=copy
 
