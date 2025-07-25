@@ -3,9 +3,7 @@ variable "DEFAULT_TAG" {
 }
 
 # https://github.com/docker/metadata-action#bake-definition
-target "docker-metadata-action" {
-  tags = ["${DEFAULT_TAG}"]
-}
+target "docker-metadata-action" {}
 
 # Default target
 group "default" {
@@ -40,7 +38,13 @@ target "image-all" {
 }
 
 target "image-cross" {
-  inherits = ["image-all", "docker-metadata-action"]
+  inherits = ["image", "docker-metadata-action"]
+  platforms = [
+    "linux/amd64",
+    "linux/arm/v6", 
+    "linux/arm/v7",
+    "linux/arm64"
+  ]
   cache-from = ["type=gha"]
   cache-to = ["type=gha,mode=max"]
 }
