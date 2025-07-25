@@ -24,11 +24,13 @@ target "image" {
 
 target "image-local" {
   inherits = ["image"]
+  tags = ["${DEFAULT_TAG}"]
   platforms = ["linux/amd64"]
 }
 
 target "image-all" {
   inherits = ["image"]
+  tags = ["${DEFAULT_TAG}"]
   platforms = [
     "linux/amd64",
     "linux/arm/v6", 
