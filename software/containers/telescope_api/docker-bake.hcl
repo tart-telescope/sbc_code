@@ -31,7 +31,6 @@ target "image-all" {
   tags = ["${DEFAULT_TAG}"]
   platforms = [
     "linux/amd64",
-    "linux/arm/v6", 
     "linux/arm/v7",
     "linux/arm64"
   ]
@@ -41,7 +40,6 @@ target "image-cross" {
   inherits = ["image", "docker-metadata-action"]
   platforms = [
     "linux/amd64",
-    "linux/arm/v6", 
     "linux/arm/v7",
     "linux/arm64"
   ]
