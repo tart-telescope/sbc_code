@@ -42,6 +42,8 @@ WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
+RUN apt-get update && apt-get install -y libhdf5-dev && rm -rf /var/lib/apt/lists/*
+
 # Copy the entire tart_api directory structure (includes generated_models now)
 COPY tart_api/ ./
 
