@@ -1,10 +1,10 @@
 # Build stage
 FROM python:3.13 AS builder
+RUN apt-get update && apt-get install -y pkg-config libhdf5-dev && rm -rf /var/lib/apt/lists/*
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL="/bin/" sh
 WORKDIR /app
 ENV UV_LINK_MODE=copy
-
 # Copy pyproject.toml first for dependency caching
 COPY tart_api/pyproject.toml ./
 RUN --mount=type=cache,target=/root/.cache/uv \
