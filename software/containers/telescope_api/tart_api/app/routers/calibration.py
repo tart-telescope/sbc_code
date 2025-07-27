@@ -7,7 +7,7 @@ Flask calibration logic while providing FastAPI-compatible responses.
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from database import AsyncDatabase, get_database
 from generated_models.calibration_models import (
@@ -41,7 +41,7 @@ async def set_gain(
 
 @router.post("/antenna_positions", response_model=EmptyResponse)
 async def set_calibration_antenna_positions(
-    antenna_positions_request: SetAntennaPositionsRequest,
+    antenna_positions: SetAntennaPositionsRequest | list[list[float]],
     config: ConfigDep,
     _: AuthDep,
 ):
@@ -49,10 +49,19 @@ async def set_calibration_antenna_positions(
     Set antenna positions.
 
     This endpoint reuses the existing Flask logic for antenna position calibration.
+    Supports both new format: {"antenna_positions": [...]} and legacy format: [[1,2,3],[4,5,6],...].
     Requires JWT authentication.
     """
-    # Extract raw data from pydantic models to avoid serialization issues with multiprocessing
-    raw_positions = [pos.root for pos in antenna_positions_request.antenna_positions]
+    # Handle both formats: new structured format and legacy array format
+    if isinstance(antenna_positions, SetAntennaPositionsRequest):
+        # New format: {"antenna_positions": [...]}
+        raw_positions = [pos.root for pos in antenna_positions.antenna_positions]
+    elif isinstance(antenna_positions, list):
+        # Legacy format: [[1,2,3],[4,5,6],...]
+        raw_positions = antenna_positions
+    else:
+        raise HTTPException(status_code=422, detail="Invalid antenna positions format")
+
     config["antenna_positions"] = raw_positions
     return EmptyResponse()
 

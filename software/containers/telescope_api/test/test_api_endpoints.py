@@ -629,6 +629,55 @@ class TARTAPITestClient:
         )
         assert response.status_code == 200
 
+    def test_antenna_positions_formats(self):
+        """Test that both new and legacy antenna positions formats are accepted."""
+        # Get original positions
+        response = requests.get(f"{self.base_url}/imaging/antenna_positions")
+        assert response.status_code == 200
+        original_positions = response.json()
+
+        # Test new format: {"antenna_positions": [...]}
+        self.authenticate()
+        new_format_payload = {"antenna_positions": [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]}
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions",
+            json=new_format_payload,
+            headers=self.headers,
+        )
+        assert response.status_code == 200
+
+        # Verify new format was set
+        response = requests.get(f"{self.base_url}/imaging/antenna_positions")
+        assert response.status_code == 200
+        retrieved_positions = response.json()
+        assert retrieved_positions == [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]
+
+        # Test legacy format: [[1,2,3],[4,5,6],...]
+        self.authenticate()
+        legacy_format_payload = [[7.0, 8.0, 9.0], [10.0, 11.0, 12.0]]
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions",
+            json=legacy_format_payload,
+            headers=self.headers,
+        )
+        assert response.status_code == 200
+
+        # Verify legacy format was set
+        response = requests.get(f"{self.base_url}/imaging/antenna_positions")
+        assert response.status_code == 200
+        retrieved_positions = response.json()
+        assert retrieved_positions == [[7.0, 8.0, 9.0], [10.0, 11.0, 12.0]]
+
+        # Restore original positions
+        self.authenticate()
+        restore_payload = {"antenna_positions": original_positions}
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions",
+            json=restore_payload,
+            headers=self.headers,
+        )
+        assert response.status_code == 200
+
 
 # Fixture for the test class
 @pytest.fixture
@@ -704,3 +753,7 @@ def test_antenna_management(api_client):
 
 def test_antenna_positions_persistence(api_client):
     api_client.test_antenna_positions_persistence()
+
+
+def test_antenna_positions_formats(api_client):
+    api_client.test_antenna_positions_formats()
