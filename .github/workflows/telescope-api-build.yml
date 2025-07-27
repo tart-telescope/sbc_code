@@ -28,22 +28,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push image
-        id: push
-        uses: docker/build-push-action@v6
+        uses: docker/bake-action@v5
         with:
-          context: ./software/containers/telescope_api
-          file: ./software/containers/telescope_api/Dockerfile
+          workdir: ./software/containers/telescope_api
+          targets: image-cross
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file }}
