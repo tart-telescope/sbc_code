@@ -12,7 +12,6 @@ import os
 import time
 
 from tart.imaging import visibility
-from tart.util import utc
 from tart_hardware_interface.highlevel_modes_api import (
     run_acquire_raw,
     run_diagnostic,
@@ -91,7 +90,7 @@ def create_direct_vis_dict(vis):
         i, j = b
         vis_el = {"i": i, "j": j, "re": v.real, "im": v.imag}
         vis_list.append(vis_el)
-    vis_dict = {"data": vis_list, "timestamp": utc.to_string(vis.timestamp)}
+    vis_dict = {"data": vis_list, "timestamp": vis.timestamp}
     return vis_dict
 
 
@@ -169,7 +168,11 @@ class TartControl:
         while self.queue_vis.qsize() > 0:
             vis, means = self.queue_vis.get()
             if vis is not None:
-                self.config["vis_current"] = create_direct_vis_dict(vis)
+                vis_dict = create_direct_vis_dict(vis)
+                self.config["vis_current"] = vis_dict
+                # Extract timestamp from the vis_current data to ensure consistency
+                if "timestamp" in vis_dict:
+                    self.config["vis_timestamp"] = vis_dict["timestamp"]
                 self.vislist.append(vis)
                 logging.debug(f"Updated vis list N={len(self.vislist)}")
 

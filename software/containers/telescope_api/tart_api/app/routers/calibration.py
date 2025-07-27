@@ -51,14 +51,14 @@ async def set_calibration_antenna_positions(
     This endpoint reuses the existing Flask logic for antenna position calibration.
     Requires JWT authentication.
     """
-    config["antenna_positions"] = antenna_positions_request.antenna_positions
+    # Extract raw data from pydantic models to avoid serialization issues with multiprocessing
+    raw_positions = [pos.root for pos in antenna_positions_request.antenna_positions]
+    config["antenna_positions"] = raw_positions
     return EmptyResponse()
 
 
 @router.get("/gain", response_model=GetGainResponse)
-async def get_gain(
-    config: ConfigDep, db: Annotated[AsyncDatabase, Depends(get_database)]
-):
+async def get_gain(config: ConfigDep, db: Annotated[AsyncDatabase, Depends(get_database)]):
     """
     Get channel based complex gains.
 

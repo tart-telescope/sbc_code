@@ -54,16 +54,12 @@ class TARTAPITestClient:
             # Save original raw num samples exp
             response = requests.get(f"{self.base_url}/acquire/raw/num_samples_exp")
             if response.status_code == 200:
-                self.original_state["raw_num_samples_exp"] = response.json().get(
-                    "N_samples_exp"
-                )
+                self.original_state["raw_num_samples_exp"] = response.json().get("N_samples_exp")
 
             # Save original vis num samples exp
             response = requests.get(f"{self.base_url}/acquire/vis/num_samples_exp")
             if response.status_code == 200:
-                self.original_state["vis_num_samples_exp"] = response.json().get(
-                    "N_samples_exp"
-                )
+                self.original_state["vis_num_samples_exp"] = response.json().get("N_samples_exp")
 
             # Save original channel states
             response = requests.get(f"{self.base_url}/channel")
@@ -215,9 +211,7 @@ class TARTAPITestClient:
 
         # Test refresh token
         refresh_headers = {"Authorization": f"Bearer {data['refresh_token']}"}
-        response = requests.post(
-            f"{self.base_url}/auth/refresh", headers=refresh_headers
-        )
+        response = requests.post(f"{self.base_url}/auth/refresh", headers=refresh_headers)
         assert response.status_code == 200
 
         refresh_data = response.json()
@@ -254,9 +248,7 @@ class TARTAPITestClient:
         for mode in test_modes:
             if mode in available_modes:
                 self.authenticate()
-                response = requests.post(
-                    f"{self.base_url}/mode/{mode}", headers=self.headers
-                )
+                response = requests.post(f"{self.base_url}/mode/{mode}", headers=self.headers)
                 assert response.status_code == 200
 
                 data = response.json()
@@ -281,9 +273,7 @@ class TARTAPITestClient:
 
         for loop_mode in loop_modes:
             self.authenticate()
-            response = requests.post(
-                f"{self.base_url}/loop/{loop_mode}", headers=self.headers
-            )
+            response = requests.post(f"{self.base_url}/loop/{loop_mode}", headers=self.headers)
             assert response.status_code == 200
 
             data = response.json()
@@ -392,9 +382,20 @@ class TARTAPITestClient:
         # Data is returned as a list directly, not wrapped in "positions"
         assert isinstance(data, list)
 
-        # Test timestamp
+        # Test timestamp - may return 404 if no visibility data available
         response = requests.get(f"{self.base_url}/imaging/timestamp")
-        assert response.status_code == 200
+        assert response.status_code in [200, 404]
+
+        if response.status_code == 200:
+            # If we have visibility data, should return a valid ISO timestamp string
+            timestamp = response.json()
+            assert isinstance(timestamp, str)
+            # Should be a valid ISO timestamp format (ends with Z or timezone offset)
+            assert timestamp.endswith("Z") or ("+" in timestamp[-6:] or "-" in timestamp[-6:])
+        else:
+            # If no visibility data, should return 404 with error message
+            error_data = response.json()
+            assert "detail" in error_data
 
     def test_channel_endpoints(self):
         """Test channel management endpoints."""
@@ -409,22 +410,16 @@ class TARTAPITestClient:
         if len(data) > 0:
             # Test enabling/disabling first channel
             self.authenticate()
-            response = requests.put(
-                f"{self.base_url}/channel/0/1", headers=self.headers
-            )
+            response = requests.put(f"{self.base_url}/channel/0/1", headers=self.headers)
             assert response.status_code == 200
 
             self.authenticate()
-            response = requests.put(
-                f"{self.base_url}/channel/0/0", headers=self.headers
-            )
+            response = requests.put(f"{self.base_url}/channel/0/0", headers=self.headers)
             assert response.status_code == 200
 
             # Always re-enable the channel after testing
             self.authenticate()
-            response = requests.put(
-                f"{self.base_url}/channel/0/1", headers=self.headers
-            )
+            response = requests.put(f"{self.base_url}/channel/0/1", headers=self.headers)
             assert response.status_code == 200
 
     def test_data_endpoints(self):
@@ -461,9 +456,7 @@ class TARTAPITestClient:
             elif method == "PUT":
                 response = requests.put(f"{self.base_url}{endpoint}")
 
-            assert response.status_code == 401, (
-                f"Endpoint {endpoint} should require authentication"
-            )
+            assert response.status_code == 401, f"Endpoint {endpoint} should require authentication"
 
     def test_openapi_docs(self):
         """Test that OpenAPI documentation is accessible."""
@@ -490,9 +483,7 @@ class TARTAPITestClient:
         """Test error handling for invalid requests."""
         # Test invalid mode
         self.authenticate()
-        response = requests.post(
-            f"{self.base_url}/mode/invalid_mode", headers=self.headers
-        )
+        response = requests.post(f"{self.base_url}/mode/invalid_mode", headers=self.headers)
         assert response.status_code == 422  # Validation error
 
         # Test invalid channel
@@ -534,9 +525,7 @@ class TARTAPITestClient:
         assert "data" in data
 
         # Should have visibility data after being in vis mode
-        assert len(data["data"]) > 0, (
-            "No visibility data collected after 3 seconds in vis mode"
-        )
+        assert len(data["data"]) > 0, "No visibility data collected after 3 seconds in vis mode"
 
         # Check data structure
         if data["data"]:
@@ -560,9 +549,7 @@ class TARTAPITestClient:
 
         for channel_id in test_channels:
             self.authenticate()
-            response = requests.put(
-                f"{self.base_url}/channel/{channel_id}/0", headers=self.headers
-            )
+            response = requests.put(f"{self.base_url}/channel/{channel_id}/0", headers=self.headers)
             assert response.status_code == 200
 
         # Verify they are disabled
@@ -579,9 +566,7 @@ class TARTAPITestClient:
         # Re-enable all channels
         for channel_id in test_channels:
             self.authenticate()
-            response = requests.put(
-                f"{self.base_url}/channel/{channel_id}/1", headers=self.headers
-            )
+            response = requests.put(f"{self.base_url}/channel/{channel_id}/1", headers=self.headers)
             assert response.status_code == 200
 
         # Verify they are enabled
@@ -594,6 +579,55 @@ class TARTAPITestClient:
                 assert channel["enabled"] == 1, (
                     f"Channel {channel['channel_id']} should be re-enabled"
                 )
+
+    def test_antenna_positions_persistence(self):
+        """Test that antenna positions set via calibration route persist when retrieved via imaging route."""
+        # First, get the original antenna positions from imaging route
+        response = requests.get(f"{self.base_url}/imaging/antenna_positions")
+        assert response.status_code == 200
+        original_positions = response.json()
+        assert isinstance(original_positions, list)
+        assert len(original_positions) > 0
+
+        # Create modified antenna positions (shift all by small amount)
+        modified_positions = []
+        for pos in original_positions:
+            modified_positions.append([pos[0] + 0.001, pos[1] + 0.001, pos[2] + 0.001])
+
+        # Set new antenna positions via calibration route
+        self.authenticate()
+        payload = {"antenna_positions": modified_positions}
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions", json=payload, headers=self.headers
+        )
+        assert response.status_code == 200
+
+        # Wait a brief moment for the config to propagate
+        import time
+
+        time.sleep(0.5)
+
+        # Retrieve antenna positions via imaging route
+        response = requests.get(f"{self.base_url}/imaging/antenna_positions")
+        assert response.status_code == 200
+        retrieved_positions = response.json()
+
+        # Verify the positions match what we set
+        assert len(retrieved_positions) == len(modified_positions)
+        for i, (set_pos, retrieved_pos) in enumerate(zip(modified_positions, retrieved_positions)):
+            for j, (set_coord, retrieved_coord) in enumerate(zip(set_pos, retrieved_pos)):
+                assert abs(set_coord - retrieved_coord) < 1e-10, (
+                    f"Position mismatch at antenna {i}, coordinate {j}: "
+                    f"set {set_coord}, retrieved {retrieved_coord}"
+                )
+
+        # Restore original positions
+        self.authenticate()
+        payload = {"antenna_positions": original_positions}
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions", json=payload, headers=self.headers
+        )
+        assert response.status_code == 200
 
 
 # Fixture for the test class
@@ -666,3 +700,7 @@ def test_visibility_data_collection(api_client):
 
 def test_antenna_management(api_client):
     api_client.test_antenna_management()
+
+
+def test_antenna_positions_persistence(api_client):
+    api_client.test_antenna_positions_persistence()
