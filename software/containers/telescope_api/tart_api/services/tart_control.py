@@ -169,7 +169,13 @@ class TartControl:
         while self.queue_vis.qsize() > 0:
             vis, means = self.queue_vis.get()
             if vis is not None:
-                self.config["vis_current"] = create_direct_vis_dict(vis)
+                vis_dict = create_direct_vis_dict(vis)
+                self.config["vis_current"] = vis_dict
+                # Extract timestamp from the vis_current data to ensure consistency
+                if "timestamp" in vis_dict:
+                    from tart.util import utc
+
+                    self.config["vis_timestamp"] = utc.from_string(vis_dict["timestamp"])
                 self.vislist.append(vis)
                 logging.debug(f"Updated vis list N={len(self.vislist)}")
 
