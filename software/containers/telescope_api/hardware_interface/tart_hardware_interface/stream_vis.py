@@ -59,28 +59,28 @@ def get_vis_object(data, runtime_config):
     return vis, means, timestamp
 
 
-def get_data(tart):
-    viz = tart.vis_read(noisy=False)
-    if tart.spi is None:
+def get_data(tart_instance):
+    viz = tart_instance.vis_read(noisy=False)
+    if tart_instance.spi is None:
         return viz
-    return viz[tart.perm]
+    return viz[tart_instance.perm]
 
 
 def capture_loop(
-    tart,
+    tart_instance,
     process_queue,
     cmd_queue,
     runtime_config,
     logger=logger,
 ):
-    print("Capture Loop Start")
-    tart.reset()
-    tart.read_status(True)
-    tart.debug(on=False, shift=False, count=False, noisy=True)
-    tart.read_status(True)
-    tart.capture(on=True, noisy=False)
-    tart.set_sample_delay(runtime_config["sample_delay"])
-    tart.start(runtime_config["vis"]["N_samples_exp"], True)
+    logger.info("Capture Loop Start")
+    tart_instance.reset()
+    tart_instance.read_status(True)
+    tart_instance.debug(on=False, shift=False, count=False, noisy=True)
+    tart_instance.read_status(True)
+    tart_instance.capture(on=True, noisy=False)
+    tart_instance.set_sample_delay(runtime_config["sample_delay"])
+    tart_instance.start(runtime_config["vis"]["N_samples_exp"], True)
     active = 1
     while active:
         try:
@@ -89,15 +89,15 @@ def capture_loop(
                 if cmd == "stop":
                     active = 0
             # Add the data to the process queue
-            data = get_data(tart)
-            d = get_status(tart)
-            runtime_config["status"] = d
-            process_queue.put(data)
-            logger.info(("Capture Loop: Acquired"))
+            data = get_data(tart_instance)
+            d = get_status(tart_instance)
+            # Pass status data through the queue instead of updating runtime_config
+            process_queue.put((data, d))
+            logger.info(("Capture Loop: Vis Data Acquired"))
         except Exception as e:
             logger.error("Capture Loop Error %s" % str(e))
             logger.error(traceback.format_exc())
-    print("Done acquisition. Closing Capture Loop.")
+    logger.info("Done acquisition. Closing Capture Loop.")
     return 1
 
 
@@ -124,7 +124,16 @@ def process_loop(process_queue, vis_queue, cmd_queue, runtime_config, logger=log
                 if cmd == "stop":
                     active = 0
             if not process_queue.empty():
-                data = process_queue.get()
+                queue_item = process_queue.get()
+
+                # Handle both old format (data only) and new format (data, status)
+                if isinstance(queue_item, tuple) and len(queue_item) == 2:
+                    data, status = queue_item
+                    # Update runtime_config with status in the main process
+                    runtime_config["status"] = status
+                else:
+                    data = queue_item
+
                 if hasattr(data, "v"):  # Test if the data contains a vis object.
                     vis = data
                     means = np.zeros(runtime_config["telescope_config"]["num_antenna"])

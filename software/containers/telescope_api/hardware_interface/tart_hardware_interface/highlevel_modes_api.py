@@ -183,10 +183,10 @@ def get_status(tart_instance):
     return d
 
 
-def run_diagnostic(tart, runtime_config):
+def run_diagnostic(tart_instance, runtime_config):
     # pp = tart.load_permute()
     logging.info("Enabling DEBUG mode")
-    tart.debug(
+    tart_instance.debug(
         on=not runtime_config["acquire"],
         shift=runtime_config["shifter"],
         count=runtime_config["counter"],
@@ -201,15 +201,15 @@ def run_diagnostic(tart, runtime_config):
     phases = []
 
     for src in range(num_ant):
-        tart.reset()
-        tart.capture(on=True, source=src, noisy=runtime_config["verbose"])
-        tart.centre(runtime_config["centre"], noisy=runtime_config["verbose"])
-        tart.start(runtime_config["diagnostic"]["N_samples_exp"], True)
+        tart_instance.reset()
+        tart_instance.capture(on=True, source=src, noisy=runtime_config["verbose"])
+        tart_instance.centre(runtime_config["centre"], noisy=runtime_config["verbose"])
+        tart_instance.start(runtime_config["diagnostic"]["N_samples_exp"], True)
         k = 0
         measured_phases = []
         while k < N_samples:
             k += 1
-            d = get_status(tart)
+            d = get_status(tart_instance)
             measured_phases.append(d["TC_STATUS"]["phase"])
 
         phases.append(
@@ -234,21 +234,23 @@ def run_diagnostic(tart, runtime_config):
     runtime_config["sample_delay"] = delay_to_be_set
 
     logging.info("Starting small test acquisition")
-    tart.reset()
-    tart.debug(on=False, noisy=runtime_config["verbose"])
-    tart.set_sample_delay(delay_to_be_set)
-    tart.capture(on=True, source=0, noisy=runtime_config["verbose"])
-    tart.centre(runtime_config["centre"], noisy=runtime_config["verbose"])
-    tart.start_acquisition(1.1, True)
+    tart_instance.reset()
+    tart_instance.debug(on=False, noisy=runtime_config["verbose"])
+    tart_instance.set_sample_delay(delay_to_be_set)
+    tart_instance.capture(on=True, source=0, noisy=runtime_config["verbose"])
+    tart_instance.centre(runtime_config["centre"], noisy=runtime_config["verbose"])
+    tart_instance.start_acquisition(1.1, True)
 
-    d = get_status(tart)
+    d = get_status(tart_instance)
 
-    while not tart.data_ready():
-        tart.pause(duration=0.005, noisy=True)
+    while not tart_instance.data_ready():
+        tart_instance.pause(duration=0.005, noisy=True)
     logging.info("Acquisition complete, beginning read-back")
-    # tart.capture(on=False, noisy=runtime_config['verbose'])
+    # tart_instance.capture(on=False, noisy=runtime_config['verbose'])
     logging.debug("N_samples_exp: %s", runtime_config["diagnostic"]["spectre"]["N_samples_exp"])
-    data = tart.read_data(num_words=2 ** runtime_config["diagnostic"]["spectre"]["N_samples_exp"])
+    data = tart_instance.read_data(
+        num_words=2 ** runtime_config["diagnostic"]["spectre"]["N_samples_exp"]
+    )
     data = np.asarray(data, dtype=np.uint8)
     ant_data = np.flipud(np.unpackbits(data).reshape(-1, 24).T)
     logging.debug("Antenna data shape: %s, first 10 samples: %s", ant_data.shape, ant_data[:, :10])
@@ -277,7 +279,7 @@ def run_diagnostic(tart, runtime_config):
         channel["radio_mean"] = radio_means[i]
         power, freq = get_psd(
             ant_data[i] - ant_data[i].mean(),
-            16e6,
+            16.368e6,
             runtime_config["diagnostic"]["spectre"]["NFFT"],
         )
         power_db = 10.0 * np.log10(power + 1e-32)  # Avoid divide by zero
@@ -297,42 +299,38 @@ RUN TART in raw data acquisition mode
 """
 
 
-def run_acquire_raw(tart, runtime_config):
+def run_acquire_raw(tart_instance, runtime_config):
     runtime_config["acquire"] = 1
-    tart.reset()
-    tart.debug(
+    tart_instance.reset()
+    tart_instance.debug(
         on=not runtime_config["acquire"],
         shift=runtime_config["shifter"],
         count=runtime_config["counter"],
         noisy=runtime_config["verbose"],
     )
-    tart.capture(on=True, source=0, noisy=runtime_config["verbose"])
-    tart.set_sample_delay(runtime_config["sample_delay"])
-    tart.centre(runtime_config["centre"], noisy=runtime_config["verbose"])
+    tart_instance.capture(on=True, source=0, noisy=runtime_config["verbose"])
+    tart_instance.set_sample_delay(runtime_config["sample_delay"])
+    tart_instance.centre(runtime_config["centre"], noisy=runtime_config["verbose"])
     t_stmp, path = create_timestamp_and_path(runtime_config["raw"]["base_path"])
-    tart.start_acquisition(1.1, True)
+    tart_instance.start_acquisition(1.1, True)
 
-    while not tart.data_ready():
-        tart.pause(duration=0.005, noisy=True)
+    while not tart_instance.data_ready():
+        tart_instance.pause(duration=0.005, noisy=True)
     logging.info("Acquisition complete, beginning read-back")
     # tart.capture(on=False, noisy=runtime_config['verbose'])
 
-    data = tart.read_data(num_words=np.power(2, runtime_config["raw"]["N_samples_exp"]))
+    data = tart_instance.read_data(num_words=np.power(2, runtime_config["raw"]["N_samples_exp"]))
 
-    d = get_status(tart)
+    d = get_status(tart_instance)
     runtime_config["status"] = d
-    tart.reset()
+    tart_instance.reset()
 
-    logging.info("Reshaping antenna data")
-    data = np.asarray(data, dtype=np.uint8)
-    ant_data = np.flipud(np.unpackbits(data).reshape(-1, 24).T)
     if runtime_config["raw"]["save"]:
+        data = np.asarray(data, dtype=np.uint8)
+        ant_data = np.flipud(np.unpackbits(data).reshape(-1, 24).T)
         config = settings.from_file(runtime_config["telescope_config_path"])
-
         fname = "data_{}.hdf".format(t_stmp.strftime("%Y-%m-%d_%H_%M_%S.%f"))
-
         filename = os.path.join(path, fname)
-
         obs = observation.Observation(t_stmp, config, savedata=ant_data)
         obs.to_hdf5(filename)
         logging.info("Saved raw data to: %s", filename)
