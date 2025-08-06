@@ -8,6 +8,7 @@ hardware, reusing the existing TartControl logic from the Flask application.
 import asyncio
 import logging
 import multiprocessing
+import time
 from typing import Any
 
 from .tart_control import (
@@ -108,10 +109,7 @@ class TelescopeControlService:
                 logger.info("Stopped telescope control process")
 
             # Stop cache cleanup processes
-            if (
-                self.observation_cache_process
-                and self.observation_cache_process.is_alive()
-            ):
+            if self.observation_cache_process and self.observation_cache_process.is_alive():
                 self.observation_cache_process.terminate()
                 self.observation_cache_process.join(timeout=5)
                 if self.observation_cache_process.is_alive():
@@ -119,10 +117,7 @@ class TelescopeControlService:
                     self.observation_cache_process.join()
                 logger.info("Stopped observation cache process")
 
-            if (
-                self.visibility_cache_process
-                and self.visibility_cache_process.is_alive()
-            ):
+            if self.visibility_cache_process and self.visibility_cache_process.is_alive():
                 self.visibility_cache_process.terminate()
                 self.visibility_cache_process.join(timeout=5)
                 if self.visibility_cache_process.is_alive():
@@ -194,6 +189,15 @@ class TelescopeControlService:
                     if field in tart_control.config:
                         shared_config[field] = tart_control.config[field]
 
+                # Add sleep to prevent excessive CPU usage in main control loop
+                # The individual state handlers (tart_control.run()) have their own sleep,
+                # but we need additional sleep here to prevent the loop from spinning
+                if current_mode == "off":
+                    # In off mode, sleep longer since nothing urgent is happening
+                    time.sleep(0.1)
+                else:
+                    time.sleep(0.01)
+
         except KeyboardInterrupt:
             logger.info("Telescope control loop interrupted")
         except Exception as e:
@@ -204,18 +208,14 @@ class TelescopeControlService:
         """Get status of all background processes."""
         return {
             "service_running": self.running,
-            "tart_process_alive": (
-                self.tart_process.is_alive() if self.tart_process else False
-            ),
+            "tart_process_alive": (self.tart_process.is_alive() if self.tart_process else False),
             "observation_cache_alive": (
                 self.observation_cache_process.is_alive()
                 if self.observation_cache_process
                 else False
             ),
             "visibility_cache_alive": (
-                self.visibility_cache_process.is_alive()
-                if self.visibility_cache_process
-                else False
+                self.visibility_cache_process.is_alive() if self.visibility_cache_process else False
             ),
             "current_mode": self.shared_config.get("mode", "unknown"),
         }
