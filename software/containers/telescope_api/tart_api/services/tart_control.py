@@ -133,7 +133,7 @@ class TartControl:
                     if "filename" in ret:
                         logging.debug(f"vis_stream_acquire = {ret}")
                         db.insert_vis_file_handle(ret["filename"], ret["sha256"])
-                    time.sleep(0.005)
+                    time.sleep(0.02)  # Reduced from 5ms to 20ms to lower CPU usage
             elif self.state == "off":
                 time.sleep(0.5)
             else:
