@@ -27,8 +27,11 @@ services:
             - TS_HOSTNAME=${TS_HOSTNAME}
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
             - TS_STATE_DIR=/var/lib/tailscale
+            - TS_ENABLE_HEALTH_CHECK=true
+            - TS_LOCAL_ADDR_PORT=127.0.0.1:41234
         healthcheck:
-            test: ["CMD", "tailscale", "status"] # Check if Tailscale is running
+            test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"]
+            # Check if Tailscale is running
             interval: 1m # How often to perform the check
             timeout: 10s # Time to wait for the check to succeed
             retries: 3 # Number of retries before marking as unhealthy
