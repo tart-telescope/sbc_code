@@ -19,8 +19,9 @@ services:
             - "8000:80"
         volumes:
             - "./tailscale/var_lib:/var/lib"        # State data will be stored in this directory
-            - "/dev/net/tun:/dev/net/tun"           # Required for tailscale to work
-        cap_add:                                    # Required for tailscale to work
+        devices:
+            - /dev/net/tun:/dev/net/tun           # Required for tailscale to work
+        cap_add:                                  # Required for tailscale to work
             - net_admin
             - sys_module
         environment:
@@ -36,8 +37,10 @@ services:
             timeout: 10s # Time to wait for the check to succeed
             retries: 3 # Number of retries before marking as unhealthy
             start_period: 10s # Time to wait before starting health checks
-        restart: unless-stopped
+        restart: always
         logging: *default-logging
+        labels:
+            autoheal: true
 
     # UI and Proxy for API.
     ui: # Port 80 on service tailscale
@@ -49,7 +52,7 @@ services:
             - data-volume:/telescope_data
             - ./nginx.conf:/etc/nginx/nginx.conf:ro
         network_mode: "service:tailscale"
-        restart: unless-stopped
+        restart: always
         logging: *default-logging
 
     # Port 5000
@@ -72,10 +75,23 @@ services:
             # - LOGLEVEL=DEBUG
         ports:
             - 5000:5000
-        restart: unless-stopped
+        restart: always
         depends_on:
             - tailscale
         logging: *default-logging
+
+
+    autoheal:
+        deploy:
+            replicas: 1
+        environment:
+            AUTOHEAL_CONTAINER_LABEL: autoheal
+        image: willfarrell/autoheal:latest
+        network_mode: none
+        restart: always
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
     # Mounted on each container as /telescope_data, used for raw data and vis data. This is a hardcoded path in each container.
