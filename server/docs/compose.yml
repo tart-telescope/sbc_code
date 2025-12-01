@@ -1,0 +1,53 @@
+services:
+  schema-export:
+    container_name: tart_schema_export
+    image: ghcr.io/tart-telescope/sbc_code:latest
+    pull_policy: always
+    volumes:
+      - api_docs:/docs:rw
+    command:
+      - python
+      - -c
+      - |
+        from app.main import app
+        import json
+        import urllib.request
+
+        # Fetch telescope list
+        with urllib.request.urlopen('https://map.elec.ac.nz/api/v1/telescopes') as response:
+            data = json.loads(response.read().decode())
+
+        # Generate OpenAPI spec
+        spec = app.openapi()
+
+        # Build servers list from telescopes
+        servers = []
+        for telescope in data['telescopes']:
+            if telescope.get('hostname'):
+                servers.append({
+                    'url': f"https://api.elec.ac.nz/tart/{telescope['hostname']}/api/v1",
+                    'description': telescope.get('telescopeName', telescope['hostname'])
+                })
+
+        # Add local dev server
+        servers.append({'url': 'http://localhost:8000', 'description': 'Local Dev'})
+
+        spec['servers'] = servers
+        json.dump(spec, open('/docs/openapi.json', 'w'), indent=2)
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: tart_swagger_ui
+    ports:
+      - "8081:8080"
+    volumes:
+      - api_docs:/docs:ro
+    environment:
+      - SWAGGER_JSON=/docs/openapi.json
+      - DISPLAY_REQUEST_DURATION=true
+      - FILTER=false
+      - TRY_IT_OUT_ENABLED=true
+      - LAYOUT=BaseLayout
+
+volumes:
+  api_docs:
+    driver: local
