@@ -47,6 +47,9 @@ services:
       - FILTER=false
       - TRY_IT_OUT_ENABLED=true
       - LAYOUT=BaseLayout
+    depends_on:
+      schema-export:
+        condition: service_completed_successfully
 
 volumes:
   api_docs:
