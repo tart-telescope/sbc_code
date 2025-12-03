@@ -37,6 +37,7 @@ services:
   swagger-ui:
     image: swaggerapi/swagger-ui
     container_name: tart_swagger_ui
+    restart: unless-stopped
     ports:
       - "8081:8080"
     volumes:
