@@ -110,6 +110,14 @@ To make the system start automatically at startup (and run in the background) mo
 
     docker compose up -d
 
+### Tag the node in the cloud
+
+    docker compose exec headscale headscale nodes list
+    docker compose exec headscale headscale nodes register --user tart --key asdfkasldfjkasdf
+    
+To enable a TART on the map:
+
+    docker compose exec headscale headscale nodes tag --tags tag:telescope -i 14
 
 ### Testing
 

@@ -18,6 +18,7 @@ TART=tart@nz-dunedin
 install:
 	rsync --recursive --verbose \
 			--exclude '*.venv*' \
+			--exclude '__pycache__' \
 			--exclude '.env'  \
 			--exclude 'node_modules'  \
 			--exclude '*config_data/*.json'  \
