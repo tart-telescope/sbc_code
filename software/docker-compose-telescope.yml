@@ -33,16 +33,14 @@ services:
             - TS_LOCAL_ADDR_PORT=127.0.0.1:41234
         healthcheck:
             test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"]
-            # Check if Tailscale is running
-            interval: 1m # How often to perform the check
-            timeout: 10s # Time to wait for the check to succeed
-            retries: 3 # Number of retries before marking as unhealthy
+            interval: 1m      # How often to perform the check
+            timeout: 10s      # Time to wait for the check to succeed
+            retries: 3        # Number of retries before marking as unhealthy
             start_period: 10s # Time to wait before starting health checks
         restart: always
         logging: *default-logging
 
-    # UI and Proxy for API.
-    ui: # Port 80 on service tailscale
+    ui: # UI and Proxy for API Port 80 as a sidecar on service tailscale
         image:  ghcr.io/tart-telescope/web_app/viewer-root:main
         depends_on:
             telescope-api:
@@ -62,7 +60,7 @@ services:
         volumes:
             -   ~/tart_web_api_store:/database/ # dir where the sqlite database is stored
             -   ~/telescope_config:/config_data # dir where telescope_config.json and calibratied_antenna_positions.json are expected
-            -   data-volume:/telescope_data # shared between containers. serving vis and raw hdf files as static files through nginx
+            -   data-volume:/telescope_data     # shared between containers. serving vis and raw hdf files as static files through nginx
         # Comment the following two lines to disable access to the TART hardware (this allows testing of software on a desktop)
         devices:
            - /dev/spidev0.0
