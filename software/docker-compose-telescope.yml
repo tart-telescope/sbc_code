@@ -28,6 +28,7 @@ services:
             - TS_HOSTNAME=${TS_HOSTNAME}
             - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
             - TS_STATE_DIR=/var/lib/tailscale
+            - TS_USERSPACE=false
             - TS_ENABLE_HEALTH_CHECK=true
             - TS_LOCAL_ADDR_PORT=127.0.0.1:41234
         healthcheck:
@@ -39,15 +40,15 @@ services:
             start_period: 10s # Time to wait before starting health checks
         restart: always
         logging: *default-logging
-        labels:
-            autoheal: true
 
     # UI and Proxy for API.
     ui: # Port 80 on service tailscale
         image:  ghcr.io/tart-telescope/web_app/viewer-root:main
         depends_on:
-            - telescope-api
-            - tailscale
+            telescope-api:
+                condition: service_healthy
+            tailscale:
+                condition: service_healthy
         volumes:
             - data-volume:/telescope_data
             - ./nginx.conf:/etc/nginx/nginx.conf:ro
@@ -76,22 +77,8 @@ services:
         ports:
             - 5000:5000
         restart: always
-        depends_on:
-            - tailscale
         logging: *default-logging
 
-
-    autoheal:
-        deploy:
-            replicas: 1
-        environment:
-            AUTOHEAL_CONTAINER_LABEL: autoheal
-        image: willfarrell/autoheal:latest
-        network_mode: none
-        restart: always
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
-            - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
     # Mounted on each container as /telescope_data, used for raw data and vis data. This is a hardcoded path in each container.
