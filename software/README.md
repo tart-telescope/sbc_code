@@ -12,7 +12,7 @@ We will need these later.
 
 The following procedure will install all the necessary TART software on a Raspberry Pi (Model 3 or later) attached to the TART hardware.
 
-### Step 1. Prepare the Pi
+## Step 1. Prepare the Pi
 
 Download latest Raspberry Pi OS Lite image from https://www.raspberrypi.org/software/operating-systems/
 Download Etcher from https://www.balena.io/etcher/ and flash the Image onto a SD Card.
@@ -58,11 +58,11 @@ Install docker on the SBC. This is done by following commands.
 Add tempfs for /var/log (https://github.com/azlux/log2ram)
 Fix up journald (https://forums.raspberrypi.com/viewtopic.php?t=341605)
 
-### Step 2. Copy code to the Pi
+## Step 2. Copy code to the Pi
 ```bash
     make install TART=user@tart-host
 ```
-### Step 3. Configuration on the Pi
+## Step 3. Configuration on the Pi
 
 SSH into the raspberry pi after completing step 1.
 ```bash
@@ -99,7 +99,7 @@ Change the default antenna positions to be the ones for your TART.
     calibrated_antenna_positions.json
 ```
 
-### Step 4. Run in local mode
+## Step 4. Run in local mode
 
 Run in local testing mode (no cloud connections)
 
@@ -112,7 +112,7 @@ This will launch a local-mode telescope:
 * Connect to http://localhost:80 to see the web interface.
 
 
-### Step 5. Connect to cloud
+## Step 5. Connect to cloud
 
 Now copy docker-compose-telescope.yml -> compose.yml
 ```bash
