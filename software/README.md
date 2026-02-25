@@ -98,13 +98,29 @@ Change the default antenna positions to be the ones for your TART.
     telescope_config.json
     calibrated_antenna_positions.json
 ```
+
+### Step 3
+
+Run in local testing mode (no cloud connections)
+
+```bash
+    docker compose -f docker-compose-local.yml up
+```    
+
+This will launch a local-mode telescope:
+* Connect to http://localhost:5000/docs to get and test the API docs. 
+* Connect to http://localhost:80 to see the web interface.
+
+
+### Step 4.
+
 Now copy docker-compose-telescope.yml -> compose.yml
 ```bash
     docker compose up -d
 ```
 This will download and launch all the necessary processes in docker containers on the pi.
 
-### Step 3.
+#### Auto start
 
 To make the system start automatically at startup (and run in the background) modify the line in step 3 to
 
