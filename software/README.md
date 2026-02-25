@@ -99,7 +99,7 @@ Change the default antenna positions to be the ones for your TART.
     calibrated_antenna_positions.json
 ```
 
-### Step 3
+### Step 4. Run in local mode
 
 Run in local testing mode (no cloud connections)
 
@@ -112,7 +112,7 @@ This will launch a local-mode telescope:
 * Connect to http://localhost:80 to see the web interface.
 
 
-### Step 4.
+### Step 5. Connect to cloud
 
 Now copy docker-compose-telescope.yml -> compose.yml
 ```bash
