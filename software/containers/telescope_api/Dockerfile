@@ -5,33 +5,36 @@ RUN apt-get update && apt-get install -y pkg-config libhdf5-dev && rm -rf /var/l
 
 WORKDIR /app
 ENV UV_LINK_MODE=copy
-# Copy pyproject.toml first for dependency caching
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+ENV VIRTUAL_ENV=/opt/venv
 
-COPY tart_api/pyproject.toml ./
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system -r pyproject.toml
-
-# Install hardware interface using uv system-wide
+# Copy lockfile, pyproject.toml, and hardware interface for dependency resolution
+COPY tart_api/pyproject.toml tart_api/uv.lock ./
 COPY ./hardware_interface /hardware_interface
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system /hardware_interface
 
-RUN find /usr/local/lib/python3.13/site-packages -name 'tests' -type d -exec rm -rf {} +
-RUN find /usr/local/lib/python3.13/site-packages -name '*dist-info' -type d -exec rm -rf {} +
+# Install locked dependencies (frozen = no lockfile update, just install)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+RUN find /opt/venv/lib -name 'tests' -type d -exec rm -rf {} + 2>/dev/null || true
+RUN find /opt/venv/lib -name '*dist-info' -type d -exec rm -rf {} + 2>/dev/null || true
 
 # Test builder stage - includes test extras
 FROM builder AS test-builder
 COPY ./permute.txt /permute/permute.txt
 COPY tart_api/ /app
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system "/hardware_interface[test]"
+    uv sync --frozen --no-install-project --extra dev
 
 
 # Runtime stage
-FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim AS runtime
+FROM python:3.13-slim-trixie AS runtime
 
 # Set environment variables
 ENV PYTHONPATH=/app:/app/app
+ENV PATH="/opt/venv/bin:$PATH"
+ENV VIRTUAL_ENV=/opt/venv
 
 COPY ./permute.txt /permute/permute.txt
 RUN mkdir -p /database
@@ -41,10 +44,8 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y libhdf5-dev && rm -rf /var/lib/apt/lists/*
 
-# Copy Python environment from builder
-COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
 
 # Copy the entire tart_api directory structure (includes generated_models now)
 COPY tart_api/ ./
