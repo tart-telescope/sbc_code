@@ -73,6 +73,8 @@ def create_runtime_config() -> Any:
         "save": 1,
         "N_samples_exp": 20,
         "base_path": os.path.join(data_root, "raw"),
+        "sync": 0,
+        "sync_acquire_at_seconds": [0, 10, 20, 30, 40, 50],
     }
     config_dict["diagnostic"] = {
         "num_ant": 24,

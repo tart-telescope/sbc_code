@@ -1,11 +1,12 @@
 # Build stage
-FROM python:3.13 AS builder
+FROM ghcr.io/astral-sh/uv:python3.13-trixie AS builder
+
 RUN apt-get update && apt-get install -y pkg-config libhdf5-dev && rm -rf /var/lib/apt/lists/*
 
-RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL="/bin/" sh
 WORKDIR /app
 ENV UV_LINK_MODE=copy
 # Copy pyproject.toml first for dependency caching
+
 COPY tart_api/pyproject.toml ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --system -r pyproject.toml
@@ -27,7 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 
 # Runtime stage
-FROM python:3.13-slim AS runtime
+FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim AS runtime
 
 # Set environment variables
 ENV PYTHONPATH=/app:/app/app
@@ -38,11 +39,12 @@ RUN mkdir -p /database
 # Set working directory
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y libhdf5-dev && rm -rf /var/lib/apt/lists/*
+
 # Copy Python environment from builder
 COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-RUN apt-get update && apt-get install -y libhdf5-dev && rm -rf /var/lib/apt/lists/*
 
 # Copy the entire tart_api directory structure (includes generated_models now)
 COPY tart_api/ ./

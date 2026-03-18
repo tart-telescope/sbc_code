@@ -125,6 +125,18 @@ class AsyncDatabase:
             None, db_ops.get_vis_cache_process_state
         )
 
+    async def get_setting(self, key: str, default: Any = None) -> Any:
+        """Async wrapper for get_setting."""
+        return await asyncio.get_event_loop().run_in_executor(
+            None, db_ops.get_setting, key, default
+        )
+
+    async def set_setting(self, key: str, value: Any) -> None:
+        """Async wrapper for set_setting."""
+        return await asyncio.get_event_loop().run_in_executor(
+            None, db_ops.set_setting, key, value
+        )
+
 
 # Global database instance
 _db_instance: AsyncDatabase | None = None

@@ -61,6 +61,16 @@ class TARTAPITestClient:
             if response.status_code == 200:
                 self.original_state["vis_num_samples_exp"] = response.json().get("N_samples_exp")
 
+            # Save original sync flag
+            response = requests.get(f"{self.base_url}/acquire/raw/sync")
+            if response.status_code == 200:
+                self.original_state["raw_sync"] = response.json().get("sync")
+
+            # Save original sync_acquire_at_seconds
+            response = requests.get(f"{self.base_url}/acquire/raw/sync_acquire_at_seconds")
+            if response.status_code == 200:
+                self.original_state["raw_sync_acquire_at_seconds"] = response.json().get("sync_acquire_at_seconds")
+
             # Save original channel states
             response = requests.get(f"{self.base_url}/channel")
             if response.status_code == 200:
@@ -110,6 +120,23 @@ class TARTAPITestClient:
                 requests.put(
                     f"{self.base_url}/acquire/vis/num_samples_exp/{self.original_state['vis_num_samples_exp']}",
                     headers=self.headers,
+                )
+
+            # Restore original sync flag
+            if "raw_sync" in self.original_state:
+                self.authenticate()
+                requests.put(
+                    f"{self.base_url}/acquire/raw/sync/{self.original_state['raw_sync']}",
+                    headers=self.headers,
+                )
+
+            # Restore original sync_acquire_at_seconds
+            if "raw_sync_acquire_at_seconds" in self.original_state:
+                self.authenticate()
+                requests.put(
+                    f"{self.base_url}/acquire/raw/sync_acquire_at_seconds",
+                    headers=self.headers,
+                    json=self.original_state["raw_sync_acquire_at_seconds"],
                 )
 
         except Exception as e:
@@ -344,6 +371,108 @@ class TARTAPITestClient:
         assert data["N_samples_exp"] == test_exp
 
         # Note: Original value will be restored in teardown_method
+
+    def test_sync_acquisition_endpoints(self):
+        """Test sync flag and sync_acquire_at_seconds endpoints."""
+        # --- sync flag: GET default ---
+        response = requests.get(f"{self.base_url}/acquire/raw/sync")
+        assert response.status_code == 200
+        data = response.json()
+        assert "sync" in data
+        original_sync = data["sync"]
+
+        # --- sync flag: PUT enable ---
+        self.authenticate()
+        response = requests.put(
+            f"{self.base_url}/acquire/raw/sync/1", headers=self.headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["sync"] == 1
+
+        # --- sync flag: GET verify ---
+        response = requests.get(f"{self.base_url}/acquire/raw/sync")
+        assert response.status_code == 200
+        assert response.json()["sync"] == 1
+
+        # --- sync flag: PUT disable ---
+        self.authenticate()
+        response = requests.put(
+            f"{self.base_url}/acquire/raw/sync/0", headers=self.headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["sync"] == 0
+
+        # --- sync flag: GET verify disabled ---
+        response = requests.get(f"{self.base_url}/acquire/raw/sync")
+        assert response.status_code == 200
+        assert response.json()["sync"] == 0
+
+        # --- sync flag: requires auth ---
+        response = requests.put(f"{self.base_url}/acquire/raw/sync/1")
+        assert response.status_code in (401, 403, 422)
+
+        # --- sync_acquire_at_seconds: GET default ---
+        response = requests.get(
+            f"{self.base_url}/acquire/raw/sync_acquire_at_seconds"
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "sync_acquire_at_seconds" in data
+        original_seconds = data["sync_acquire_at_seconds"]
+        assert isinstance(original_seconds, list)
+
+        # --- sync_acquire_at_seconds: PUT new list ---
+        new_seconds = [0, 30]
+        self.authenticate()
+        response = requests.put(
+            f"{self.base_url}/acquire/raw/sync_acquire_at_seconds",
+            headers=self.headers,
+            json=new_seconds,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["sync_acquire_at_seconds"] == [0, 30]
+
+        # --- sync_acquire_at_seconds: GET verify ---
+        response = requests.get(
+            f"{self.base_url}/acquire/raw/sync_acquire_at_seconds"
+        )
+        assert response.status_code == 200
+        assert response.json()["sync_acquire_at_seconds"] == [0, 30]
+
+        # --- sync_acquire_at_seconds: PUT with out-of-range values filters them ---
+        self.authenticate()
+        response = requests.put(
+            f"{self.base_url}/acquire/raw/sync_acquire_at_seconds",
+            headers=self.headers,
+            json=[0, 15, 60, -1, 45],
+        )
+        assert response.status_code == 200
+        data = response.json()
+        # Only 0, 15, 45 should survive (60 and -1 are out of range 0-59)
+        assert data["sync_acquire_at_seconds"] == [0, 15, 45]
+
+        # --- sync_acquire_at_seconds: PUT deduplicates and sorts ---
+        self.authenticate()
+        response = requests.put(
+            f"{self.base_url}/acquire/raw/sync_acquire_at_seconds",
+            headers=self.headers,
+            json=[50, 10, 10, 30, 0, 30],
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["sync_acquire_at_seconds"] == [0, 10, 30, 50]
+
+        # --- sync_acquire_at_seconds: requires auth ---
+        response = requests.put(
+            f"{self.base_url}/acquire/raw/sync_acquire_at_seconds",
+            json=[0, 15, 30, 45],
+        )
+        assert response.status_code in (401, 403, 422)
+
+        # Note: Original values will be restored in teardown_method
 
     def test_calibration_endpoints(self):
         """Test calibration endpoints."""
@@ -757,3 +886,7 @@ def test_antenna_positions_persistence(api_client):
 
 def test_antenna_positions_formats(api_client):
     api_client.test_antenna_positions_formats()
+
+
+def test_sync_acquisition_endpoints(api_client):
+    api_client.test_sync_acquisition_endpoints()

@@ -43,6 +43,16 @@ async def lifespan(app: FastAPI):
     db = get_database()
     config["sample_delay"] = await db.get_sample_delay()
 
+    # Load persisted sync settings into runtime config
+    raw_config = config["raw"]
+    persisted_sync = await db.get_setting("raw.sync")
+    if persisted_sync is not None:
+        raw_config["sync"] = persisted_sync
+    persisted_sync_seconds = await db.get_setting("raw.sync_acquire_at_seconds")
+    if persisted_sync_seconds is not None:
+        raw_config["sync_acquire_at_seconds"] = persisted_sync_seconds
+    config["raw"] = raw_config
+
     # Start telescope control service (state machine)
     await init_telescope_service(config)
 
