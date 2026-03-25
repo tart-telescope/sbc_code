@@ -1,27 +1,54 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "definitions": {
-    "SaveFlagResponse": {
-      "type": "object",
-      "properties": {
-        "save": {
-          "$ref": "models/common.json#/definitions/BinaryFlag",
-          "description": "Save flag: 0=disabled, 1=enabled"
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "SaveFlagResponse": {
+            "type": "object",
+            "properties": {
+                "save": {
+                    "$ref": "models/common.json#/definitions/BinaryFlag",
+                    "description": "Save flag: 0=disabled, 1=enabled"
+                }
+            },
+            "required": ["save"],
+            "additionalProperties": false
+        },
+        "SampleExponentResponse": {
+            "type": "object",
+            "properties": {
+                "N_samples_exp": {
+                    "$ref": "models/common.json#/definitions/SampleExponent",
+                    "description": "Exponent for number of samples (2^exp)"
+                }
+            },
+            "required": ["N_samples_exp"],
+            "additionalProperties": false
+        },
+        "SyncResponse": {
+            "type": "object",
+            "properties": {
+                "sync": {
+                    "$ref": "models/common.json#/definitions/BinaryFlag",
+                    "description": "Sync flag: 0=disabled (acquire immediately), 1=enabled (wait for next allowed second before acquiring)"
+                }
+            },
+            "required": ["sync"],
+            "additionalProperties": false
+        },
+        "SyncAcquireAtSecondsResponse": {
+            "type": "object",
+            "properties": {
+                "sync_acquire_at_seconds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 59
+                    },
+                    "description": "Allowed seconds-of-the-minute (0-59) at which acquisition may start. When sync is enabled, the system waits until the clock reaches the next second in this list before beginning acquisition."
+                }
+            },
+            "required": ["sync_acquire_at_seconds"],
+            "additionalProperties": false
         }
-      },
-      "required": ["save"],
-      "additionalProperties": false
-    },
-    "SampleExponentResponse": {
-      "type": "object",
-      "properties": {
-        "N_samples_exp": {
-          "$ref": "models/common.json#/definitions/SampleExponent",
-          "description": "Exponent for number of samples (2^exp)"
-        }
-      },
-      "required": ["N_samples_exp"],
-      "additionalProperties": false
     }
-  }
 }

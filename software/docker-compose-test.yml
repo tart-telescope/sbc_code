@@ -21,7 +21,7 @@ services:
 
     # Port 5000
     telescope-api:
-        image: ghcr.io/tart-telescope/sbc_code:v0.1.9.6
+        image: ghcr.io/tart-telescope/sbc_code:v0.2.0.4
         build:
             context: ./containers/telescope_api
         volumes:

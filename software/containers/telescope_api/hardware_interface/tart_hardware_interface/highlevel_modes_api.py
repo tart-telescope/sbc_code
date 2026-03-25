@@ -166,13 +166,9 @@ def mkdir_p(path):
     os.makedirs(path, exist_ok=True)
 
 
-def create_timestamp_and_path(base_path):
-    ts = utc.now()  # Timestamp information for directory structure
-    # Create a meaningful directory structure to organize recorded data
+def create_timestamp_and_path(base_path, ts):
     p = os.path.join(base_path, str(ts.year), str(ts.month), str(ts.day))
     mkdir_p(p)
-    # Call timestamp again (the directory name will not have changed, but the timestamp will be more accurate)
-    ts = utc.now()
     return ts, p
 
 
@@ -296,6 +292,8 @@ def run_diagnostic(tart, runtime_config):
 RUN TART in raw data acquisition mode
 """
 
+from datetime import datetime, timezone
+from .util import wait_for_second
 
 def run_acquire_raw(tart, runtime_config):
     runtime_config["acquire"] = 1
@@ -309,8 +307,14 @@ def run_acquire_raw(tart, runtime_config):
     tart.capture(on=True, source=0, noisy=runtime_config["verbose"])
     tart.set_sample_delay(runtime_config["sample_delay"])
     tart.centre(runtime_config["centre"], noisy=runtime_config["verbose"])
-    t_stmp, path = create_timestamp_and_path(runtime_config["raw"]["base_path"])
+
+    if runtime_config["raw"].get("sync", 0):
+        sync_seconds = set(runtime_config["raw"].get("sync_acquire_at_seconds", [0, 10, 20, 30, 40, 50]))
+        ts = wait_for_second(sync_seconds, verbose=runtime_config.get("verbose", False))
+    else:
+        ts = datetime.now(timezone.utc)
     tart.start_acquisition(1.1, True)
+    t_stmp, path = create_timestamp_and_path(runtime_config["raw"]["base_path"], ts)
 
     while not tart.data_ready():
         tart.pause(duration=0.005, noisy=True)

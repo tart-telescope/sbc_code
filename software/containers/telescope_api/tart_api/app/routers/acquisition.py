@@ -5,11 +5,16 @@ This module provides data acquisition endpoints that reuse the existing
 Flask acquisition logic while providing FastAPI-compatible responses.
 """
 
-from fastapi import APIRouter
+from typing import Annotated
 
+from fastapi import APIRouter, Depends
+
+from database import AsyncDatabase, get_database
 from generated_models.acquisition_models import (
     SampleExponentResponse,
     SaveFlagResponse,
+    SyncResponse,
+    SyncAcquireAtSecondsResponse,
 )
 
 from ..dependencies import AuthDep, ConfigDep
@@ -117,3 +122,62 @@ async def get_vis_num_samples_exp(config: ConfigDep):
     This endpoint reuses the existing Flask logic for visibility data sample configuration.
     """
     return SampleExponentResponse(N_samples_exp=config["vis"]["N_samples_exp"])
+
+
+@router.put("/raw/sync/{flag}", response_model=SyncResponse)
+async def set_raw_sync(
+    flag: int, config: ConfigDep, _: AuthDep, db: Annotated[AsyncDatabase, Depends(get_database)]
+):
+    """
+    Enable or disable synchronized acquisition start times.
+
+    When enabled, raw acquisition will wait until the next allowed
+    second-of-the-minute (as configured in sync_acquire_at_seconds)
+    before starting. When disabled, acquisition starts immediately.
+    Requires JWT authentication.
+    """
+    raw_config = config["raw"]
+    raw_config["sync"] = flag
+    config["raw"] = raw_config
+    await db.set_setting("raw.sync", flag)
+    return SyncResponse(sync=config["raw"]["sync"])
+
+
+@router.get("/raw/sync", response_model=SyncResponse)
+async def get_raw_sync(config: ConfigDep):
+    """
+    Get the synchronized acquisition flag for raw data acquisition.
+    """
+    return SyncResponse(sync=config["raw"].get("sync", 0))
+
+
+@router.put("/raw/sync_acquire_at_seconds", response_model=SyncAcquireAtSecondsResponse)
+async def set_raw_sync_acquire_at_seconds(
+    seconds: list[int], config: ConfigDep, _: AuthDep, db: Annotated[AsyncDatabase, Depends(get_database)]
+):
+    """
+    Set the allowed seconds-of-the-minute at which raw acquisition may start.
+
+    Provide a list of second values (0-59). When sync is enabled and the
+    system is ready to acquire, it will wait until the clock hits one of
+    these seconds before starting.
+    Example: [0, 10, 20, 30, 40, 50] means acquisition can begin at
+    :00, :10, :20, :30, :40, or :50 of any minute.
+    Requires JWT authentication.
+    """
+    # Validate all values are in range 0-59
+    validated = sorted(set(s for s in seconds if 0 <= s <= 59))
+    if validated:
+        raw_config = config["raw"]
+        raw_config["sync_acquire_at_seconds"] = validated
+        config["raw"] = raw_config
+        await db.set_setting("raw.sync_acquire_at_seconds", validated)
+    return SyncAcquireAtSecondsResponse(sync_acquire_at_seconds=config["raw"].get("sync_acquire_at_seconds", [0, 10, 20, 30, 40, 50]))
+
+
+@router.get("/raw/sync_acquire_at_seconds", response_model=SyncAcquireAtSecondsResponse)
+async def get_raw_sync_acquire_at_seconds(config: ConfigDep):
+    """
+    Get the allowed seconds-of-the-minute at which raw acquisition may start.
+    """
+    return SyncAcquireAtSecondsResponse(sync_acquire_at_seconds=config["raw"].get("sync_acquire_at_seconds", [0, 10, 20, 30, 40, 50]))

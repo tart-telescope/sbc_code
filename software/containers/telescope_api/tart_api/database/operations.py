@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sqlite3
@@ -44,6 +45,9 @@ def setup_db(num_ant):
             "CREATE TABLE IF NOT EXISTS calibration (utc_timestamp TEXT, antenna INTEGER, g_abs REAL, g_phase REAL)"
         )
         c.execute("CREATE TABLE IF NOT EXISTS channels (channel_id INTEGER, enabled BOOLEAN)")
+        c.execute(
+            "CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)"
+        )
     with connect_to_db() as con:
         c = con.cursor()
         c.execute("SELECT * FROM channels;")
@@ -251,3 +255,30 @@ def get_vis_cache_process_state():
         else:
             ret = {"state": rows[0][2], "timestamp": rows[0][1]}
     return ret
+
+
+################
+#  Settings    #
+################
+
+
+def get_setting(key, default=None):
+    """Get a setting value by key. Values are stored as JSON."""
+    with connect_to_db() as con:
+        c = con.cursor()
+        c.execute("SELECT value FROM settings WHERE key = ?", (key,))
+        row = c.fetchone()
+        if row is None:
+            return default
+        return json.loads(row[0])
+
+
+def set_setting(key, value):
+    """Set a setting value by key. Values are stored as JSON."""
+    with connect_to_db() as con:
+        c = con.cursor()
+        c.execute(
+            "INSERT INTO settings (key, value) VALUES (?, ?) "
+            "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            (key, json.dumps(value)),
+        )
