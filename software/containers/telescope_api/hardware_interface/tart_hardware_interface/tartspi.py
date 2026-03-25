@@ -1,8 +1,11 @@
-import spidev
+try:
+    import spidev
+except ImportError:
+    spidev = None
 import logging
+import time
 
 import numpy as np
-import time
 
 
 def tobin(arr):
@@ -209,13 +212,14 @@ class TartSPI(object):
     def extract(self, vals):
         def unpack(x):
             return np.unpackbits(
-                    np.array(
-                        [
-                            x,
-                        ],
-                        dtype=np.uint8,
-                    )
-                )[::-1]
+                np.array(
+                    [
+                        x,
+                    ],
+                    dtype=np.uint8,
+                )
+            )[::-1]
+
         extractors = {
             self.TC_CENTRE: lambda val: dict(
                 list(
