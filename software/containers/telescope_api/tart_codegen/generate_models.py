@@ -37,6 +37,7 @@ def generate_single_model(schema_file):
         "--use-field-description",
         "--strip-default-none",
         "--enable-version-header",
+        "--disable-timestamp",
         "--use-standard-collections",
         "--formatters",
         "ruff-format",

@@ -2,6 +2,10 @@ variable "DEFAULT_TAG" {
   default = "telescope-api:local"
 }
 
+variable "GIT_COMMIT" {
+  default = "unknown"
+}
+
 # https://github.com/docker/metadata-action#bake-definition
 target "docker-metadata-action" {}
 
@@ -18,6 +22,9 @@ group "all" {
 target "image" {
   context = "."
   dockerfile = "Dockerfile"
+  args = {
+    GIT_COMMIT = "${GIT_COMMIT}"
+  }
 }
 
 target "image-local" {

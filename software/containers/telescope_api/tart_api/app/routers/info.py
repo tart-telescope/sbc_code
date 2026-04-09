@@ -5,6 +5,8 @@ This module provides telescope information endpoints that reuse the existing
 Flask info logic while providing FastAPI-compatible responses.
 """
 
+import os
+
 from fastapi import APIRouter
 
 from generated_models.info_models import InfoResponse
@@ -33,6 +35,7 @@ async def get_info(config: ConfigDep):
         "bandwidth": t_c["bandwidth"],
         "num_antenna": t_c["num_antenna"],
         "location": {"lon": t_c["lon"], "lat": t_c["lat"], "alt": t_c["alt"]},
+        "git_commit": os.environ.get("GIT_COMMIT", None),
     }
 
     return InfoResponse(info=info_data)
