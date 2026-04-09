@@ -87,12 +87,11 @@ app.add_middleware(
     client_cache_middleware.AdvancedClientCacheMiddleware,
     default_max_age=300,
     path_configs={
-        "/static/": {"max_age": 31536000, "immutable": True},  # 1 year for static assets
         "/auth": {"no_cache": True},                          # No cache for auth endpoints
         "/imaging/antenna_positions": {"max_age": 600},         # No cache for auth endpoints
         "/imaging/vis": {"max_age": 15},        # 15 second cache for vis data
         "/vis/data": {"max_age": 60},        # 60 second cache for vis data
-        "/raw/data": {"max_age": 60},        # 60 second cache for vis data
+        "/raw/data": {"max_age": 60},        # 60 second cache for raw data
     }
 )
 
