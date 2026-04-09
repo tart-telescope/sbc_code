@@ -1,10 +1,15 @@
 # middleware/client_cache_middleware.py
+"""
+Insert cache control headers into the response headers
+
+Author Tim Molteno April 2026.
+"""
 from fastapi import FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 
 class AdvancedClientCacheMiddleware(BaseHTTPMiddleware):
-    """Advanced client cache middleware with path-specific configurations."""
+    """Client cache middleware with path-specific configurations."""
 
     def __init__(
         self,
@@ -46,7 +51,6 @@ class AdvancedClientCacheMiddleware(BaseHTTPMiddleware):
     def _get_cache_config(self, path: str) -> dict:
         """Get cache configuration for a specific path."""
         for pattern, config in self.path_configs.items():
-            print(path, pattern, config)
             if path.startswith(pattern):
                 return config
         return {}
