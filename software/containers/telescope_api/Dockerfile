@@ -33,6 +33,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Runtime stage
 FROM python:3.13-slim-trixie AS runtime
 
+# Git commit hash passed in from CI
+ARG GIT_COMMIT=unknown
+ENV GIT_COMMIT=${GIT_COMMIT}
+
 # Set environment variables
 ENV PYTHONPATH=/app:/app/app
 ENV PATH="/opt/venv/bin:$PATH"
