@@ -8,6 +8,7 @@ Flask status logic while providing FastAPI-compatible responses.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+
 from tart.util import utc
 
 from database import AsyncDatabase, get_database
