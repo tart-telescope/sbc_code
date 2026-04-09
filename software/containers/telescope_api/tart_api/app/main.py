@@ -88,10 +88,10 @@ app.add_middleware(
     default_max_age=300,
     path_configs={
         "/auth": {"no_cache": True},                          # No cache for auth endpoints
-        "/imaging/antenna_positions": {"max_age": 600},         # No cache for auth endpoints
-        "/imaging/vis": {"max_age": 15},        # 15 second cache for vis data
-        "/vis/data": {"max_age": 60},        # 60 second cache for vis data
-        "/raw/data": {"max_age": 60},        # 60 second cache for raw data
+        "/imaging/antenna_positions": {"max_age": 600},       # 10 minute cache for antenna positions
+        "/imaging/vis": {"max_age": 15},                      # 15 second cache for vis data
+        "/vis/data": {"max_age": 60},                         # 60 second cache for vis data
+        "/raw/data": {"max_age": 60},                         # 60 second cache for raw data
     }
 )
 
