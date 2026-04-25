@@ -11,7 +11,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=["tart_hardware_interface"],
     install_requires=[
-        "spidev; platform_machine=='aarch64'",
+        "spidev; platform_machine=='aarch64' or platform_machine=='armv7l'",
         "numpy",
         "tart",
         "requests",
