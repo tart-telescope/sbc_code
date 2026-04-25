@@ -1,12 +1,13 @@
 # Build stage
 FROM python:3.13-trixie AS builder
-RUN apt-get update && apt-get install -y libhdf5-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libhdf5-dev libopenblas-dev && rm -rf /var/lib/apt/lists/*
 ADD https://astral.sh/uv/install.sh /uv-installer.sh
 RUN sh /uv-installer.sh && rm /uv-installer.sh
 ENV PATH="/root/.local/bin/:$PATH"
 
 WORKDIR /app
 ENV UV_LINK_MODE=copy
+ENV UV_EXTRA_INDEX_URL=https://www.piwheels.org/simple
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 ENV VIRTUAL_ENV=/opt/venv
@@ -48,7 +49,7 @@ RUN mkdir -p /database
 # Set working directory
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y libhdf5-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libhdf5-dev libopenblas0 && rm -rf /var/lib/apt/lists/*
 
 # Copy virtual environment from builder
 COPY --from=builder /opt/venv /opt/venv
