@@ -1,12 +1,8 @@
 
 services:
-
     # The headscale config file is in config/config.yaml
     headscale:
-        image: headscale/headscale:v0.25
-        # build:
-        #     context: .
-        #     network: host
+        image: headscale/headscale:v0.28.0
         container_name: headscale
         volumes:
             - ./config:/etc/headscale/
@@ -17,7 +13,7 @@ services:
             # - "8080:8080"
             - "9090:9090"
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:9090/metrics"]
+            test: ["CMD", "headscale", "health"]
             interval: 1m30s
             timeout: 10s
             retries: 3
@@ -53,7 +49,37 @@ services:
     #     # ports:
     #     #     - 9443:443
 
+    ts-nginx:
+        # ts-nginx & nginx required to expose
+        # headscale grpc port to the headscale network
+        image: tailscale/tailscale:v1.84.3
+        restart: unless-stopped
+        hostname: headscale-grpc
+        ports:
+            - 50443:50443
+        environment:
+            - TS_STATE_DIR=/var/lib/tailscale
+            - TS_EXTRA_ARGS=--login-server https://cloud.elec.ac.nz
+            - TS_NO_LOGS_NO_SUPPORT=true
+            - TS_ACCEPT_DNS=true
+            - TS_USERSPACE=false
+        devices:
+            - /dev/net/tun:/dev/net/tun
+        cap_add:
+            - NET_ADMIN
+            - SYS_MODULE
+        volumes:
+            - ts-grpc-data:/var/lib/tailscale
+    nginx:
+        image: nginx:latest
+        restart: unless-stopped
+        volumes:
+            - ./grpc-nginx.conf:/etc/nginx/nginx.conf
+        network_mode: "service:ts-nginx"
+
+
 volumes:
   caddy_data:
     external: true
   caddy_config:
+  ts-grpc-data:

@@ -35,3 +35,18 @@ services:
             retries: 3 # Number of retries before marking as unhealthy
             start_period: 10s # Time to wait before starting health checks
         restart: always
+        labels:
+            autoheal: true
+
+    autoheal:
+        deploy:
+            replicas: 1
+        environment:
+            AUTOHEAL_CONTAINER_LABEL: autoheal
+            AUTOHEAL_START_PERIOD: 10
+        image: willfarrell/autoheal:latest
+        network_mode: none
+        restart: always
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /var/run/docker.sock:/var/run/docker.sock
