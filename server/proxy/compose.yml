@@ -1,0 +1,109 @@
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-file: "5"
+    max-size: "1m"
+
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    cap_add: # Required for tailscale to work
+      - net_admin
+      - sys_module
+    volumes:
+      - "./ts-proxy/state:/var/lib/tailscale" # State data will be stored in this directory
+      - "/dev/net/tun:/dev/net/tun" # Required for tailscale to work
+      - "tailscale-tmp:/tmp" # Share socket with dns-init
+    environment:
+      - TS_ACCEPT_DNS=true
+      - TS_USERSPACE=false
+      - TS_EXTRA_ARGS=--login-server=https://cloud.elec.ac.nz
+      - TS_HOSTNAME=telescope-proxy-new
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_ENABLE_HEALTH_CHECK=true # Enable healthcheck endpoint: "/healthz"
+      - TS_LOCAL_ADDR_PORT=127.0.0.1:41234 # The <addr>:<port> for the healthz endpoint
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
+      interval: 1m # How often to perform the check
+      timeout: 10s # Time to wait for the check to succeed
+      retries: 3 # Number of retries before marking as unhealthy
+      start_period: 10s # Time to wait before starting health checks
+    restart: always
+    logging: *default-logging
+    labels:
+      autoheal: true
+
+  autoheal:
+    deploy:
+      replicas: 1
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal
+      AUTOHEAL_START_PERIOD: 10
+    image: willfarrell/autoheal:latest
+    network_mode: none
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging: *default-logging
+
+  nginx-sidecar:
+    image: nginx:alpine
+    depends_on:
+      tailscale:
+        condition: service_healthy
+      dns-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    network_mode: "service:tailscale"
+    volumes:
+      # Mount the custom nginx config file
+      - ./nginx/nginx-sidecar.conf:/etc/nginx/nginx.conf:ro
+      # Mount static html files
+      - ./nginx/html:/var/www/html:ro
+      # Mount a volume for the cache data to persist
+      - nginx-cache:/var/cache/nginx
+    logging: *default-logging
+
+  dns-init:
+    image: tailscale/tailscale:latest
+    depends_on:
+      tailscale:
+        condition: service_healthy
+    network_mode: "service:tailscale"
+    volumes:
+      - "tailscale-tmp:/tmp"
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "Toggling tailscale DNS to load resolver config..."
+        tailscale --socket=/tmp/tailscaled.sock set --accept-dns=false
+        sleep 1
+        tailscale --socket=/tmp/tailscaled.sock set --accept-dns=true
+        echo "DNS toggle complete"
+    restart: "no"
+
+  nginx-external:
+    image: nginx:alpine
+    ports:
+      - 8880:80
+    depends_on:
+      dns-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    volumes:
+      # Mount the custom nginx config file
+      - ./nginx/nginx-external.conf:/etc/nginx/nginx.conf:ro
+      # Mount a volume for the cache data to persist
+      - nginx-external-cache:/var/cache/nginx
+    logging: *default-logging
+
+volumes:
+  # Define the named volume for Nginx cache
+  nginx-cache:
+    driver: local
+  nginx-external-cache:
+    driver: local
+  tailscale-tmp:
+    driver: local
