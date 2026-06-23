@@ -2,7 +2,7 @@ x-logging: &default-logging
   driver: "json-file"
   options:
     max-file: "5"
-    max-size: "10m"
+    max-size: "1m"
 
 services:
   tailscale:
@@ -97,6 +97,7 @@ services:
       - ./nginx/nginx-external.conf:/etc/nginx/nginx.conf:ro
       # Mount a volume for the cache data to persist
       - nginx-external-cache:/var/cache/nginx
+    logging: *default-logging
 
 volumes:
   # Define the named volume for Nginx cache
