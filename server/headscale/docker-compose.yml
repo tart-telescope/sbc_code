@@ -19,6 +19,7 @@ services:
             retries: 3
             start_period: 40s
             start_interval: 5s
+        command: serve
         restart: unless-stopped
 
     # Caddy proxies both the headscale via cloud.elec.ac.nz, as well as the api.elec.ac.nz
