@@ -26,7 +26,7 @@ services:
     # Proxy for API listening on port 5000. http://localhost:5000/docs
     #
     telescope-api:
-        image: ghcr.io/tart-telescope/sbc_code:latest
+        image: ghcr.io/tart-telescope/sbc_code:v0.2.0.4
         volumes:
             -   ~/tart_web_api_store:/database/ # dir where the sqlite database is stored
             -   ~/telescope_config:/config_data # dir where telescope_config.json and calibratied_antenna_positions.json are expected

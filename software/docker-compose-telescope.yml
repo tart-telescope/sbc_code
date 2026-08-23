@@ -38,8 +38,6 @@ services:
       retries: 3 # Number of retries before marking as unhealthy
       start_period: 10s # Time to wait before starting health checks
     restart: unless-stopped
-    labels:
-      autoheal: true
     logging: *default-logging
 
   autoheal:
@@ -60,7 +58,7 @@ services:
     image: ghcr.io/tart-telescope/web_app/viewer-root:main
     depends_on:
       telescope-api:
-        condition: service_healthy
+        condition: service_started
       tailscale:
         condition: service_healthy
     volumes:
@@ -81,11 +79,16 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    labels:
+      autoheal: true
     logging: *default-logging
 
   # Port 5000
   telescope-api:
-    image: ghcr.io/tart-telescope/sbc_code:latest
+    image: ghcr.io/tart-telescope/sbc_code:v0.2.0.4
+    depends_on:
+      tailscale:
+        condition: service_healthy
     volumes:
       - ~/tart_web_api_store:/database/ # dir where the sqlite database is stored
       - ~/telescope_config:/config_data # dir where telescope_config.json and calibratied_antenna_positions.json are expected
@@ -102,19 +105,12 @@ services:
       # - DATA_ROOT=/telescope_data
       # - LOGLEVEL=DEBUG
     healthcheck:
-      test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      disable: true
     ports:
       - 5000:5000
     restart: unless-stopped
+    labels:
+      autoheal: true
     logging: *default-logging
 
 volumes:
