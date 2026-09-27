@@ -34,6 +34,28 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Issue #25: build the linux/arm64 variant first and boot it before any
+      # image is published, so a broken/mis-built base image (illegal
+      # instructions on ARMv8.0, venv/interpreter skew, broken imports) is
+      # caught in CI instead of crashing in the field. NOTE: QEMU emulates a
+      # CPU newer than ARMv8.0, so this is a gross-breakage gate only; the
+      # authoritative ARMv8.0 check is the manual smoke test on a Raspberry Pi
+      # 4 (see issue #25).
+      - name: Build arm64 smoke-test image
+        uses: docker/bake-action@v5
+        with:
+          workdir: ./software/containers/telescope_api
+          targets: image-smoke
+          files: |
+            ./docker-bake.hcl
+        env:
+          GIT_COMMIT: ${{ github.sha }}
+
+      - name: Smoke test arm64 image (issue #25)
+        run: |
+          docker run --rm --platform linux/arm64 telescope-api:smoke \
+            python -X faulthandler -c "import gc, ensurepip, pydantic.fields, fastapi, app.main; [gc.collect() for _ in range(20)]; print('smoke ok')"
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7

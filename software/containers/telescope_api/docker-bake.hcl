@@ -54,6 +54,18 @@ target "image-cross" {
   cache-to = ["type=gha,mode=max"]
 }
 
+# Single-platform arm64 build loaded into the local daemon for the pre-publish
+# smoke test (issue #25): runs the image under QEMU and exercises the runtime
+# (stdlib + pydantic/fastapi imports, forced GC) before anything is pushed.
+target "image-smoke" {
+  inherits = ["image"]
+  tags = ["telescope-api:smoke"]
+  platforms = ["linux/arm64"]
+  output = ["type=docker"]
+  cache-from = ["type=gha"]
+  cache-to = ["type=gha,mode=max"]
+}
+
 target "test" {
   inherits = ["image"]
   target = "test-builder"
