@@ -112,6 +112,19 @@ This will launch a local-mode telescope:
 * Connect to http://localhost:80 to see the web interface.
 
 
+## Step 4b. Run a local development environment (no telescope hardware)
+
+`docker-compose-dev.yml` builds the telescope API from the local source in `containers/telescope_api` and runs it without SPI hardware, so it works on a desktop for API development and testing.
+
+```bash
+    docker compose -f docker-compose-dev.yml up --build
+```
+
+* API docs at http://localhost:8000/docs (login: `admin` / `password`)
+* Web UI at http://localhost:8080
+* Uses the repo's `telescope_config.json` and `calibrated_antenna_positions.json`, with the API source live-mounted for development
+* Stop with `docker compose -f docker-compose-dev.yml down -v`
+
 ## Step 5. Connect to cloud
 
 Now copy docker-compose-telescope.yml -> compose.yml
