@@ -6,8 +6,9 @@ This module creates the FastAPI application and includes all routers.
 
 import logging
 from contextlib import asynccontextmanager
+from typing import Annotated, Any
 
-from fastapi import FastAPI, Request, Response, status
+from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -17,6 +18,7 @@ from database import init_database
 from services import cleanup_telescope_service, init_telescope_service
 
 from .config import init_config
+from .dependencies import get_runtime_config
 from .routers import (
     acquisition,
     auth,
@@ -103,12 +105,22 @@ async def root():
 
 
 @app.get("/health")
-async def health_check(response: Response):
+async def health_check(
+    request: Request,
+    response: Response,
+    config: Annotated[Any, Depends(get_runtime_config)],
+):
     """Health check endpoint with telescope service status.
 
     Returns 503 when the telescope service is not running or an error
-    occurred while checking it.
+    occurred while checking it. Configuration degradations (e.g. a corrupted
+    antenna positions file) are reported in degraded_reasons.
     """
+    degraded_reasons = []
+
+    if config is not None and config.get("antenna_positions_error"):
+        degraded_reasons.append(f"antenna positions: {config['antenna_positions_error']}")
+
     try:
         from services import get_telescope_service
 
@@ -120,10 +132,13 @@ async def health_check(response: Response):
         if not service_running:
             response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
 
-        return {
-            "status": "healthy" if service_running else "degraded",
+        result = {
+            "status": "healthy" if service_running and not degraded_reasons else "degraded",
             "telescope_service": telescope_status,
         }
+        if degraded_reasons:
+            result["degraded_reasons"] = degraded_reasons
+        return result
     except Exception as e:
         logging.exception("Health check failed")
         return JSONResponse(
@@ -132,6 +147,7 @@ async def health_check(response: Response):
                 "status": "degraded",
                 "telescope_service": {"error": str(e)},
                 "message": "Telescope service not available",
+                "degraded_reasons": degraded_reasons,
             },
         )
 

@@ -17,6 +17,7 @@ from generated_models.calibration_models import (
 )
 from generated_models.common_models import EmptyResponse
 
+from ..config import validate_antenna_positions
 from ..dependencies import AuthDep, ConfigDep
 
 router = APIRouter()
@@ -39,7 +40,11 @@ async def set_gain(
     return EmptyResponse()
 
 
-@router.post("/antenna_positions", response_model=EmptyResponse)
+@router.post(
+    "/antenna_positions",
+    response_model=EmptyResponse,
+    responses={422: {"description": "Invalid antenna positions format"}},
+)
 async def set_calibration_antenna_positions(
     antenna_positions: SetAntennaPositionsRequest | list[list[float]],
     config: ConfigDep,
@@ -51,6 +56,7 @@ async def set_calibration_antenna_positions(
     This endpoint reuses the existing Flask logic for antenna position calibration.
     Supports both new format: {"antenna_positions": [...]} and legacy format: [[1,2,3],[4,5,6],...].
     Requires JWT authentication.
+    Invalid element shapes are rejected with 422.
     """
     # Handle both formats: new structured format and legacy array format
     if isinstance(antenna_positions, SetAntennaPositionsRequest):
@@ -62,7 +68,14 @@ async def set_calibration_antenna_positions(
     else:
         raise HTTPException(status_code=422, detail="Invalid antenna positions format")
 
+    # Validate element shapes so a bad request cannot poison the runtime config
+    try:
+        validate_antenna_positions(raw_positions)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from None
+
     config["antenna_positions"] = raw_positions
+    config["antenna_positions_error"] = None
     return EmptyResponse()
 
 

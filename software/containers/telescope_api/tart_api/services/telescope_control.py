@@ -165,6 +165,11 @@ class TelescopeControlService:
                 ]
                 for field in api_updatable_fields:
                     if field in shared_config:
+                        # Never propagate a None antenna_positions (corrupted
+                        # calibration file at startup); valid values set via
+                        # the API are still copied below.
+                        if field == "antenna_positions" and shared_config[field] is None:
+                            continue
                         tart_control.config[field] = shared_config[field]
 
                 # Update state machine

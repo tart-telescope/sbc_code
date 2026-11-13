@@ -775,6 +775,50 @@ class TARTAPITestClient:
         )
         assert response.status_code == 200
 
+    def test_antenna_positions_validation(self):
+        """Test that malformed antenna positions are rejected with 422."""
+        # New format with wrong element shape (2 instead of 3 components)
+        self.authenticate()
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions",
+            json={"antenna_positions": [[1.0, 2.0], [3.0, 4.0]]},
+            headers=self.headers,
+        )
+        assert response.status_code == 422
+
+        # Legacy format with wrong element shape
+        self.authenticate()
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions",
+            json=[[1.0, 2.0], [3.0, 4.0]],
+            headers=self.headers,
+        )
+        assert response.status_code == 422
+
+        # Empty positions list
+        self.authenticate()
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions",
+            json={"antenna_positions": []},
+            headers=self.headers,
+        )
+        assert response.status_code == 422
+
+        # Error response should name the problem
+        assert "detail" in response.json()
+
+        # Valid positions remain accepted (originals from the GET endpoint)
+        original_positions = requests.get(
+            f"{self.base_url}/imaging/antenna_positions"
+        ).json()
+        self.authenticate()
+        response = requests.post(
+            f"{self.base_url}/calibration/antenna_positions",
+            json=original_positions,
+            headers=self.headers,
+        )
+        assert response.status_code == 200
+
     def test_antenna_positions_formats(self):
         """Test that both new and legacy antenna positions formats are accepted."""
         # Get original positions
@@ -899,6 +943,10 @@ def test_antenna_management(api_client):
 
 def test_antenna_positions_persistence(api_client):
     api_client.test_antenna_positions_persistence()
+
+
+def test_antenna_positions_validation(api_client):
+    api_client.test_antenna_positions_validation()
 
 
 def test_antenna_positions_formats(api_client):

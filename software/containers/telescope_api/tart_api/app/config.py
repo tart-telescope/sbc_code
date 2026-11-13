@@ -32,6 +32,26 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
+def validate_antenna_positions(positions: Any) -> None:
+    """
+    Validate antenna positions shape: a non-empty list of [e, n, u] number triples.
+
+    Raises ValueError with a descriptive message when the shape is invalid.
+    """
+    if not isinstance(positions, list) or not positions:
+        raise ValueError("antenna positions must be a non-empty list of [e, n, u] triples")
+    for idx, pos in enumerate(positions):
+        if not isinstance(pos, list) or len(pos) != 3:
+            raise ValueError(
+                f"antenna position {idx} must be an [e, n, u] triple, got {pos!r}"
+            )
+        for value in pos:
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError(
+                    f"antenna position {idx} must contain numbers, got {pos!r}"
+                )
+
+
 def create_runtime_config() -> Any:
     """
     Create runtime configuration compatible with existing Flask config.
@@ -111,11 +131,20 @@ def create_runtime_config() -> Any:
             "alt": 100.0,
         }
 
-    # Load antenna positions - fail hard if file doesn't exist (like Flask app)
+    # Load antenna positions. On failure, record the error and continue with
+    # antenna_positions=None so the API stays up and can report a sensible
+    # error, and POST /calibration/antenna_positions remains available as a
+    # remote recovery path.
     antenna_positions_path = os.path.join(config_root, "calibrated_antenna_positions.json")
-    with open(antenna_positions_path) as a_c:
-        config_dict["antenna_positions"] = json.load(a_c)
-        a_c.close()
+    config_dict["antenna_positions"] = None
+    config_dict["antenna_positions_error"] = None
+    try:
+        with open(antenna_positions_path) as a_c:
+            positions = json.load(a_c)
+        validate_antenna_positions(positions)
+        config_dict["antenna_positions"] = positions
+    except (OSError, json.JSONDecodeError, ValueError) as e:
+        config_dict["antenna_positions_error"] = f"{antenna_positions_path}: {e}"
 
     config_dict["calibration_dir"] = f"/{config_root}/"
     config_dict["realtime_image_path"] = f"{data_root}/assets/img/image.png"

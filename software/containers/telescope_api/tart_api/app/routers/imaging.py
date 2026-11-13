@@ -58,14 +58,25 @@ async def get_latest_vis(config: ConfigDep):
     return VisibilityResponse(**ret)
 
 
-@router.get("/antenna_positions", response_model=AntennaPositionsResponse)
+@router.get(
+    "/antenna_positions",
+    response_model=AntennaPositionsResponse,
+    responses={503: {"description": "Antenna positions unavailable (corrupted or missing calibration file)"}},
+)
 async def get_imaging_antenna_positions(config: ConfigDep):
     """
     Get antenna positions.
 
     This endpoint reuses the existing Flask logic for antenna position reporting.
+    Returns 503 when antenna positions could not be loaded from
+    calibrated_antenna_positions.json (see the error detail).
     """
     positions = config["antenna_positions"]
+    if positions is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Antenna positions unavailable: {config.get('antenna_positions_error')}",
+        )
     # Map raw positions to response model format
     response_items = [AntennaPositionsResponseItem(root=pos) for pos in positions]
     return AntennaPositionsResponse(root=response_items)

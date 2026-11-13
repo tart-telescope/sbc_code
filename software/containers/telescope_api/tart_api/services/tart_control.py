@@ -180,23 +180,29 @@ class TartControl:
                 if len(self.vislist) >= chunksize:
                     logging.info(f"reached chunksize of {chunksize}")
                     if self.config["vis"]["save"] == 1:
-                        fname = "{}/vis_{}.hdf".format(
-                            self.config["vis"]["base_path"],
-                            vis.timestamp.strftime("%Y-%m-%d_%H_%M_%S.%f"),
-                        )
+                        ant_pos = self.config.get("antenna_positions")
+                        if ant_pos is None:
+                            logging.error(
+                                "Skipping vis save: antenna positions unavailable (%s)",
+                                self.config.get("antenna_positions_error"),
+                            )
+                        else:
+                            fname = "{}/vis_{}.hdf".format(
+                                self.config["vis"]["base_path"],
+                                vis.timestamp.strftime("%Y-%m-%d_%H_%M_%S.%f"),
+                            )
 
-                        # Get the gains and phases and save them with the visibilities
-                        rows_dict = db.get_gain()
-                        gain = [rows_dict[i][2] for i in range(24)]
-                        phases = [rows_dict[i][3] for i in range(24)]
+                            # Get the gains and phases and save them with the visibilities
+                            rows_dict = db.get_gain()
+                            gain = [rows_dict[i][2] for i in range(24)]
+                            phases = [rows_dict[i][3] for i in range(24)]
 
-                        ant_pos = self.config["antenna_positions"]
-                        save_vis_list(self.vislist, ant_pos, gain, phases, fname)
+                            save_vis_list(self.vislist, ant_pos, gain, phases, fname)
 
-                        logging.info(f"saved to {vis}")
-                        ret["filename"] = fname
-                        ret["sha256"] = sha256_checksum(fname)
-                    self.vislist = []
+                            logging.info(f"saved to {vis}")
+                            ret["filename"] = fname
+                            ret["sha256"] = sha256_checksum(fname)
+                        self.vislist = []
         return ret
 
     def vis_stream_finish(self):
