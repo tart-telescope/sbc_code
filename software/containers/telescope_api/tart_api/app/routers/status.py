@@ -7,7 +7,7 @@ Flask status logic while providing FastAPI-compatible responses.
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from tart.util import utc
 
 from database import AsyncDatabase, get_database
@@ -103,7 +103,14 @@ async def get_status_channel_all(
         return StatusChannelAllResponse([])
 
 
-@router.get("/channel/{channel_idx}", response_model=StatusChannelSingleResponse)
+@router.get(
+    "/channel/{channel_idx}",
+    response_model=StatusChannelSingleResponse,
+    responses={
+        404: {"description": "Channel not found"},
+        503: {"description": "Channel status not available (telescope service not ready)"},
+    },
+)
 async def get_status_channel_i(
     channel_idx: int,
     config: ConfigDep,
@@ -113,33 +120,30 @@ async def get_status_channel_i(
     Get specific channel status information.
 
     This endpoint reuses the existing Flask logic for individual channel status.
+    Returns 404 if the channel index is out of range, or 503 if channel
+    status has not been published by the telescope service yet.
     """
-    if "channels" in config:
-        if 0 <= channel_idx < 24:
-            channel_list = await db.get_manual_channel_status()
-            ret = dict(config["channels"][channel_idx])
+    if "channels" not in config:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Channel status not available (telescope service not ready)",
+        )
 
-            # Find corresponding channel in database
-            db_channel = next(
-                (c for c in channel_list if c["channel_id"] == channel_idx),
-                {"enabled": True},
-            )
-            ret["enabled"] = db_channel["enabled"]
+    num_ant = config["telescope_config"]["num_antenna"]
+    if not 0 <= channel_idx < num_ant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Channel {channel_idx} not found (telescope has {num_ant} channels)",
+        )
 
-            return StatusChannelSingleResponse(**ret)
+    channel_list = await db.get_manual_channel_status()
+    ret = dict(config["channels"][channel_idx])
 
-    # Return empty channel response when channel not found
-    return StatusChannelSingleResponse(
-        id=channel_idx,
-        enabled=0,
-        phase={
-            "N_samples": 0,
-            "measured": 0.0,
-            "ok": 0,
-            "stability": 0.0,
-            "threshold": 0.0,
-        },
-        radio_mean={"mean": 0.0, "ok": 0, "threshold": 0.0},
-        freq=[],
-        power=[],
+    # Find corresponding channel in database
+    db_channel = next(
+        (c for c in channel_list if c["channel_id"] == channel_idx),
+        {"enabled": True},
     )
+    ret["enabled"] = db_channel["enabled"]
+
+    return StatusChannelSingleResponse(**ret)

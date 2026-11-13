@@ -179,12 +179,16 @@ class TARTAPITestClient:
     def test_health_check(self):
         """Test health check endpoint."""
         response = requests.get(f"{self.base_url}/health")
-        assert response.status_code == 200
+        assert response.status_code in [200, 503]
 
         data = response.json()
         assert data["status"] in ["healthy", "degraded"]
         assert "telescope_service" in data
-        assert data["telescope_service"]["service_running"] is True
+
+        if response.status_code == 200:
+            assert data["telescope_service"]["service_running"] is True
+        else:
+            assert data["telescope_service"]["service_running"] is False
 
     def test_root_endpoint(self):
         """Test root endpoint."""
@@ -495,13 +499,16 @@ class TARTAPITestClient:
 
     def test_imaging_endpoints(self):
         """Test imaging endpoints."""
-        # Test get latest visibilities
+        # Test get latest visibilities - may return 404 if no data available yet
         response = requests.get(f"{self.base_url}/imaging/vis")
-        assert response.status_code == 200
+        assert response.status_code in [200, 404]
 
-        # Response might be empty if no data available, but should not error
-        data = response.json()
-        # The response structure depends on whether vis_current is available
+        if response.status_code == 200:
+            # Response structure depends on whether vis_current is available
+            response.json()
+        else:
+            error_data = response.json()
+            assert "detail" in error_data
 
         # Test antenna positions
         response = requests.get(f"{self.base_url}/imaging/antenna_positions")
@@ -615,21 +622,31 @@ class TARTAPITestClient:
         response = requests.post(f"{self.base_url}/mode/invalid_mode", headers=self.headers)
         assert response.status_code == 422  # Validation error
 
-        # Test invalid channel
+        # Test invalid channel index
         self.authenticate()
         response = requests.put(f"{self.base_url}/channel/999/1", headers=self.headers)
-        assert response.status_code in [
-            200,
-            400,
-            404,
-            422,
-        ]  # 200 might be returned for invalid channels
+        assert response.status_code == 404
+
+        # Test invalid enable value
+        self.authenticate()
+        response = requests.put(f"{self.base_url}/channel/0/5", headers=self.headers)
+        assert response.status_code == 422  # Path parameter validation
 
         # Test invalid sample exponent
+        self.authenticate()
         response = requests.put(
             f"{self.base_url}/acquire/raw/num_samples_exp/999", headers=self.headers
         )
-        assert response.status_code == 200  # Should be silently ignored based on logic
+        assert response.status_code == 400
+
+        # Test sync_acquire_at_seconds with no valid values
+        self.authenticate()
+        response = requests.put(
+            f"{self.base_url}/acquire/raw/sync_acquire_at_seconds",
+            headers=self.headers,
+            json=[-1, 60, 100],
+        )
+        assert response.status_code == 400
 
         # Test nonexistent endpoint
         response = requests.get(f"{self.base_url}/nonexistent")

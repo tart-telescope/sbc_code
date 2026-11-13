@@ -7,7 +7,7 @@ Flask acquisition logic while providing FastAPI-compatible responses.
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from database import AsyncDatabase, get_database
 from generated_models.acquisition_models import (
@@ -52,35 +52,53 @@ async def set_vis_save_flag(flag: int, config: ConfigDep, _: AuthDep):
     return SaveFlagResponse(save=config["vis"]["save"])
 
 
-@router.put("/raw/num_samples_exp/{exp}", response_model=SampleExponentResponse)
+@router.put(
+    "/raw/num_samples_exp/{exp}",
+    response_model=SampleExponentResponse,
+    responses={400: {"description": "Exponent out of range"}},
+)
 async def set_raw_num_samples_exp(exp: int, config: ConfigDep, _: AuthDep):
     """
     Set exponent for number of samples for raw data acquisition (2**exp).
 
     This endpoint reuses the existing Flask logic for raw data sample configuration.
     Requires JWT authentication.
+    Returns 400 if the exponent is outside the range 16-24.
     """
-    if 16 <= exp <= 24:
-        # For managed dict, we need to update nested dict properly
-        raw_config = config["raw"]
-        raw_config["N_samples_exp"] = exp
-        config["raw"] = raw_config
+    if not 16 <= exp <= 24:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Sample exponent must be between 16 and 24, got {exp}",
+        )
+    # For managed dict, we need to update nested dict properly
+    raw_config = config["raw"]
+    raw_config["N_samples_exp"] = exp
+    config["raw"] = raw_config
     return SampleExponentResponse(N_samples_exp=config["raw"]["N_samples_exp"])
 
 
-@router.put("/vis/num_samples_exp/{exp}", response_model=SampleExponentResponse)
+@router.put(
+    "/vis/num_samples_exp/{exp}",
+    response_model=SampleExponentResponse,
+    responses={400: {"description": "Exponent out of range"}},
+)
 async def set_vis_num_samples_exp(exp: int, config: ConfigDep, _: AuthDep):
     """
     Set exponent for number of samples for visibility data acquisition (2**exp).
 
     This endpoint reuses the existing Flask logic for visibility data sample configuration.
     Requires JWT authentication.
+    Returns 400 if the exponent is outside the range 16-24.
     """
-    if 16 <= exp <= 24:
-        # For managed dict, we need to update nested dict properly
-        vis_config = config["vis"]
-        vis_config["N_samples_exp"] = exp
-        config["vis"] = vis_config
+    if not 16 <= exp <= 24:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Sample exponent must be between 16 and 24, got {exp}",
+        )
+    # For managed dict, we need to update nested dict properly
+    vis_config = config["vis"]
+    vis_config["N_samples_exp"] = exp
+    config["vis"] = vis_config
     return SampleExponentResponse(N_samples_exp=config["vis"]["N_samples_exp"])
 
 
@@ -151,7 +169,11 @@ async def get_raw_sync(config: ConfigDep):
     return SyncResponse(sync=config["raw"].get("sync", 0))
 
 
-@router.put("/raw/sync_acquire_at_seconds", response_model=SyncAcquireAtSecondsResponse)
+@router.put(
+    "/raw/sync_acquire_at_seconds",
+    response_model=SyncAcquireAtSecondsResponse,
+    responses={400: {"description": "No valid seconds provided"}},
+)
 async def set_raw_sync_acquire_at_seconds(
     seconds: list[int], config: ConfigDep, _: AuthDep, db: Annotated[AsyncDatabase, Depends(get_database)]
 ):
@@ -164,14 +186,19 @@ async def set_raw_sync_acquire_at_seconds(
     Example: [0, 10, 20, 30, 40, 50] means acquisition can begin at
     :00, :10, :20, :30, :40, or :50 of any minute.
     Requires JWT authentication.
+    Out-of-range values are ignored; returns 400 if no valid seconds remain.
     """
     # Validate all values are in range 0-59
     validated = sorted(set(s for s in seconds if 0 <= s <= 59))
-    if validated:
-        raw_config = config["raw"]
-        raw_config["sync_acquire_at_seconds"] = validated
-        config["raw"] = raw_config
-        await db.set_setting("raw.sync_acquire_at_seconds", validated)
+    if not validated:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No valid seconds in range 0-59 provided",
+        )
+    raw_config = config["raw"]
+    raw_config["sync_acquire_at_seconds"] = validated
+    config["raw"] = raw_config
+    await db.set_setting("raw.sync_acquire_at_seconds", validated)
     return SyncAcquireAtSecondsResponse(sync_acquire_at_seconds=config["raw"].get("sync_acquire_at_seconds", [0, 10, 20, 30, 40, 50]))
 
 

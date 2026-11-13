@@ -4,10 +4,14 @@ FastAPI main application entry point for TART telescope web API.
 This module creates the FastAPI application and includes all routers.
 """
 
+import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from database import init_database
 from services import cleanup_telescope_service, init_telescope_service
@@ -99,8 +103,12 @@ async def root():
 
 
 @app.get("/health")
-async def health_check():
-    """Health check endpoint with telescope service status."""
+async def health_check(response: Response):
+    """Health check endpoint with telescope service status.
+
+    Returns 503 when the telescope service is not running or an error
+    occurred while checking it.
+    """
     try:
         from services import get_telescope_service
 
@@ -108,14 +116,35 @@ async def health_check():
         telescope_status = service.get_status()
 
         # Overall health is healthy if service is running
-        overall_status = (
-            "healthy" if telescope_status["service_running"] else "degraded"
+        service_running = telescope_status["service_running"]
+        if not service_running:
+            response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
+        return {
+            "status": "healthy" if service_running else "degraded",
+            "telescope_service": telescope_status,
+        }
+    except Exception as e:
+        logging.exception("Health check failed")
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "status": "degraded",
+                "telescope_service": {"error": str(e)},
+                "message": "Telescope service not available",
+            },
         )
 
-        return {"status": overall_status, "telescope_service": telescope_status}
-    except Exception as e:
-        return {
-            "status": "degraded",
-            "telescope_service": {"error": str(e)},
-            "message": "Telescope service not available",
-        }
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """Return a consistent JSON error for unexpected server errors."""
+    # Let FastAPI handle its own HTTPException and validation errors
+    if isinstance(exc, (StarletteHTTPException, RequestValidationError)):
+        raise exc
+
+    logging.exception("Unhandled error processing %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error"},
+    )
