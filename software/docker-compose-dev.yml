@@ -1,7 +1,7 @@
 ### Local development / testing environment for the TART telescope API.
 #
-# Builds the API from local source (no prebuilt image) and runs without
-# telescope hardware (SPI), so it works on a desktop. The repo's
+# Builds the API and the web UI from local source (no prebuilt images) and
+# runs without telescope hardware (SPI), so it works on a desktop. The repo's
 # telescope_config.json and calibrated_antenna_positions.json are mounted
 # into the container.
 #
@@ -37,7 +37,20 @@ services:
       - tart-network
 
   ui:
-    image: ghcr.io/tart-telescope/web_app/viewer-root:main
+    # Serves a viewer built from the sibling web_app checkout, so web-interface
+    # changes show up in this environment (`docker compose -f
+    # docker-compose-dev.yml up --build`). Set VIEWER_IMAGE to serve a
+    # published image instead:
+    #   VIEWER_IMAGE=ghcr.io/tart-telescope/web_app/viewer-root:main \
+    #     docker compose -f docker-compose-dev.yml up
+    image: ${VIEWER_IMAGE:-tart-viewer:local}
+    build:
+      context: ../../web_app
+      dockerfile: Dockerfile
+      args:
+        BASE_URL: ""
+        CI_COMMIT_SHA: dev-local
+        CI_PROJECT_NAME: viewer
     volumes:
       - ./containers/telescope_api/nginx.conf:/etc/nginx/nginx.conf:ro
       - telescope_data:/telescope_data:ro

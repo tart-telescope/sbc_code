@@ -123,6 +123,7 @@ This will launch a local-mode telescope:
 * API docs at http://localhost:8000/docs (login: `admin` / `password`)
 * Web UI at http://localhost:8080
 * Uses the repo's `telescope_config.json` and `calibrated_antenna_positions.json`, with the API source live-mounted for development
+* The web UI is built from the sibling `web_app` checkout (tagged `tart-viewer:local`); set `VIEWER_IMAGE=<image>` to serve a published viewer image instead (see `DEVELOPMENT.md`)
 * Stop with `docker compose -f docker-compose-dev.yml down -v`
 
 ## Step 5. Connect to cloud
